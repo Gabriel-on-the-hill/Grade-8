@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module Template — [GRADE] Hub</title>
+<style>
+:root{
+  --pitch-green:#14532D; --gold:#FAC415; --navy:#0F172A; --bg:#F5F4EE; --card:#FFFFFF; --muted:#64748B;
+  --green-light:#E7F0EA; --gold-light:#FEF3C7; --border:#E5E7EB; --teach-bg:#F0F7F3; --teach-accent:#0F3D22;
+  --ok:#15803D; --ok-bg:#DCFCE7; --bad:#DC2626; --bad-bg:#FEE2E2; --blue:#1D4ED8; --orange:#B45309; --purple:#6D28D9;
+}
+.math{font-family:"Cambria Math","Times New Roman",Georgia,serif;font-style:italic;white-space:nowrap}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--navy);line-height:1.55}
+header.mod{background:var(--pitch-green);color:#fff;padding:1.3rem 1.5rem;border-bottom:5px solid var(--gold)}
+header.mod h1{margin:0 0 .2rem;font-size:1.5rem;font-weight:600;letter-spacing:-.01em}
+header.mod p{margin:0;opacity:.85;font-size:.92rem}
+#g7bar{background:#fff;border-bottom:1px solid var(--border);padding:.5rem 1rem;font-size:.86rem;color:var(--muted);display:flex;align-items:center;gap:.6rem}
+#g7bar a{color:var(--pitch-green);text-decoration:none;font-weight:600}
+nav.topics{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--border);padding:.55rem 1rem;z-index:50;box-shadow:0 1px 3px rgba(0,0,0,.04);overflow-x:auto;white-space:nowrap}
+nav.topics a{display:inline-block;padding:.35rem .8rem;margin-right:.3rem;color:var(--pitch-green);text-decoration:none;border-radius:6px;font-weight:500;font-size:.86rem;border:1px solid transparent}
+nav.topics a:hover{background:var(--green-light)} nav.topics a.active{background:var(--pitch-green);color:#fff}
+main{max-width:1000px;margin:0 auto;padding:1.3rem 1rem 4rem}
+section.topic{margin-top:2.2rem;scroll-margin-top:80px}
+section.topic > h2{color:var(--pitch-green);font-size:1.45rem;margin:0 0 .3rem;padding-bottom:.35rem;border-bottom:3px solid var(--gold);display:inline-block;padding-right:1rem}
+section.topic > p.intro{margin:.4rem 0 .5rem;color:var(--muted);font-size:.95rem}
+.objective{margin:.1rem 0 1.1rem;font-size:.88rem;color:var(--teach-accent);background:var(--teach-bg);border-left:3px solid var(--pitch-green);padding:.45rem .7rem;border-radius:5px}
+.tcard{background:var(--teach-bg);border:1px solid #C5D8CB;border-left:5px solid var(--pitch-green);border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem}
+.tcard h3{margin:0 0 .55rem;color:var(--teach-accent);font-size:1.04rem}
+.tcard p{margin:.45rem 0} .tcard ul,.tcard ol{margin:.4rem 0;padding-left:1.4rem}
+.worked{background:#fff;border:1px dashed #B7CBBE;border-radius:8px;padding:.6rem .8rem;margin:.5rem 0;font-size:.9rem}
+.worked .wl{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--pitch-green)}
+.qcard{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem;border-left:5px solid var(--gold);box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.qhead{display:flex;align-items:center;flex-wrap:wrap;gap:.5rem;margin-bottom:.55rem}
+.qtag{color:#fff;font-size:.7rem;font-weight:600;padding:.18rem .55rem;border-radius:4px;letter-spacing:.02em;background:var(--pitch-green)}
+.qtag.learn{background:#14532D}.qtag.guided{background:#0F766E}.qtag.practice{background:#1D4ED8}.qtag.apply{background:#15803D}.qtag.exam{background:#B45309}.qtag.stretch{background:#6D28D9}
+.qtitle{font-weight:600;color:var(--pitch-green);font-size:1rem;margin-left:auto}
+.qbody{font-size:.95rem} .qbody p{margin:.45rem 0}
+.step{margin:.65rem 0;padding:.65rem .85rem;background:#FBFBF7;border:1px solid #E8E4D2;border-radius:6px;transition:.3s}
+.step.locked{opacity:.35;pointer-events:none;background:#F5F4EE}
+.step.completed{background:#F0FAF3;border-color:#A7D8B6}
+.step .step-label{font-size:.76rem;font-weight:600;color:var(--pitch-green);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.25rem}
+.step p{margin:.3rem 0}
+.input-row{display:inline-flex;align-items:center;gap:.4rem;margin:.2rem .8rem .2rem 0}
+.input-row .lbl{font-size:.92rem}
+.ans-input{border:2px solid var(--border);padding:.3rem .5rem;border-radius:5px;font-size:.92rem;width:96px;font-family:inherit;background:#fff;transition:.2s}
+.ans-input.wide{width:170px}
+.ans-input:focus{outline:none;border-color:var(--pitch-green)}
+.ans-input.correct{border-color:var(--ok);background:var(--ok-bg)} .ans-input.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.feedback{display:inline-block;font-size:.95rem;font-weight:700;min-width:16px}
+.feedback.correct{color:var(--ok)} .feedback.wrong{color:var(--bad)}
+.check-btn{background:var(--pitch-green);color:#fff;border:none;padding:.38rem .85rem;border-radius:6px;cursor:pointer;font-size:.84rem;font-weight:500;margin-top:.5rem;font-family:inherit;transition:.15s}
+.check-btn:hover{background:#0F3D22} .check-btn.done{background:var(--ok)} .check-btn.done::before{content:'\2713 '}
+.hint-btn{background:transparent;color:var(--muted);border:1px solid var(--border);padding:.28rem .7rem;border-radius:6px;cursor:pointer;font-size:.78rem;margin-left:.4rem;font-family:inherit}
+.hint-btn:hover{color:var(--pitch-green);border-color:var(--pitch-green)}
+.hint-content{display:none;font-size:.85rem;color:var(--muted);font-style:italic;margin-top:.4rem;padding:.4rem .6rem;background:#fff;border-left:3px solid #94A3B8;border-radius:3px}
+.hint-content.show{display:block}
+.mc-group{display:flex;flex-wrap:wrap;gap:.45rem;margin:.4rem 0}
+.mc-option{background:#fff;border:2px solid var(--border);padding:.45rem .9rem;border-radius:6px;cursor:pointer;font-size:.88rem;font-family:inherit;transition:.2s;text-align:left}
+.mc-option:hover{border-color:var(--pitch-green);background:var(--green-light)}
+.mc-option.correct{background:var(--ok-bg);border-color:var(--ok);color:var(--ok);font-weight:600}
+.mc-option.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad);font-weight:600}
+.mc-option.disabled{pointer-events:none;opacity:.55} .mc-option.disabled.correct,.mc-option.disabled.wrong{opacity:1}
+.mc-feedback{margin-top:.4rem;font-size:.86rem;font-weight:500;min-height:1.1em}
+.mc-feedback.correct{color:var(--ok)} .mc-feedback.wrong{color:var(--bad)}
+.ms-group{display:flex;flex-direction:column;gap:.4rem;margin:.4rem 0}
+.ms-option{display:flex;align-items:center;gap:.55rem;background:#fff;border:2px solid var(--border);padding:.45rem .8rem;border-radius:7px;cursor:pointer;font-size:.9rem;font-family:inherit;text-align:left}
+.ms-option .box{width:18px;height:18px;border:2px solid #9aa5b1;border-radius:4px;flex:none;display:grid;place-items:center;font-size:.78rem;color:#fff;font-weight:700}
+.ms-option.sel{border-color:var(--pitch-green);background:var(--green-light)}
+.ms-option.sel .box{background:var(--pitch-green);border-color:var(--pitch-green)} .ms-option.sel .box::after{content:'\2713'}
+.ms-option.correct{border-color:var(--ok);background:var(--ok-bg)} .ms-option.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.ms-option.disabled{pointer-events:none;opacity:.8}
+.cr-area{width:100%;min-height:84px;border:2px solid var(--border);border-radius:8px;padding:.55rem;font:inherit;font-size:.92rem;resize:vertical;background:#fff}
+.cr-area:focus{outline:none;border-color:var(--pitch-green)}
+.cr-saved{color:var(--ok);font-size:.84rem;font-weight:600;margin-top:.3rem}
+table.gtable{border-collapse:collapse;margin:.65rem 0;font-size:.88rem}
+table.gtable th,table.gtable td{border:1px solid #B5C5BB;padding:.35rem .65rem;text-align:center}
+table.gtable th{background:var(--pitch-green);color:#fff;font-weight:600} table.gtable td.label{background:var(--green-light);font-weight:600;text-align:left}
+.keyfact{background:var(--gold-light);border-left:4px solid var(--gold);padding:.5rem .8rem;margin:.55rem 0;border-radius:4px;font-size:.92rem}
+.keyfact strong{color:#7C5E11}
+.guide{background:#Eef4ff;border:1px solid #C7D7F5;border-left:5px solid var(--blue);border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem;font-size:.9rem}
+.guide h3{margin:0 0 .5rem;color:var(--blue);font-size:1rem}
+.guide code{background:#fff;border:1px solid #d6e0f5;border-radius:4px;padding:.05rem .3rem;font-size:.85rem}
+.overall-progress{background:#fff;border:1px solid var(--border);border-radius:10px;padding:.85rem 1rem;margin-bottom:1.2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.7rem}
+.op-counts{display:flex;gap:1rem;flex-wrap:wrap} .op-stat{text-align:center}
+.op-stat .num{font-size:1.45rem;font-weight:700;line-height:1} .op-stat .lbl{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.op-stat.done .num{color:var(--ok)} .op-stat.total .num{color:var(--navy)} .op-stat.pct .num{color:var(--pitch-green)}
+.btn-export{background:var(--pitch-green);color:#fff;border:none;padding:.4rem .85rem;border-radius:6px;cursor:pointer;font-size:.83rem;font-weight:500;font-family:inherit}
+.btn-reset-all{background:#fff;color:var(--muted);border:1px solid var(--border);padding:.4rem .85rem;border-radius:6px;cursor:pointer;font-size:.83rem;font-family:inherit}
+.challenge{background:#F3EEFB;border:1px solid #D6C9F0;border-left:5px solid var(--purple);border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem}
+.challenge h3{margin:0 0 .5rem;color:var(--purple);font-size:1.04rem}
+.legend{font-size:.86rem;color:var(--muted);margin:.5rem 0 1rem} .legend strong{color:var(--pitch-green)}
+footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;border-top:1px solid var(--border);margin-top:3rem}
+@media(max-width:640px){main{padding:1rem .75rem 3rem}.qcard,.tcard,.challenge,.guide{padding:.85rem}.qtitle{margin-left:0;width:100%;font-size:.93rem}header.mod h1{font-size:1.25rem}}
+</style>
+</head>
+<body>
+
+<header class="mod">
+  <h1>Module Template</h1>
+  <p>[GRADE] Hub &middot; reusable module skeleton &amp; format showcase</p>
+</header>
+
+<div id="g7bar">
+  <a href="Grade_7_Math_Hub.html">&#8592; Back to Hub</a>
+  <span style="margin-left:auto">Student: <strong id="g7name" style="color:var(--pitch-green)">Guest</strong></span>
+</div>
+
+<nav class="topics" id="topnav">
+  <a href="#guide" class="navlink">Guide</a>
+  <a href="#concept" class="navlink">1 · Concept</a>
+  <a href="#formats" class="navlink">2 · Formats</a>
+  <a href="#check" class="navlink">3 · Module Check</a>
+</nav>
+
+<main>
+  <p class="legend"><strong>How to use:</strong> work top to bottom. Type answers and press <em>Check</em> or Enter. Green = correct, red = retry. Steps unlock as you go. Progress saves automatically.</p>
+
+  <div class="overall-progress">
+    <div class="op-counts">
+      <div class="op-stat done"><div class="num" id="op-done">0</div><div class="lbl">Steps done</div></div>
+      <div class="op-stat total"><div class="num" id="op-total">0</div><div class="lbl">Total</div></div>
+      <div class="op-stat pct"><div class="num" id="op-pct">0%</div><div class="lbl">Mastery</div></div>
+    </div>
+    <div style="display:flex;gap:.5rem">
+      <button class="btn-export" id="btn-export">Export progress</button>
+      <button class="btn-reset-all" id="btn-reset-all">Reset all</button>
+    </div>
+  </div>
+
+  <div class="guide">
+    <h3>Entering your answers</h3>
+    <p>Type each answer the way you would on a computer-based test:</p>
+    <ul>
+      <li><strong>Fractions:</strong> type with a slash, like <code>5/11</code>. Any equal form is accepted (<code>6/9</code> = <code>2/3</code>) &mdash; you'll be nudged to simplify.</li>
+      <li><strong>Exponents:</strong> when a box asks for an exponent, type just that number.</li>
+      <li><strong>Negatives:</strong> include the minus sign, like <code>-5</code>.</li>
+      <li><strong>Whole &amp; decimal numbers:</strong> digits only, no commas &mdash; type <code>53000</code>, not <code>53,000</code>.</li>
+    </ul>
+    <p>On many computer-based tests, a symbol palette builds fractions, exponents and square roots for you. If you're unsure, fill in what you can &mdash; partial answers can still earn credit, and <em>Clear All</em> erases only the blanks.</p>
+  </div>
+
+  <section class="topic" id="guide">
+  <h2>Template guide</h2>
+  <p class="intro">This file is the canonical module skeleton. Every [GRADE] unit is stamped from it for consistency.</p>
+  <div class="guide">
+    <h3>Anatomy of a module (the baseline)</h3>
+    <p>Header (title · unit · standard · objectives) → hub bar → progress → <strong>5–8 sections</strong>, each = an <em>objective</em>, a <em>teach card + worked example</em>, then a climb of questions: <code>Learn → Guided → Practice → Apply → Exam</code> (with hints, step-locking) → <strong>module check</strong> → <strong>make-your-own</strong> challenge → export/reset.</p>
+    <h3>Rules baked in</h3>
+    <ul>
+      <li><strong>Curriculum &cup; MCAP:</strong> teach every required concept; weave real MCAP items on top as <code>Exam</code> capstones (<code>data-exam="1"</code>).</li>
+      <li><strong>Flow:</strong> representation before operations; no advanced concept before its prerequisite.</li>
+      <li><strong>One data contract:</strong> set <code>G7_TOPIC_ID</code>, <code>G7_TOPIC_TITLE</code>, and the concept <code>G7_SKILLS</code> map; everything else is shared with the hub.</li>
+      <li><strong>Best-of curation:</strong> pull the strongest explanation and exercises from the source set — no filler.</li>
+    </ul>
+    <h3>Five question formats (shown live below)</h3>
+    <p>Fill-in (accepts equivalent fractions), single multiple-choice, multi-select (&ldquo;select all&rdquo;), two-part (A unlocks B), and constructed-response (typed, logged to the teacher).</p>
+  </div>
+  </section>
+
+  <section class="topic" id="concept">
+  <h2>1 &middot; Concept</h2>
+  <p class="intro">Each section opens by teaching, then climbs into practice.</p>
+  <p class="objective"><strong>By the end:</strong> you can do the worked skill on your own.</p>
+
+  <div class="tcard">
+    <h3>Teach card + worked example</h3>
+    <p>State the idea simply, then show one fully worked example before asking the student to try.</p>
+    <div class="worked"><div class="wl">Worked example</div>
+      <p><span class="math">1/2 + 1/4</span>: rewrite with a common denominator &rarr; <span class="math">2/4 + 1/4 = 3/4</span>.</p>
+    </div>
+    <div class="keyfact"><strong>Tip:</strong> answers can be entered in any equivalent form; the checker accepts them and nudges to simplify.</div>
+  </div>
+
+  <div class="qcard" data-qid="d1">
+    <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Your turn (fill-in)</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Q1 &middot; <span class="math">1/2 + 1/4</span> = (lowest terms)</div>
+        <div class="input-row"><input type="text" class="ans-input" data-type="text" placeholder="e.g. 5/11" data-answer="3/4"/><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+        <button class="hint-btn">Hint</button>
+        <div class="hint-content">Try <span class="math">6/8</span> too — it's accepted, with a nudge to simplify to <span class="math">3/4</span>.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="d2">
+    <div class="qhead"><span class="qtag guided">Guided</span><span class="qtitle">Single multiple-choice</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Q2 &middot; Which is greater?</div>
+        <div class="mc-group">
+          <button class="mc-option" data-correct="true">-3</button>
+          <button class="mc-option" data-correct="false">-5</button>
+        </div>
+        <div class="mc-feedback">-3 is closer to zero, so it is greater.</div>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <section class="topic" id="formats">
+  <h2>2 &middot; Formats showcase</h2>
+  <p class="intro">The remaining interaction types, all on the same engine.</p>
+  <p class="objective"><strong>By the end:</strong> you can use multi-select, two-part, constructed-response and exam items.</p>
+
+  <div class="qcard" data-qid="d3">
+    <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Multi-select (&ldquo;select all&rdquo;)</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Q3 &middot; Select every expression equal to 12.</div>
+        <div class="ms-group">
+          <button class="ms-option" data-correct="true"><span class="box"></span>3 &times; 4</button>
+          <button class="ms-option" data-correct="true"><span class="box"></span>6 + 6</button>
+          <button class="ms-option" data-correct="false"><span class="box"></span>5 &times; 3</button>
+          <button class="ms-option" data-correct="true"><span class="box"></span>10 + 2</button>
+        </div>
+        <button class="check-btn ms-check">Check</button>
+        <button class="hint-btn">Hint</button>
+        <div class="hint-content">There are three correct choices.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="d4">
+    <div class="qhead"><span class="qtag apply">Apply</span><span class="qtitle">Two-part (A unlocks B)</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Part A &middot; <span class="math">7 &times; 8</span> =</div>
+        <div class="input-row"><input type="number" class="ans-input" data-answer="56" data-tol="0"/><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+      </div>
+      <div class="step locked">
+        <div class="step-label">Part B &middot; use Part A: <span class="math">56 &divide; 8</span> =</div>
+        <div class="input-row"><input type="number" class="ans-input" data-answer="7" data-tol="0"/><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="d5">
+    <div class="qhead"><span class="qtag stretch">Reasoning</span><span class="qtitle">Constructed-response (teacher-reviewed)</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Q5 &middot; Explain, in your own words, why a negative times a negative is positive.</div>
+        <textarea class="cr-area" placeholder="Type your reasoning..."></textarea>
+        <button class="check-btn cr-save">Save response</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="d6" data-exam="1">
+    <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">Exam-grade capstone (tracked separately)</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Q6 &middot; <span class="math">-8 + 3</span> =</div>
+        <div class="input-row"><input type="number" class="ans-input" data-answer="-5" data-tol="0"/><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <section class="topic" id="check">
+  <h2>3 &middot; Module Check — Show What You Know</h2>
+  <p class="intro">Every module ends with a short mixed check spanning its skills.</p>
+  <p class="objective"><strong>By the end:</strong> you can use the unit's skills on your own, without being told which to apply.</p>
+
+  <div class="qcard" data-qid="d7" data-exam="1">
+    <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">Mixed check (example)</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Q7 &middot; <span class="math">-6 &times; (-2)</span> =</div>
+        <div class="input-row"><input type="number" class="ans-input" data-answer="12" data-tol="0"/><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="challenge">
+    <h3>Make your own</h3>
+    <p>Every module closes by handing ownership to the student: invent a problem of your own that uses this unit's skills, solve it, and bring it to your next session. (This is also the natural <strong>homework</strong> anchor — see below.)</p>
+  </div>
+  </section>
+
+  <footer>Module Template &middot; [GRADE] Hub. Duplicate this file, set the topic id/title/skill map, and author sections in the corrected flow.</footer>
+</main>
+<script>
+  // ===== Per-module identity (change these per unit) =====
+  const G7_TOPIC_ID='template-demo';
+  const G7_TOPIC_TITLE='Module Template (Demo)';
+  const G7_SKILLS={'d1':'demo','d2':'demo','d3':'demo','d4':'demo','d5':'reasoning','d6':'demo','d7':'demo'};
+  const G7_SKILL_LABELS={'demo':'Template skill','reasoning':'Reasoning & error analysis',
+    'rationals':'Rational numbers & ordering','numberline':'Number line, opposites & absolute value',
+    'addsub-int':'Adding & subtracting integers','addsub-rat':'Adding & subtracting fractions & decimals',
+    'muldiv':'Multiplying & dividing','decimals':'Decimals: forms & conversions','realworld':'Real-world multi-step problems'};
+
+  // ===== Shared [GRADE] Hub store =====
+  function g7current(){return localStorage.getItem('g7.current')||'Guest';}
+  function g7all(){try{return JSON.parse(localStorage.getItem('g7.data'))||{students:{}};}catch(e){return{students:{}};}}
+  function g7save(o){localStorage.setItem('g7.data',JSON.stringify(o));}
+  function g7topic(o){o.students=o.students||{};var s=g7current();o.students[s]=o.students[s]||{topics:{}};var T=o.students[s].topics;T[G7_TOPIC_ID]=T[G7_TOPIC_ID]||{title:G7_TOPIC_TITLE,tree:{},totalSteps:0,sectionTotals:{},lastPracticed:0,attempts:0,correct:0,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[]};return T[G7_TOPIC_ID];}
+  function g7sectionTotals(){var m={};document.querySelectorAll('.qcard[data-qid]').forEach(function(c){var sec=(c.dataset.qid||'').split('-')[0];m[sec]=(m[sec]||0)+c.querySelectorAll('.step').length;});return m;}
+  function loadData(){return g7topic(g7all()).tree;}
+  function saveData(tree){var o=g7all();var t=g7topic(o);t.tree=tree;t.totalSteps=document.querySelectorAll('.qcard .step').length;t.sectionTotals=g7sectionTotals();t.lastPracticed=Date.now();g7save(o);}
+  function g7sheet(event,question,detail){var url=localStorage.getItem('g7.sheetURL');if(!url)return;try{fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({student:g7current(),topic:G7_TOPIC_TITLE,question:question||'',event:event,detail:detail||'',ts:Date.now()})});}catch(e){}}
+  function g7log(qid,wrong,label,your,exam){var o=g7all();var t=g7topic(o);var sk=G7_SKILLS[qid]||'reasoning';t.skillStats[sk]=t.skillStats[sk]||{attempts:0,misses:0};t.skillStats[sk].attempts++;t.attempts=(t.attempts||0)+1;if(wrong){t.skillStats[sk].misses++;t.struggles.push({qid:qid,label:(label||qid).trim(),skill:sk,skillLabel:G7_SKILL_LABELS[sk],your:your||'',ts:Date.now()});}else{t.correct=(t.correct||0)+1;}if(exam){t.exam=t.exam||{attempts:0,correct:0};t.exam.attempts++;if(!wrong)t.exam.correct++;}t.lastPracticed=Date.now();g7save(o);g7sheet(wrong?'struggle':'step_complete',(label||qid).trim(),wrong?('typed "'+(your||'')+'"'):'');}
+
+  // ===== answer helpers =====
+  function normalizeText(s){s=String(s).toLowerCase().trim();var neg=/^[-–—]/.test(s);s=s.replace(/[\s–—-]+/g,'-').replace(/^-|-$/g,'').replace(/\s+/g,' ');return (neg?'-':'')+s;}
+  function g7fracVal(s){s=String(s).trim().replace(/\s+/g,'');var m=s.match(/^(-?\d+)\/(-?\d+)$/);if(m){var d=parseFloat(m[2]);if(d===0)return null;return parseFloat(m[1])/d;}if(/^-?\d+(?:\.\d+)?$/.test(s))return parseFloat(s);return null;}
+  function g7isLowest(s){var m=String(s).trim().match(/^-?(\d+)\/(\d+)$/);if(!m)return true;var a=parseInt(m[1],10),b=parseInt(m[2],10);function g(x,y){x=Math.abs(x);y=Math.abs(y);while(y){var t=y;y=x%y;x=t;}return x;}return g(a,b)===1;}
+  function checkInput(input){
+    var val=input.value.trim(); if(val==='')return null;
+    var type=input.dataset.type||'numeric'; var correct=false;
+    if(type==='numeric'){var ex=parseFloat(input.dataset.answer),tol=parseFloat(input.dataset.tol||'0.01'),v=parseFloat(val);correct=!isNaN(v)&&Math.abs(v-ex)<=tol;}
+    else{var raw=input.dataset.answer||'';var ans=raw.split('|');correct=ans.map(function(a){return normalizeText(a);}).indexOf(normalizeText(val))>=0;input.dataset.simplify='';
+      if(!correct){var ev=g7fracVal(ans[0]),uv=g7fracVal(val);if(ev!==null&&uv!==null&&Math.abs(ev-uv)<1e-9){correct=true;if(!g7isLowest(val))input.dataset.simplify='1';}}}
+    input.classList.remove('correct','wrong');input.classList.add(correct?'correct':'wrong');
+    var fb=input.parentElement.querySelector('.feedback');if(!fb){var row=input.closest('.input-row, td');if(row)fb=row.querySelector('.feedback');}
+    if(fb){fb.classList.remove('correct','wrong');fb.classList.add(correct?'correct':'wrong');fb.textContent=correct?(input.dataset.simplify==='1'?'✓ simplify':'✓'):'✗';}
+    return correct;
+  }
+  function unlockNext(step){var n=step.nextElementSibling;while(n&&!n.classList.contains('step'))n=n.nextElementSibling;if(n&&n.classList.contains('locked'))n.classList.remove('locked');}
+  function saveStepDone(card,step){var qid=card.dataset.qid;if(!qid)return;var tr=loadData();if(!tr[qid])tr[qid]={steps:{}};var idx=Array.prototype.indexOf.call(card.querySelectorAll('.step'),step);tr[qid].steps[idx]=true;saveData(tr);refreshOverall();}
+
+  document.addEventListener('click',function(e){
+    if(e.target.matches('.check-btn')&&!e.target.classList.contains('ms-check')&&!e.target.classList.contains('cr-save')){
+      var step=e.target.closest('.step');if(!step)return;var inputs=step.querySelectorAll('.ans-input');if(inputs.length===0)return;
+      var all=true;inputs.forEach(function(i){if(checkInput(i)!==true)all=false;});
+      var card=step.closest('.qcard');var qid=card?card.dataset.qid:'';var lbl=(step.querySelector('.step-label')||{}).textContent||'';var exam=card&&card.dataset.exam==='1';
+      if(all){step.classList.add('completed');e.target.classList.add('done');e.target.textContent='Step complete';unlockNext(step);if(card)saveStepDone(card,step);if(!step.dataset.logged){g7log(qid,false,lbl,'',exam);step.dataset.logged='1';}}
+      else{var your=Array.prototype.slice.call(inputs).map(function(i){return i.value;}).filter(function(v){return v!=='';}).join(', ');g7log(qid,true,lbl,your,exam);}
+    }
+    if(e.target.closest('.mc-option')){
+      var opt=e.target.closest('.mc-option');var group=opt.closest('.mc-group');if(!group||group.classList.contains('answered'))return;group.classList.add('answered');
+      var correct=opt.dataset.correct==='true';group.querySelectorAll('.mc-option').forEach(function(b){b.classList.add('disabled');});opt.classList.add(correct?'correct':'wrong');
+      if(!correct){var c=group.querySelector('.mc-option[data-correct="true"]');if(c)c.classList.add('correct');}
+      var fb=group.parentElement.querySelector('.mc-feedback');if(fb){fb.textContent=(correct?'✓ Correct! ':'✗ Not quite. ')+(fb.textContent||'');fb.classList.add(correct?'correct':'wrong');}
+      var mcStep=group.closest('.step');var mcCard=group.closest('.qcard');var mcQid=mcCard?mcCard.dataset.qid:'';var mcLbl=mcStep?((mcStep.querySelector('.step-label')||{}).textContent||''):'';var mcExam=mcCard&&mcCard.dataset.exam==='1';
+      g7log(mcQid,!correct,mcLbl,(opt.textContent||'').trim(),mcExam);
+      if(correct&&mcStep){mcStep.classList.add('completed');unlockNext(mcStep);if(mcCard)saveStepDone(mcCard,mcStep);}
+    }
+    var mso=e.target.closest('.ms-option');
+    if(mso){var g=mso.closest('.ms-group');if(g&&!g.classList.contains('answered'))mso.classList.toggle('sel');return;}
+    if(e.target.matches('.ms-check')){
+      var st=e.target.closest('.step');if(!st)return;var grp=st.querySelector('.ms-group');if(!grp||grp.classList.contains('answered'))return;
+      var opts=Array.prototype.slice.call(grp.querySelectorAll('.ms-option'));if(!opts.some(function(o){return o.classList.contains('sel');}))return;
+      var ok=opts.every(function(o){return (o.dataset.correct==='true')===o.classList.contains('sel');});
+      var card2=st.closest('.qcard');var qid2=card2?card2.dataset.qid:'';var lbl2=(st.querySelector('.step-label')||{}).textContent||'';var exam2=card2&&card2.dataset.exam==='1';
+      if(ok){grp.classList.add('answered');opts.forEach(function(o){o.classList.add('disabled');if(o.dataset.correct==='true')o.classList.add('correct');});st.classList.add('completed');e.target.classList.add('done');e.target.textContent='Correct';unlockNext(st);if(card2)saveStepDone(card2,st);if(!st.dataset.logged){g7log(qid2,false,lbl2,'',exam2);st.dataset.logged='1';}}
+      else{var your2=opts.filter(function(o){return o.classList.contains('sel');}).map(function(o){return (o.textContent||'').trim().slice(0,24);}).join('; ');opts.forEach(function(o){if(o.classList.contains('sel')&&o.dataset.correct!=='true')o.classList.add('wrong');});g7log(qid2,true,lbl2,your2,exam2);setTimeout(function(){opts.forEach(function(o){o.classList.remove('wrong');});},1100);}
+      return;
+    }
+    if(e.target.matches('.cr-save')){
+      var st3=e.target.closest('.step');if(!st3)return;var ta=st3.querySelector('.cr-area');if(!ta||!ta.value.trim())return;
+      var card3=st3.closest('.qcard');var qid3=card3?card3.dataset.qid:'';var lbl3=(st3.querySelector('.step-label')||{}).textContent||'';
+      var o=g7all();var t=g7topic(o);t.responses=t.responses||[];t.responses.push({qid:qid3,label:lbl3.trim(),text:ta.value.trim(),ts:Date.now()});g7save(o);
+      g7sheet('constructed_response',lbl3.trim(),ta.value.trim().slice(0,180));
+      st3.classList.add('completed');e.target.classList.add('done');e.target.textContent='Saved';unlockNext(st3);if(card3)saveStepDone(card3,st3);
+      if(!st3.querySelector('.cr-saved')){var sv=document.createElement('div');sv.className='cr-saved';sv.textContent='Saved — your teacher will review this.';st3.appendChild(sv);}
+      return;
+    }
+    if(e.target.matches('.hint-btn')){var nx=e.target.nextElementSibling;if(nx&&nx.classList.contains('hint-content')){nx.classList.toggle('show');e.target.textContent=nx.classList.contains('show')?'Hide hint':'Hint';}}
+  });
+  document.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.matches('.ans-input')){e.preventDefault();var step=e.target.closest('.step');if(step){var b=step.querySelector('.check-btn');if(b&&!b.classList.contains('ms-check')&&!b.classList.contains('cr-save'))b.click();else checkInput(e.target);}else checkInput(e.target);}});
+
+  function countAllSteps(){return document.querySelectorAll('.qcard .step').length;}
+  function refreshOverall(){var d=loadData(),done=0;document.querySelectorAll('.qcard').forEach(function(c){var q=c.dataset.qid;if(q&&d[q]&&d[q].steps)done+=Object.keys(d[q].steps).filter(function(k){return d[q].steps[k];}).length;});var tot=countAllSteps();document.getElementById('op-done').textContent=done;document.getElementById('op-total').textContent=tot;document.getElementById('op-pct').textContent=(tot?Math.round(done/tot*100):0)+'%';}
+
+  function restoreProgress(){
+    var nm=document.getElementById('g7name');if(nm)nm.textContent=g7current();
+    var d=loadData();var topic=g7topic(g7all());
+    document.querySelectorAll('.qcard').forEach(function(card){
+      var qid=card.dataset.qid;if(!qid||!d[qid]||!d[qid].steps)return;
+      var steps=Array.prototype.slice.call(card.querySelectorAll('.step'));
+      steps.forEach(function(step,idx){
+        if(d[qid].steps[idx]){
+          step.classList.add('completed');step.classList.remove('locked');step.dataset.logged='1';
+          if(idx+1<steps.length)steps[idx+1].classList.remove('locked');
+          var b=step.querySelector('.check-btn');if(b){b.classList.add('done');b.textContent=b.classList.contains('cr-save')?'Saved':'Step complete';}
+          var mc=step.querySelector('.mc-group');if(mc){mc.classList.add('answered');mc.querySelectorAll('.mc-option').forEach(function(o){o.classList.add('disabled');if(o.dataset.correct==='true')o.classList.add('correct');});}
+          var ms=step.querySelector('.ms-group');if(ms){ms.classList.add('answered');ms.querySelectorAll('.ms-option').forEach(function(o){o.classList.add('disabled');if(o.dataset.correct==='true')o.classList.add('correct');});}
+          var ta=step.querySelector('.cr-area');if(ta){var rs=(topic.responses||[]).filter(function(r){return r.qid===qid;});if(rs.length)ta.value=rs[rs.length-1].text;}
+          step.querySelectorAll('.ans-input').forEach(function(i){i.classList.add('correct');i.value=(i.dataset.answer||'').split('|')[0];});
+        }
+      });
+    });
+    refreshOverall();
+  }
+  window.addEventListener('load',restoreProgress);
+
+  document.getElementById('btn-export').addEventListener('click',function(){
+    var d=loadData();var cards=document.querySelectorAll('.qcard');var lines=[],td=0,ts=0;
+    cards.forEach(function(c){var q=c.dataset.qid||'?';var title=(c.querySelector('.qtitle')||{}).textContent||'';var steps=c.querySelectorAll('.step');ts+=steps.length;var done=0;if(d[q]&&d[q].steps)done=Object.keys(d[q].steps).filter(function(k){return d[q].steps[k];}).length;td+=done;lines.push(q.padEnd(8)+(done+'/'+steps.length).padEnd(8)+title.trim());});
+    var date=new Date().toLocaleDateString('en-US',{day:'2-digit',month:'short',year:'numeric'});
+    var sum=G7_TOPIC_TITLE+' — Progress Report\nStudent: '+g7current()+'    Date: '+date+'\n'+'='.repeat(58)+'\nOverall: '+td+' / '+ts+' steps  ('+(ts?Math.round(td/ts*100):0)+'%)\n'+'='.repeat(58)+'\n\n'+lines.join('\n');
+    var blob=new Blob([sum],{type:'text/plain'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='progress-'+g7current().replace(/\W+/g,'_')+'-'+new Date().toISOString().slice(0,10)+'.txt';a.click();URL.revokeObjectURL(a.href);
+  });
+  document.getElementById('btn-reset-all').addEventListener('click',function(){if(!confirm('Reset your progress for this module? This cannot be undone.'))return;var o=g7all();var s=g7current();if(o.students&&o.students[s]&&o.students[s].topics){delete o.students[s].topics[G7_TOPIC_ID];g7save(o);}location.reload();});
+
+  var sections=document.querySelectorAll('section.topic'),navlinks=document.querySelectorAll('.navlink');
+  function updateActive(){var cur='';sections.forEach(function(s){if(window.scrollY+120>=s.offsetTop)cur=s.id;});navlinks.forEach(function(a){a.classList.toggle('active',a.getAttribute('href')==='#'+cur);});}
+  window.addEventListener('scroll',updateActive);window.addEventListener('load',updateActive);
+</script>
+</body>
+</html>

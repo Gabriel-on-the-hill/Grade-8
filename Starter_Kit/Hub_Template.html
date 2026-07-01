@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[GRADE] — Study Hub</title>
+<style>
+:root{
+  --green:#14532D; --green-700:#0F3D22; --gold:#FAC415; --bg:#F4F2EC; --card:#FFFFFF;
+  --ink:#16241C; --muted:#6B7280; --line:#E4E1D6; --green-soft:#E8F0EA; --gold-soft:#FBF1D2;
+  --ok:#15803D; --warn:#B45309; --bad:#C2410C; --shadow:0 1px 2px rgba(20,40,30,.06),0 6px 18px rgba(20,40,30,.05);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+     background:var(--bg);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:var(--green)}
+.wrap{max-width:1060px;margin:0 auto;padding:0 1.1rem}
+
+/* Top bar */
+.topbar{background:var(--green);color:#fff;border-bottom:4px solid var(--gold)}
+.topbar .wrap{display:flex;align-items:center;gap:.9rem;height:62px}
+.brand{display:flex;align-items:center;gap:.6rem;font-weight:600;font-size:1.06rem;letter-spacing:-.01em}
+.brand svg{display:block}
+.brand small{display:block;font-weight:400;font-size:.72rem;opacity:.8;letter-spacing:.02em;margin-top:1px}
+.spacer{margin-left:auto}
+.tb-btn{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.22);
+        padding:.4rem .8rem;border-radius:8px;font:inherit;font-size:.84rem;cursor:pointer;transition:.15s}
+.tb-btn:hover{background:rgba(255,255,255,.22)}
+.tb-btn.icon{padding:.4rem .55rem;line-height:1}
+.who{display:flex;align-items:center;gap:.5rem;font-size:.86rem}
+.who .avatar{width:30px;height:30px;border-radius:50%;background:var(--gold);color:var(--green-700);
+             display:grid;place-items:center;font-weight:700;font-size:.85rem}
+
+/* generic */
+.hidden{display:none!important}
+h1,h2,h3{letter-spacing:-.01em}
+.section-title{font-size:.78rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);
+               font-weight:700;margin:1.7rem 0 .7rem}
+.btn{background:var(--green);color:#fff;border:none;padding:.55rem 1rem;border-radius:9px;
+     font:inherit;font-weight:600;font-size:.9rem;cursor:pointer;transition:.15s}
+.btn:hover{background:var(--green-700)}
+.btn.ghost{background:#fff;color:var(--green);border:1px solid var(--line)}
+.btn.ghost:hover{border-color:var(--green);background:var(--green-soft)}
+.btn.sm{padding:.35rem .7rem;font-size:.82rem;border-radius:7px}
+input.field{border:1.5px solid var(--line);border-radius:9px;padding:.55rem .7rem;font:inherit;font-size:.92rem;width:100%;background:#fff}
+input.field:focus{outline:none;border-color:var(--green)}
+
+/* Sign-in */
+.signin{max-width:640px;margin:3.4rem auto 0;text-align:center}
+.signin h1{font-size:1.7rem;margin:0 0 .4rem}
+.signin p.sub{color:var(--muted);margin:0 0 1.6rem}
+.roster-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.8rem;margin-top:.5rem}
+.name-tile{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:1.1rem .8rem;
+           cursor:pointer;box-shadow:var(--shadow);transition:.15s;display:flex;flex-direction:column;align-items:center;gap:.5rem}
+.name-tile:hover{border-color:var(--green);transform:translateY(-2px)}
+.name-tile .av{width:46px;height:46px;border-radius:50%;background:var(--green-soft);color:var(--green);
+               display:grid;place-items:center;font-weight:700;font-size:1.15rem}
+.name-tile .nm{font-weight:600;font-size:.95rem}
+.empty-note{background:var(--gold-soft);border:1px solid #EBD8A0;border-radius:12px;padding:1.1rem;color:#6b5410;font-size:.92rem}
+
+/* App / topics */
+.hello{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-top:1.6rem}
+.hello h1{font-size:1.55rem;margin:0}
+.hello p{margin:.2rem 0 0;color:var(--muted);font-size:.92rem}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;margin-top:1.1rem}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.9rem 1rem;box-shadow:var(--shadow)}
+.stat .n{font-size:1.6rem;font-weight:700;line-height:1;color:var(--green)}
+.stat .l{font-size:.76rem;color:var(--muted);margin-top:.3rem}
+.topic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:.9rem}
+.tcard{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:1rem 1.05rem;box-shadow:var(--shadow);
+       display:flex;flex-direction:column;gap:.55rem;position:relative;transition:.15s}
+.tcard.avail{cursor:pointer}
+.tcard.avail:hover{border-color:var(--green);transform:translateY(-2px)}
+.tcard.soon{opacity:.72}
+.tcard .th{display:flex;align-items:flex-start;gap:.6rem}
+.tcard .ico{flex:none;width:38px;height:38px;border-radius:9px;background:var(--green-soft);color:var(--green);display:grid;place-items:center}
+.tcard h3{font-size:1.02rem;margin:0}
+.tcard .desc{font-size:.85rem;color:var(--muted);margin:0}
+.badge{font-size:.68rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:.16rem .5rem;border-radius:5px}
+.badge.av{background:var(--green-soft);color:var(--green)}
+.badge.so{background:#EEE;color:var(--muted)}
+.pbar{height:8px;background:#EDEBE2;border-radius:99px;overflow:hidden}
+.pbar > span{display:block;height:100%;background:var(--gold);border-radius:99px}
+.tmeta{display:flex;align-items:center;justify-content:space-between;font-size:.78rem;color:var(--muted)}
+.chip{display:inline-flex;align-items:center;gap:.3rem;font-size:.74rem;font-weight:600;padding:.18rem .5rem;border-radius:6px}
+.chip.review{background:var(--gold-soft);color:#6b5410}
+.chip.clear{background:var(--green-soft);color:var(--green)}
+
+/* Subject switcher */
+.subject-tabs{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1.5rem}
+.subject-tab{display:inline-flex;align-items:center;gap:.5rem;background:var(--card);border:1px solid var(--line);
+             border-radius:99px;padding:.45rem .95rem;font:inherit;font-weight:600;font-size:.9rem;color:var(--ink);cursor:pointer;transition:.15s}
+.subject-tab:hover{border-color:var(--green)}
+.subject-tab.active{background:var(--green);color:#fff;border-color:var(--green)}
+.subject-tab svg{display:block;width:18px;height:18px}
+.subject-tab .cs{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;opacity:.7}
+.dash-subject{display:flex;align-items:center;gap:.45rem;font-size:.8rem;font-weight:700;color:var(--green);
+              text-transform:uppercase;letter-spacing:.05em;margin:1rem 0 .3rem;padding-top:.7rem;border-top:1px solid var(--line)}
+.dash-subject:first-child{border-top:none;padding-top:0}
+.dash-subject svg{width:16px;height:16px}
+
+/* Teacher dashboard */
+.t-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.8rem;margin-top:1.6rem}
+.t-head h1{font-size:1.5rem;margin:0}
+.student-block{background:var(--card);border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow);margin-bottom:1rem;overflow:hidden}
+.sb-top{display:flex;align-items:center;gap:.7rem;padding:.85rem 1rem;border-bottom:1px solid var(--line);background:#FbFaf6}
+.sb-top .av{width:34px;height:34px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;font-weight:700;font-size:.9rem}
+.sb-top .nm{font-weight:700}
+.sb-top .meta{margin-left:auto;font-size:.8rem;color:var(--muted)}
+.sb-body{padding:.6rem 1rem 1rem}
+.topic-row{padding:.7rem 0;border-bottom:1px dashed var(--line)}
+.topic-row:last-child{border-bottom:none}
+.tr-top{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+.tr-top .t{font-weight:600;font-size:.92rem}
+.tr-top .pct{margin-left:auto;font-weight:700;color:var(--green)}
+.skill-line{display:flex;align-items:center;gap:.6rem;margin:.35rem 0;font-size:.83rem}
+.skill-line .lbl{flex:none;width:230px;max-width:46%}
+.skill-line .meter{flex:1;height:7px;background:#EDEBE2;border-radius:99px;overflow:hidden}
+.skill-line .meter > span{display:block;height:100%;border-radius:99px}
+.skill-line .v{flex:none;width:84px;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+.miss-ok > span{background:var(--ok)} .miss-mid > span{background:var(--gold)} .miss-hi > span{background:var(--bad)}
+.struggle-toggle{font-size:.8rem;color:var(--green);cursor:pointer;font-weight:600;margin-top:.3rem;display:inline-block}
+.struggle-list{margin:.4rem 0 0;padding:.6rem .8rem;background:#FBFAF6;border:1px solid var(--line);border-radius:8px;font-size:.82rem}
+.struggle-list div{padding:.18rem 0;color:#5a4a2a}
+.struggle-list .q{font-weight:600;color:var(--ink)}
+.muted-note{color:var(--muted);font-size:.86rem}
+
+/* roster manager + settings */
+.panel{background:var(--card);border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow);padding:1.1rem;margin-bottom:1rem}
+.panel h2{font-size:1.05rem;margin:0 0 .7rem}
+.roster-row{display:flex;align-items:center;gap:.5rem;padding:.4rem 0;border-bottom:1px solid var(--line)}
+.roster-row:last-child{border-bottom:none}
+.roster-row .nm{font-weight:600}
+.roster-row .x{margin-left:auto;color:var(--bad);cursor:pointer;border:none;background:none;font:inherit;font-size:.84rem}
+.add-row{display:flex;gap:.5rem;margin-top:.7rem}
+.modal-bg{position:fixed;inset:0;background:rgba(20,30,24,.45);display:grid;place-items:center;z-index:100;padding:1rem}
+.modal{background:#fff;border-radius:14px;max-width:480px;width:100%;padding:1.3rem;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.modal h2{margin:.1rem 0 .3rem;font-size:1.15rem}
+.modal p{color:var(--muted);font-size:.86rem;margin:.2rem 0 .9rem}
+.modal .row{display:flex;gap:.5rem;margin-top:.8rem}
+.statusline{font-size:.82rem;margin-top:.6rem}
+footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color:var(--muted);font-size:.82rem;text-align:center}
+
+@media(max-width:620px){
+  .stats{grid-template-columns:1fr 1fr}
+  .skill-line .lbl{width:auto;max-width:50%}
+  .topbar .wrap{height:auto;padding-top:.5rem;padding-bottom:.5rem;flex-wrap:wrap}
+}
+
+.badge.mastered{background:var(--gold);color:#5a4410}
+.hw-card{background:var(--gold-soft);border:1px solid #EBD8A0;border-left:5px solid var(--gold);border-radius:12px;padding:.9rem 1.1rem;margin:1.1rem 0 .2rem}
+.hw-card h3{margin:0 0 .35rem;font-size:1rem;color:#6b5410}
+.hw-card .item{font-size:.88rem;color:#6b5410;margin:.15rem 0}
+.exam-line{font-size:.78rem;color:var(--muted);margin-top:.2rem}.exam-line b{color:var(--green)}
+.secbars{display:flex;gap:3px;margin:.35rem 0}.secbars .sb{flex:1;height:6px;background:#EDEBE2;border-radius:3px;overflow:hidden}.secbars .sb>span{display:block;height:100%;background:var(--gold)}
+.assign-box{display:flex;gap:.4rem;margin-top:.6rem}.assign-box input{flex:1}
+.resp-list{margin:.4rem 0 0;padding:.6rem .8rem;background:#F1F6F2;border:1px solid var(--line);border-radius:8px;font-size:.84rem}.resp-list div{padding:.2rem 0;color:#33433a}.resp-list .q{font-weight:600}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <div class="brand">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+        <rect x="1" y="1" width="24" height="24" rx="6" fill="#FAC415"/>
+        <path d="M7 17.5 L13 6 L19 17.5" stroke="#14532D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <line x1="9.3" y1="13" x2="16.7" y2="13" stroke="#14532D" stroke-width="2.2" stroke-linecap="round"/>
+      </svg>
+      <span>[GRADE] Hub<small>Study &amp; Practice</small></span>
+    </div>
+    <div class="spacer"></div>
+    <div id="tb-right"></div>
+  </div>
+</div>
+
+<main class="wrap">
+  <!-- Sign-in -->
+  <section id="view-signin" class="hidden">
+    <div class="signin">
+      <h1>Who's working today?</h1>
+      <p class="sub">Choose your name to open your work and pick up where you left off.</p>
+      <div id="roster-grid" class="roster-grid"></div>
+      <div id="roster-empty" class="empty-note hidden">
+        No students added yet. Open <strong>Teacher</strong> (top right) to add names to the roster.
+      </div>
+    </div>
+  </section>
+
+  <!-- Student app -->
+  <section id="view-app" class="hidden">
+    <div class="hello">
+      <div>
+        <h1 id="greeting">Welcome</h1>
+        <p id="greeting-sub"></p>
+      </div>
+    </div>
+    <div id="subject-tabs" class="subject-tabs"></div>
+    <div class="stats" id="stat-tiles"></div>
+    <div id="hw-banner"></div>
+    <div id="units"></div>
+  </section>
+
+  <!-- Teacher dashboard -->
+  <section id="view-teacher" class="hidden">
+    <div class="t-head">
+      <h1>Teacher dashboard</h1>
+      <div style="display:flex;gap:.5rem">
+        <button class="btn ghost sm" id="btn-roster">Manage roster</button>
+        <button class="btn ghost sm" id="btn-settings2">Settings</button>
+        <button class="btn ghost sm" id="btn-exit-teacher">Back to student view</button>
+      </div>
+    </div>
+    <p class="muted-note" style="margin-top:.4rem">Progress and struggle points across all students. Use this to see exactly which concepts to revisit.</p>
+    <div id="dash"></div>
+
+    <div id="roster-panel" class="panel hidden">
+      <h2>Roster</h2>
+      <p class="muted-note">Add or remove student names. Names appear on the sign-in screen.</p>
+      <div id="roster-list"></div>
+      <div class="add-row">
+        <input id="new-name" class="field" placeholder="Add a student name" maxlength="40"/>
+        <button class="btn" id="btn-add-name">Add</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">[GRADE] Study &amp; Practice Hub · One sign-in, one teacher dashboard across every subject. Configure the SUBJECTS array below.</div>
+</footer>
+
+<!-- Settings modal -->
+<div id="settingsModal" class="modal-bg hidden">
+  <div class="modal">
+    <h2>Settings</h2>
+    <p>Connect a Google Sheet to keep a cloud log of activity (optional). See the setup guide for how to get this link.</p>
+    <label class="muted-note">Google Sheet web app URL</label>
+    <input id="sheet-url" class="field" placeholder="https://script.google.com/.../exec" style="margin-top:.3rem"/>
+    <div class="row">
+      <button class="btn sm" id="btn-save-sheet">Save</button>
+      <button class="btn ghost sm" id="btn-test-sheet">Send test row</button>
+    </div>
+    <div id="sheet-status" class="statusline muted-note"></div>
+    <hr style="border:none;border-top:1px solid var(--line);margin:1.1rem 0">
+    <label class="muted-note">Teacher passcode</label>
+    <input id="pass-set" class="field" type="password" placeholder="Set or change teacher passcode" style="margin-top:.3rem"/>
+    <div class="row">
+      <button class="btn sm" id="btn-save-pass">Save passcode</button>
+      <button class="btn ghost sm" id="btn-close-settings">Close</button>
+    </div>
+    <div id="pass-status" class="statusline muted-note"></div>
+    <hr style="border:none;border-top:1px solid var(--line);margin:1.1rem 0">
+    <label class="muted-note">Backup (download or restore all students &amp; progress)</label>
+    <div class="row">
+      <button class="btn sm" id="btn-export-data">Export all data</button>
+      <button class="btn ghost sm" id="btn-import-data">Import data</button>
+      <input type="file" id="import-file" accept="application/json" style="display:none">
+    </div>
+    <div id="backup-status" class="statusline muted-note"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var LS=localStorage;
+  /* Storage namespace. Keep 'g7.' for back-compat with existing data; change to isolate a deployment. */
+  var STORE_PREFIX='g7.';
+  function K(s){return STORE_PREFIX+s;}
+  function jget(k,f){try{var v=JSON.parse(LS.getItem(k));return (v===null||v===undefined)?f:v;}catch(e){return f;}}
+  function jset(k,v){LS.setItem(k,JSON.stringify(v));}
+  function getRoster(){return jget(K('roster'),[]);}
+  function setRoster(r){jset(K('roster'),r);}
+  function getData(){return jget(K('data'),{students:{}});}
+  function current(){return LS.getItem(K('current'))||'';}
+  function setCurrent(n){ if(n){LS.setItem(K('current'),n);} else {LS.removeItem(K('current'));} }
+  function sheetURL(){return LS.getItem(K('sheetURL'))||'';}
+  function teacherPass(){return LS.getItem(K('teacherPass'))||'';}
+  function curSubject(){var v=LS.getItem(K('subject'));return (v&&subjectById(v))?v:firstSubject().id;}
+  function setSubject(id){LS.setItem(K('subject'),id);}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function initials(n){return String(n||'?').trim().split(/\s+/).map(function(w){return w[0]||'';}).slice(0,2).join('').toUpperCase();}
+  function postSheet(p){var u=sheetURL();if(!u)return Promise.resolve();return fetch(u,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(p)}).catch(function(){});}
+
+  /* Per-subject skill labels (drive the struggle dashboard). One map per subject; merged into SKILL_LABELS below.
+     Give each subject ~8 skill tags; the matching module reports against these keys via G7_SKILLS. */
+  var SUBJECT1_SKILLS={
+    'skill-a':'[Skill A - full label]',
+    'skill-b':'[Skill B - full label]'
+    /* ...add the subject's remaining skill tags... */
+  };
+
+  function svg(paths){return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+paths+'</svg>';}
+  var IC={
+    num:svg('<line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="10" y1="4" x2="8" y2="20"/><line x1="16" y1="4" x2="14" y2="20"/>'),
+    ratio:svg('<circle cx="7" cy="7" r="2.4"/><circle cx="17" cy="17" r="2.4"/><line x1="6" y1="18" x2="18" y2="6"/>'),
+    expr:svg('<line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/>'),
+    geo:svg('<path d="M12 4 L20 19 L4 19 Z"/>'),
+    stat:svg('<line x1="6" y1="20" x2="6" y2="12"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="18" y1="20" x2="18" y2="14"/>'),
+    life:svg('<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.52-4.48 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/>'),
+    phys:svg('<circle cx="12" cy="12" r="1.4"/><ellipse cx="12" cy="12" rx="10" ry="4.4"/><ellipse cx="12" cy="12" rx="10" ry="4.4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4.4" transform="rotate(120 12 12)"/>'),
+    earth:svg('<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18 14 14 0 0 1 0-18Z"/>'),
+    sci:svg('<path d="M9 3h6"/><path d="M10 3v6.6L4.9 18A1.6 1.6 0 0 0 6.4 20.4h11.2A1.6 1.6 0 0 0 19.1 18L14 9.6V3"/>')
+  };
+
+  /* ===== EDIT PER DEPLOYMENT: subjects -> units -> topics. =====
+     A topic's .id IS the storage key its module writes (G7_TOPIC_ID). Keep existing
+     IDs as-is for back-compat; give every NEW subject's topics a subject prefix
+     (e.g. 'sci.life') so two subjects can never collide in a student's data. */
+  var SUBJECTS=[
+    {id:'subject1', label:'[SUBJECT 1]', tagline:'[GRADE] - [exam program]', icon:IC.num,
+     examLabel:'Exam-ready', examLabelLong:'Exam-readiness', skillLabels:SUBJECT1_SKILLS,
+     units:[
+       {unit:'[Unit / domain name]',topics:[
+         {id:'subject1.topic-a',title:'[Topic A]',desc:'[One-line description of what this topic covers.]',file:'Topic_A.html',status:'available',icon:IC.num},
+         {id:'subject1.topic-b',title:'[Topic B]',desc:'[One-line description.]',status:'soon',icon:IC.ratio}
+       ]}
+     ]}
+    /* Add more subjects the same way. IMPORTANT: prefix every NEW topic id with its subject
+       (e.g. 'subject2.cells') so two subjects can never collide in a student's stored data:
+    ,{id:'subject2', label:'[SUBJECT 2]', tagline:'[GRADE]', icon:IC.life,
+      examLabel:'Exam-ready', examLabelLong:'Exam-readiness', skillLabels:{},
+      units:[ {unit:'[Unit]',topics:[ {id:'subject2.topic-a',title:'[Topic]',desc:'[...]',status:'soon',icon:IC.life} ]} ]}
+    */
+  ];
+
+  /* Global skill-label lookup, merged across subjects (dashboard fallback). */
+  var SKILL_LABELS={}; SUBJECTS.forEach(function(s){var m=s.skillLabels||{};Object.keys(m).forEach(function(k){SKILL_LABELS[k]=m[k];});});
+
+  function subjectById(id){for(var i=0;i<SUBJECTS.length;i++){if(SUBJECTS[i].id===id)return SUBJECTS[i];}return null;}
+  function eachTopic(fn){SUBJECTS.forEach(function(s){s.units.forEach(function(u){u.topics.forEach(function(t){fn(t,u,s);});});});}
+  function topicMeta(id){var found=null;eachTopic(function(t){if(t.id===id)found=t;});return found;}
+  function subjectForTopic(id){var found=null;eachTopic(function(t,u,s){if(t.id===id)found=s;});return found;}
+  function subjectTopicIds(s){var ids=[];s.units.forEach(function(u){u.topics.forEach(function(t){ids.push(t.id);});});return ids;}
+  function subjectHasAvailable(s){var has=false;s.units.forEach(function(u){u.topics.forEach(function(t){if(t.status==='available')has=true;});});return has;}
+  function firstSubject(){for(var i=0;i<SUBJECTS.length;i++){if(subjectHasAvailable(SUBJECTS[i]))return SUBJECTS[i];}return SUBJECTS[0];}
+
+  function studentTopics(name){var d=getData();return (d.students&&d.students[name]&&d.students[name].topics)||{};}
+  function topicProgress(t){
+    if(!t)return{done:0,total:0,pct:0,struggles:0,last:0};
+    var done=0,tree=t.tree||{};
+    Object.keys(tree).forEach(function(q){var s=tree[q].steps||{};done+=Object.keys(s).filter(function(k){return s[k];}).length;});
+    var total=t.totalSteps||0;
+    return {done:done,total:total,pct:total?Math.round(done/total*100):0,struggles:(t.struggles||[]).length,last:t.lastPracticed||0};
+  }
+  var MASTERY_PCT=100;
+  function examReadiness(t){var e=(t&&t.exam)||{attempts:0,correct:0};return {att:e.attempts||0,cor:e.correct||0,pct:e.attempts?Math.round((e.correct||0)/e.attempts*100):0};}
+  function sectionProgress(t){var totals=(t&&t.sectionTotals)||{};var tree=(t&&t.tree)||{};var by={};Object.keys(tree).forEach(function(q){var sec=q.split('-')[0];var s=tree[q].steps||{};by[sec]=(by[sec]||0)+Object.keys(s).filter(function(k){return s[k];}).length;});return Object.keys(totals).sort(function(a,b){return (parseInt(a)||99)-(parseInt(b)||99);}).map(function(sec){return {sec:sec,total:totals[sec],done:Math.min(by[sec]||0,totals[sec])};});}
+  function suggestHomework(topics, ids, labels){var agg={};(ids||Object.keys(topics)).forEach(function(id){var to=topics[id];if(!to)return;var st=to.skillStats||{};Object.keys(st).forEach(function(k){if(st[k].misses>0){agg[k]=agg[k]||{misses:0};agg[k].misses+=st[k].misses;}});});return Object.keys(agg).sort(function(a,b){return agg[b].misses-agg[a].misses;}).slice(0,3).map(function(k){return {label:(labels&&labels[k])||SKILL_LABELS[k]||k,misses:agg[k].misses};});}
+  function getAssign(stu,sid){ if(stu&&stu.assignments&&stu.assignments[sid]&&stu.assignments[sid].text)return stu.assignments[sid].text; if(sid==='math'&&stu&&stu.assignment&&stu.assignment.text)return stu.assignment.text; return ''; }
+  function relTime(ts){
+    if(!ts)return 'not started';
+    var diff=Date.now()-ts, m=60000,h=3600000,d=86400000;
+    if(diff<m)return 'just now';
+    if(diff<h)return Math.round(diff/m)+' min ago';
+    if(diff<d)return Math.round(diff/h)+' h ago';
+    if(diff<7*d)return Math.round(diff/d)+' d ago';
+    return new Date(ts).toLocaleDateString();
+  }
+
+  // ---- view switching ----
+  function show(id){['view-signin','view-app','view-teacher'].forEach(function(v){document.getElementById(v).classList.toggle('hidden',v!==id);});window.scrollTo(0,0);}
+
+  function renderTopbar(){
+    var el=document.getElementById('tb-right');var cur=current();var h='';
+    if(cur){
+      h+='<div class="who"><span class="avatar">'+esc(initials(cur))+'</span><span>'+esc(cur)+'</span></div>';
+      h+='<button class="tb-btn" id="tb-switch">Switch student</button>';
+    }
+    h+='<button class="tb-btn" id="tb-teacher">Teacher</button>';
+    h+='<button class="tb-btn icon" id="tb-settings" title="Settings">&#9881;</button>';
+    el.innerHTML=h;
+    var sw=document.getElementById('tb-switch'); if(sw)sw.onclick=function(){setCurrent('');boot();};
+    document.getElementById('tb-teacher').onclick=enterTeacher;
+    document.getElementById('tb-settings').onclick=openSettings;
+  }
+
+  // ---- sign in ----
+  function renderSignIn(){
+    var grid=document.getElementById('roster-grid');var roster=getRoster();
+    document.getElementById('roster-empty').classList.toggle('hidden',roster.length>0);
+    grid.innerHTML=roster.map(function(n){
+      return '<div class="name-tile" data-n="'+esc(n)+'"><span class="av">'+esc(initials(n))+'</span><span class="nm">'+esc(n)+'</span></div>';
+    }).join('');
+    Array.prototype.forEach.call(grid.querySelectorAll('.name-tile'),function(t){
+      t.onclick=function(){setCurrent(t.getAttribute('data-n'));boot();};
+    });
+    show('view-signin');
+  }
+
+  // ---- student app ----
+  function renderSubjectTabs(activeId){
+    var el=document.getElementById('subject-tabs');
+    el.innerHTML=SUBJECTS.map(function(s){
+      var soon=!subjectHasAvailable(s);
+      return '<button class="subject-tab'+(s.id===activeId?' active':'')+'" data-s="'+esc(s.id)+'">'+s.icon+'<span>'+esc(s.label)+'</span>'+(soon?'<span class="cs">soon</span>':'')+'</button>';
+    }).join('');
+    Array.prototype.forEach.call(el.querySelectorAll('.subject-tab'),function(b){
+      b.onclick=function(){setSubject(b.getAttribute('data-s'));renderApp();};
+    });
+  }
+  function renderApp(){
+    var cur=current();
+    document.getElementById('greeting').textContent='Welcome, '+cur;
+    var subj=subjectById(curSubject())||firstSubject();
+    renderSubjectTabs(subj.id);
+    var topics=studentTopics(cur);
+    var ids=subjectTopicIds(subj);
+    var started=0,mastered=0,skillsToReview={};
+    ids.forEach(function(id){
+      if(!topics[id])return;
+      var p=topicProgress(topics[id]); if(p.last)started++; mastered+=p.done;
+      (topics[id].struggles||[]).forEach(function(s){ if(s.skill)skillsToReview[s.skill]=true; });
+    });
+    document.getElementById('greeting-sub').textContent=subj.label+' — pick a topic to begin, or carry on where you left off.';
+    document.getElementById('stat-tiles').innerHTML=
+      '<div class="stat"><div class="n">'+started+'</div><div class="l">Topics started</div></div>'+
+      '<div class="stat"><div class="n">'+mastered+'</div><div class="l">Steps mastered</div></div>'+
+      '<div class="stat"><div class="n">'+Object.keys(skillsToReview).length+'</div><div class="l">Skills to review</div></div>';
+    renderHomeworkBanner(cur, topics, subj);
+
+    var html='';
+    subj.units.forEach(function(u){
+      html+='<div class="section-title">'+esc(u.unit)+'</div><div class="topic-grid">';
+      u.topics.forEach(function(t){
+        var avail=t.status==='available';
+        if(avail){
+          var p=topicProgress(topics[t.id]);
+          var er = examReadiness(topics[t.id]);
+          var done = p.total>0 && p.pct>=MASTERY_PCT;
+          var chip = done ? '<span class="chip clear">Mastered</span>'
+                    : (p.struggles>0 ? '<span class="chip review">'+p.struggles+' to review</span>'
+                    : (p.last ? '<span class="chip clear">On track</span>' : ''));
+          html+='<div class="tcard avail" data-id="'+t.id+'">'+
+            '<div class="th"><span class="ico">'+t.icon+'</span><div><h3>'+esc(t.title)+'</h3></div>'+
+            '<span class="badge av" style="margin-left:auto">Available</span></div>'+
+            '<p class="desc">'+esc(t.desc)+'</p>'+
+            '<div class="pbar"><span style="width:'+p.pct+'%"></span></div>'+
+            '<div class="tmeta"><span>'+p.pct+'% · '+p.done+(p.total?('/'+p.total):'')+' steps</span>'+chip+'</div>'+
+            '<div class="tmeta"><span>Last: '+relTime(p.last)+'</span>'+(er.att?('<span class="exam-line">'+esc(subj.examLabel)+': <b>'+er.cor+'/'+er.att+'</b></span>'):'')+'</div>'+
+          '</div>';
+        } else {
+          html+='<div class="tcard soon">'+
+            '<div class="th"><span class="ico">'+t.icon+'</span><div><h3>'+esc(t.title)+'</h3></div>'+
+            '<span class="badge so" style="margin-left:auto">Coming soon</span></div>'+
+            '<p class="desc">'+esc(t.desc)+'</p>'+
+          '</div>';
+        }
+      });
+      html+='</div>';
+    });
+    document.getElementById('units').innerHTML=html;
+    Array.prototype.forEach.call(document.querySelectorAll('.tcard.avail'),function(c){
+      c.onclick=function(){openTopic(c.getAttribute('data-id'));};
+    });
+    show('view-app');
+  }
+  function openTopic(id){
+    var t=topicMeta(id); if(!t||!t.file)return;
+    postSheet({student:current(),topic:t.title,question:'',event:'topic_opened',detail:'',ts:Date.now()});
+    location.href=t.file;
+  }
+  function renderHomeworkBanner(cur, topics, subj){
+    var el=document.getElementById('hw-banner'); if(!el)return;
+    var data=getData(); var stu=(data.students&&data.students[cur])||{};
+    var assign=getAssign(stu, subj.id);
+    var sugg=suggestHomework(topics, subjectTopicIds(subj), subj.skillLabels);
+    if(!assign && !sugg.length){ el.innerHTML=''; return; }
+    var s='<div class="hw-card"><h3>Your '+esc(subj.label)+' homework</h3>';
+    if(assign) s+='<div class="item">From your teacher: '+esc(assign)+'</div>';
+    if(sugg.length) s+='<div class="item">Practice again: '+sugg.map(function(x){return esc(x.label)+' ('+x.misses+' missed)';}).join('; ')+'</div>';
+    s+='</div>'; el.innerHTML=s;
+  }
+
+  // ---- teacher ----
+  function enterTeacher(){
+    var pass=teacherPass();
+    if(!pass){ alert('Set a teacher passcode first (Settings).'); openSettings(); return; }
+    var entry=prompt('Enter teacher passcode:');
+    if(entry===null)return;
+    if(entry!==pass){ alert('Incorrect passcode.'); return; }
+    renderTeacher();
+  }
+  function missClass(ratio){ return ratio>=0.5?'miss-hi':(ratio>=0.25?'miss-mid':'miss-ok'); }
+  function renderTeacher(){
+    document.getElementById('roster-panel').classList.add('hidden');
+    var data=getData(); var names=getRoster().slice();
+    Object.keys(data.students||{}).forEach(function(n){ if(names.indexOf(n)<0)names.push(n); });
+    var dash=document.getElementById('dash');
+    if(names.length===0){ dash.innerHTML='<p class="muted-note">No students yet. Use “Manage roster” to add names.</p>'; show('view-teacher'); return; }
+    var html='';
+    names.forEach(function(name){
+      var topics=studentTopics(name);
+      var lastAll=0; Object.keys(topics).forEach(function(id){var p=topicProgress(topics[id]); if(p.last>lastAll)lastAll=p.last;});
+      html+='<div class="student-block"><div class="sb-top"><span class="av">'+esc(initials(name))+'</span><span class="nm">'+esc(name)+'</span><span class="meta">Last active: '+relTime(lastAll)+'</span></div><div class="sb-body">';
+      var stuA=(data.students&&data.students[name])||{};
+      var anyStudent=false;
+      SUBJECTS.forEach(function(subj){
+        var ids=subjectTopicIds(subj);
+        var hasData=ids.some(function(id){return !!topics[id];});
+        if(!subjectHasAvailable(subj) && !hasData) return; // nothing to show for this subject yet
+        anyStudent=true;
+        html+='<div class="dash-subject">'+subj.icon+'<span>'+esc(subj.label)+'</span></div>';
+        var any=false;
+        subj.units.forEach(function(u){u.topics.forEach(function(t){
+          if(t.status!=='available')return;
+          var to=topics[t.id]; if(!to){return;}
+          any=true;
+          var p=topicProgress(to);
+          var er=examReadiness(to); var mastered=p.total>0&&p.pct>=MASTERY_PCT;
+          html+='<div class="topic-row"><div class="tr-top"><span class="t">'+esc(t.title)+'</span>'+(mastered?'<span class="badge mastered">Mastered</span>':'')+'<span class="pct">'+p.pct+'%</span></div>';
+          html+='<div class="pbar" style="margin:.4rem 0"><span style="width:'+p.pct+'%"></span></div>';
+          var secs=sectionProgress(to); if(secs.length){html+='<div class="secbars">'+secs.map(function(s){return '<span class="sb" title="Section '+s.sec+': '+s.done+'/'+s.total+'"><span style="width:'+(s.total?Math.round(s.done/s.total*100):0)+'%"></span></span>';}).join('')+'</div>';}
+          if(er.att){html+='<div class="exam-line">'+esc(subj.examLabelLong)+': <b>'+er.cor+'/'+er.att+'</b> ('+er.pct+'%)</div>';}
+          var stats=to.skillStats||{};
+          var keys=Object.keys(stats).filter(function(k){return stats[k].attempts>0;});
+          keys.sort(function(a,b){return (stats[b].misses/stats[b].attempts)-(stats[a].misses/stats[a].attempts);});
+          if(keys.length){
+            keys.forEach(function(k){
+              var st=stats[k],ratio=st.attempts?st.misses/st.attempts:0,pctw=Math.round(ratio*100);
+              html+='<div class="skill-line"><span class="lbl">'+esc((subj.skillLabels&&subj.skillLabels[k])||SKILL_LABELS[k]||k)+'</span>'+
+                '<span class="meter '+missClass(ratio)+'"><span style="width:'+pctw+'%"></span></span>'+
+                '<span class="v">'+st.misses+'/'+st.attempts+' missed</span></div>';
+            });
+          } else {
+            html+='<div class="muted-note">No attempts logged yet.</div>';
+          }
+          var strug=to.struggles||[];
+          if(strug.length){
+            var sid='st-'+name.replace(/\W/g,'')+'-'+t.id.replace(/\W/g,'');
+            html+='<span class="struggle-toggle" data-tg="'+sid+'">Show '+strug.length+' missed attempt'+(strug.length>1?'s':'')+'</span>';
+            html+='<div class="struggle-list hidden" id="'+sid+'">'+strug.slice(-40).map(function(s){
+              return '<div><span class="q">'+esc(s.label||s.qid)+'</span> — typed “'+esc(s.your)+'” · <em>'+esc(s.skillLabel||'')+'</em> · '+relTime(s.ts)+'</div>';
+            }).join('')+'</div>';
+          }
+          var resp=to.responses||[];
+          if(resp.length){
+            var rid='rs-'+name.replace(/\W/g,'')+'-'+t.id.replace(/\W/g,'');
+            html+='<span class="struggle-toggle" data-tg="'+rid+'">Show '+resp.length+' written response'+(resp.length>1?'s':'')+'</span>';
+            html+='<div class="resp-list hidden" id="'+rid+'">'+resp.slice(-20).map(function(r){return '<div><span class="q">'+esc(r.label||r.qid)+'</span>: '+esc(r.text)+'</div>';}).join('')+'</div>';
+          }
+          html+='</div>';
+        });});
+        if(!any) html+='<p class="muted-note">No activity yet in '+esc(subj.label)+'.</p>';
+        var av=getAssign(stuA, subj.id);
+        html+='<div class="assign-box"><input class="field assign-inp" data-s="'+esc(subj.id)+'" placeholder="Set '+esc(subj.label)+' homework for '+esc(name)+'..." value="'+esc(av)+'"/><button class="btn sm assign-save" data-n="'+esc(name)+'" data-s="'+esc(subj.id)+'">Save</button></div>';
+      });
+      if(!anyStudent) html+='<p class="muted-note">No activity yet.</p>';
+      html+='</div></div>';
+    });
+    dash.innerHTML=html;
+    Array.prototype.forEach.call(dash.querySelectorAll('.assign-save'),function(b){b.onclick=function(){var inp=b.parentNode.querySelector('.assign-inp');var n=b.getAttribute('data-n');var sid=b.getAttribute('data-s');var d=getData();d.students=d.students||{};d.students[n]=d.students[n]||{topics:{}};d.students[n].assignments=d.students[n].assignments||{};d.students[n].assignments[sid]={text:inp.value.trim(),ts:Date.now()};jset(K('data'),d);b.textContent='Saved';setTimeout(function(){b.textContent='Save';},1200);};});
+    Array.prototype.forEach.call(dash.querySelectorAll('.struggle-toggle'),function(tg){
+      tg.onclick=function(){var box=document.getElementById(tg.getAttribute('data-tg'));var hidden=box.classList.toggle('hidden');tg.textContent=(hidden?'Show ':'Hide ')+tg.textContent.replace(/^(Show|Hide)\s/,'');};
+    });
+    show('view-teacher');
+  }
+
+  // ---- roster manager ----
+  function renderRosterPanel(){
+    var roster=getRoster();var list=document.getElementById('roster-list');
+    list.innerHTML=roster.length?roster.map(function(n){
+      return '<div class="roster-row"><span class="nm">'+esc(n)+'</span><button class="x" data-n="'+esc(n)+'">Remove</button></div>';
+    }).join(''):'<p class="muted-note">No names yet.</p>';
+    Array.prototype.forEach.call(list.querySelectorAll('.x'),function(b){
+      b.onclick=function(){var n=b.getAttribute('data-n');setRoster(getRoster().filter(function(x){return x!==n;}));renderRosterPanel();};
+    });
+    document.getElementById('roster-panel').classList.remove('hidden');
+  }
+  function addName(){
+    var inp=document.getElementById('new-name');var n=inp.value.trim();if(!n)return;
+    var r=getRoster(); if(r.indexOf(n)<0){r.push(n);setRoster(r);} inp.value='';renderRosterPanel();
+  }
+
+  // ---- settings ----
+  function openSettings(){
+    document.getElementById('sheet-url').value=sheetURL();
+    document.getElementById('sheet-status').textContent='';
+    document.getElementById('pass-status').textContent=teacherPass()?'A passcode is set.':'No passcode set yet.';
+    document.getElementById('settingsModal').classList.remove('hidden');
+  }
+  function closeSettings(){document.getElementById('settingsModal').classList.add('hidden');}
+
+  function wire(){
+    renderTopbar();
+    document.getElementById('btn-exit-teacher').onclick=function(){boot();};
+    document.getElementById('btn-roster').onclick=renderRosterPanel;
+    document.getElementById('btn-settings2').onclick=openSettings;
+    document.getElementById('btn-add-name').onclick=addName;
+    document.getElementById('new-name').addEventListener('keydown',function(e){if(e.key==='Enter')addName();});
+    document.getElementById('btn-settings2');
+    document.getElementById('btn-close-settings').onclick=closeSettings;
+    document.getElementById('btn-save-sheet').onclick=function(){
+      var u=document.getElementById('sheet-url').value.trim();
+      if(u)LS.setItem(K('sheetURL'),u); else LS.removeItem(K('sheetURL'));
+      document.getElementById('sheet-status').textContent=u?'Saved. Sheet logging is on.':'Cleared. Sheet logging is off.';
+    };
+    document.getElementById('btn-test-sheet').onclick=function(){
+      if(!sheetURL()){document.getElementById('sheet-status').textContent='Save a URL first.';return;}
+      postSheet({student:current()||'(teacher test)',topic:'Hub',question:'-',event:'test',detail:'Connection test',ts:Date.now()});
+      document.getElementById('sheet-status').textContent='Test row sent. Check your Google Sheet (Log tab).';
+    };
+    document.getElementById('btn-save-pass').onclick=function(){
+      var v=document.getElementById('pass-set').value;
+      if(!v){document.getElementById('pass-status').textContent='Enter a passcode to set.';return;}
+      LS.setItem(K('teacherPass'),v);document.getElementById('pass-set').value='';
+      document.getElementById('pass-status').textContent='Passcode saved.';
+    };
+    document.getElementById('settingsModal').addEventListener('click',function(e){if(e.target===this)closeSettings();});
+    document.getElementById('btn-export-data').onclick=function(){
+      var blob=new Blob([JSON.stringify({roster:getRoster(),data:getData(),sheetURL:sheetURL(),exported:Date.now()},null,2)],{type:'application/json'});
+      var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='hub-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(a.href);
+      document.getElementById('backup-status').textContent='Backup downloaded.';
+    };
+    document.getElementById('btn-import-data').onclick=function(){document.getElementById('import-file').click();};
+    document.getElementById('import-file').onchange=function(e){
+      var f=e.target.files[0]; if(!f)return; var r=new FileReader();
+      r.onload=function(){try{var o=JSON.parse(r.result); if(o.roster)setRoster(o.roster); if(o.data)jset(K('data'),o.data); if(o.sheetURL)LS.setItem(K('sheetURL'),o.sheetURL); document.getElementById('backup-status').textContent='Imported. Reloading...'; setTimeout(function(){location.reload();},700);}catch(err){document.getElementById('backup-status').textContent='Could not read that file.';}};
+      r.readAsText(f);
+    };
+  }
+
+  function boot(){
+    renderTopbar();
+    if(current()) renderApp(); else renderSignIn();
+  }
+  wire();
+  boot();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+# Third-party / copyrighted source material — do not publish
+*.pdf
+Curriculum/
+MCAP MATHS/
+Textbooks/
+
+# scratch / junk
+_synctest.txt
+outputs/
+*.log
+.DS_Store
