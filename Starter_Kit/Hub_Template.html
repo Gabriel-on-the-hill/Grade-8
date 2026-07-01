@@ -54,6 +54,7 @@ input.field:focus{outline:none;border-color:var(--green)}
 .name-tile{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:1.1rem .8rem;
            cursor:pointer;box-shadow:var(--shadow);transition:.15s;display:flex;flex-direction:column;align-items:center;gap:.5rem}
 .name-tile:hover{border-color:var(--green);transform:translateY(-2px)}
+.name-tile:focus-visible,.tcard.avail:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .name-tile .av{width:46px;height:46px;border-radius:50%;background:var(--green-soft);color:var(--green);
                display:grid;place-items:center;font-weight:700;font-size:1.15rem}
 .name-tile .nm{font-weight:600;font-size:.95rem}
@@ -348,7 +349,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
   var MASTERY_PCT=100;
   function examReadiness(t){var e=(t&&t.exam)||{attempts:0,correct:0};return {att:e.attempts||0,cor:e.correct||0,pct:e.attempts?Math.round((e.correct||0)/e.attempts*100):0};}
   function sectionProgress(t){var totals=(t&&t.sectionTotals)||{};var tree=(t&&t.tree)||{};var by={};Object.keys(tree).forEach(function(q){var sec=q.split('-')[0];var s=tree[q].steps||{};by[sec]=(by[sec]||0)+Object.keys(s).filter(function(k){return s[k];}).length;});return Object.keys(totals).sort(function(a,b){return (parseInt(a)||99)-(parseInt(b)||99);}).map(function(sec){return {sec:sec,total:totals[sec],done:Math.min(by[sec]||0,totals[sec])};});}
-  function suggestHomework(topics, ids, labels){var agg={};(ids||Object.keys(topics)).forEach(function(id){var to=topics[id];if(!to)return;var st=to.skillStats||{};Object.keys(st).forEach(function(k){if(st[k].misses>0){agg[k]=agg[k]||{misses:0};agg[k].misses+=st[k].misses;}});});return Object.keys(agg).sort(function(a,b){return agg[b].misses-agg[a].misses;}).slice(0,3).map(function(k){return {label:(labels&&labels[k])||SKILL_LABELS[k]||k,misses:agg[k].misses};});}
+  function suggestHomework(topics, ids, labels){var agg={};(ids||Object.keys(topics)).forEach(function(id){var to=topics[id];if(!to)return;var st=to.skillStats||{};Object.keys(st).forEach(function(k){if(st[k].misses>0){agg[k]=agg[k]||{misses:0};agg[k].misses+=st[k].misses;}});});return Object.keys(agg).filter(function(k){return agg[k].misses>=2;}).sort(function(a,b){return agg[b].misses-agg[a].misses;}).slice(0,3).map(function(k){return {label:(labels&&labels[k])||SKILL_LABELS[k]||k,misses:agg[k].misses};});}
   function getAssign(stu,sid){ if(stu&&stu.assignments&&stu.assignments[sid]&&stu.assignments[sid].text)return stu.assignments[sid].text; if(sid==='math'&&stu&&stu.assignment&&stu.assignment.text)return stu.assignment.text; return ''; }
   function relTime(ts){
     if(!ts)return 'not started';
@@ -382,10 +383,10 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     var grid=document.getElementById('roster-grid');var roster=getRoster();
     document.getElementById('roster-empty').classList.toggle('hidden',roster.length>0);
     grid.innerHTML=roster.map(function(n){
-      return '<div class="name-tile" data-n="'+esc(n)+'"><span class="av">'+esc(initials(n))+'</span><span class="nm">'+esc(n)+'</span></div>';
+      return '<div class="name-tile" role="button" tabindex="0" data-n="'+esc(n)+'"><span class="av">'+esc(initials(n))+'</span><span class="nm">'+esc(n)+'</span></div>';
     }).join('');
     Array.prototype.forEach.call(grid.querySelectorAll('.name-tile'),function(t){
-      t.onclick=function(){setCurrent(t.getAttribute('data-n'));boot();};
+      t.onclick=function(){setCurrent(t.getAttribute('data-n'));boot();};t.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();setCurrent(t.getAttribute('data-n'));boot();}};
     });
     show('view-signin');
   }
@@ -433,7 +434,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
           var chip = done ? '<span class="chip clear">Mastered</span>'
                     : (p.struggles>0 ? '<span class="chip review">'+p.struggles+' to review</span>'
                     : (p.last ? '<span class="chip clear">On track</span>' : ''));
-          html+='<div class="tcard avail" data-id="'+t.id+'">'+
+          html+='<div class="tcard avail" role="button" tabindex="0" data-id="'+t.id+'">'+
             '<div class="th"><span class="ico">'+t.icon+'</span><div><h3>'+esc(t.title)+'</h3></div>'+
             '<span class="badge av" style="margin-left:auto">Available</span></div>'+
             '<p class="desc">'+esc(t.desc)+'</p>'+
@@ -453,7 +454,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     });
     document.getElementById('units').innerHTML=html;
     Array.prototype.forEach.call(document.querySelectorAll('.tcard.avail'),function(c){
-      c.onclick=function(){openTopic(c.getAttribute('data-id'));};
+      c.onclick=function(){openTopic(c.getAttribute('data-id'));};c.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();openTopic(c.getAttribute('data-id'));}};
     });
     show('view-app');
   }
@@ -590,7 +591,6 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     document.getElementById('btn-settings2').onclick=openSettings;
     document.getElementById('btn-add-name').onclick=addName;
     document.getElementById('new-name').addEventListener('keydown',function(e){if(e.key==='Enter')addName();});
-    document.getElementById('btn-settings2');
     document.getElementById('btn-close-settings').onclick=closeSettings;
     document.getElementById('btn-save-sheet').onclick=function(){
       var u=document.getElementById('sheet-url').value.trim();
@@ -626,7 +626,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     renderTopbar();
     if(current()) renderApp(); else renderSignIn();
   }
-  wire();
+  try{wire();}catch(e){if(window.console)console.error('wire() failed:',e);}
   boot();
 })();
 </script>

@@ -64,6 +64,10 @@ Header (title · unit · standard · objectives) → hub bar → progress → **
 
 **Five item formats (all in the template):** fill-in (accepts equivalent fractions), single multiple-choice, multi-select, two-part (A unlocks B), constructed-response. Mark exam-grade items with `data-exam="1"`.
 
+**qid convention (required):** every qcard's `data-qid` is `<section>-<n>` (e.g. `3-2` = section 3, item 2). The number before the first `-` drives `sectionTotals` and the teacher dashboard's per-section bars — never use any other scheme, and never duplicate a qid.
+
+**Access gate:** the hub and every module carry the same `g8gate` overlay (constant `PW` in the first inline script; unlock stored under localStorage `g8.gate`, shared across pages). New modules stamped from the template keep it; if the password ever changes, change it in every file.
+
 ### The Number System — skill tags used (drives the struggle dashboard)
 `rational-decimal` (rational numbers & decimal expansions), `repeat-fraction` (repeating decimal → fraction), `irrational` (identify irrational numbers), `roots` (square & cube roots), `estimate` (approximate irrationals between integers / truncating), `compare` (compare & order on a number line), `expr-est` (estimate value of expressions), `reasoning` (reasoning & error analysis).
 
@@ -72,23 +76,35 @@ Auto-suggested from each student's weakest concepts; optional teacher-set per-st
 
 ## 7. Build & verify discipline
 1. **Consult the sources first** (scan folder, read chapters/items); build from the best.
-2. Author from the template; lean, best-of.
-3. **Verify every build:** `node --check` the script; check structure (`</html>`, one `<script>`, balanced braces/parens, qid uniqueness, skill-map coverage); recompute every answer key.
-4. **Large files (>~70KB)** edit via bash (python in-place / heredoc), verify a copy before swapping into the live file.
-5. Keep this standard updated.
+2. Author from the template; lean, best-of. Never hand-roll the answer-checking handlers — they carry the integrity invariants (§8).
+3. **Verify every build:** `node --check` every extracted `<script>`; check structure (`</html>` present, balanced braces/parens, qid uniqueness, every qid covered in `G7_SKILLS`); recompute every answer key by hand or by code.
+4. **Behavioral verification (required for hub or engine changes):** headless jsdom test — load the file with `runScripts:'dangerously'`, seed `localStorage` in `beforeParse` (e.g. `g8.gate=ok`, `g7.current`, roster/pins), dispatch a `load` event, then click through: sign-in → PIN → app; module: answer wrong → retry → correct; reload → progress restored; teacher dashboard renders. A page that parses can still be dead on arrival (v1.3 found a null-binding crash that blanked the whole hub) — only a behavioral test catches that.
+5. **Large HTML files (>~35KB): do NOT use editor Write/Edit tools** — an after-save reformat can truncate the file mid-`<script>`. Regenerate via a bash `python3` heredoc doing string `.replace()` on the intact file, then re-verify (step 3–4). Assert each replacement matched exactly once.
+6. Keep this standard updated; log every build in §10.
 
 ## 8. Engine versioning (anti-dilution)
-Engine: **Engine v1.2** (v1.1 + the multi-subject hub layer: flat `UNITS` replaced by `SUBJECTS → units → topics`, subject switcher, per-subject stats/homework/assignments, subject-grouped teacher dashboard, `STORE_PREFIX`, and the subject-prefixed topic-id convention, 2026-06-23). v1.1 = v1 from Grade 7 + an "Entering your answers" guide card and fraction-format placeholders. Do not fork the engine per grade/subject; improve in one place and re-propagate deliberately. The hub and `Starter_Kit/Hub_Template.html` carry the same engine; module files are unchanged by v1.2 (no module edits required).
+Engine: **Engine v1.3** (v1.2 + the assessment-integrity layer, 2026-07-01). The bullets below are **invariants — any new or edited module/hub must preserve every one**:
+- **Hub:** PIN modal markup precedes the app script (fixes a fatal null-binding crash that blanked the app); `wire()` wrapped in try/catch so `boot()` always renders; homework auto-suggestion requires ≥2 misses per skill (one slip ≠ homework); sign-in tiles and topic cards are keyboard-accessible (`role="button"`, `tabindex`, Enter/Space, focus outline).
+- **Modules:** MC explanations hidden until answered (they used to leak the answer); wrong MC answers no longer lock the question or reveal the key — the chosen option is eliminated and the student retries (mastery stays reachable); exam-readiness counts **first attempts only** across all formats (retries can't inflate it); locked steps have their controls `disabled` (no keyboard bypass); Check on an empty box is a no-op (no false struggles); a "not signed in" warning links back to the Hub when work would be saved as Guest.
+Engine v1.2 (v1.1 + the multi-subject hub layer: flat `UNITS` replaced by `SUBJECTS → units → topics`, subject switcher, per-subject stats/homework/assignments, subject-grouped teacher dashboard, `STORE_PREFIX`, and the subject-prefixed topic-id convention, 2026-06-23). v1.1 = v1 from Grade 7 + an "Entering your answers" guide card and fraction-format placeholders. Do not fork the engine per grade/subject; improve in one place and re-propagate deliberately. The hub and `Starter_Kit/Hub_Template.html` carry the same engine; module files are unchanged by v1.2 (no module edits required).
 
 ## 9. How to add a new unit (checklist)
 1. Copy `Module_Template.html` → `<Unit_Name>.html`; set `G7_TOPIC_ID`, `G7_TOPIC_TITLE`, `G7_SKILLS`.
 2. Scan the folder; read the unit's chapters/items; list curriculum concepts + aligned MCAP items.
 3. Author sections in correct flow; weave MCAP items as `Exam` capstones; hints sparingly; one worked example per skill.
-4. Add the topic to the hub `UNITS` array (status `available`, `file`).
-5. Verify (Section 7) and confirm the dashboard reflects it.
+4. Add the topic to the right subject's `units` in the hub `SUBJECTS` array (status `available`, `file`). Keep the qid convention (§5) and the access gate (§5).
+5. Verify (Section 7, including the behavioral test) and confirm the dashboard reflects it.
 
 ## 10. Build log
 - **2026-06-22** — Project instantiated from Starter Kit. Hub configured for Grade 8 (5 domains). **The Number System (8.NS)** built as the first full unit, with both real MCAP NS items woven in as exam capstones. Remaining four domains marked "coming soon".
 - **2026-06-22** — `Textbooks/` folder added and grade-verified (see textbook list above; one enVision file is actually Grade 7 and is excluded). **Enriched The Number System** using the verified enVision Grade 8 Teacher's Edition Vol 1: sharpened the teach cards/worked examples (real-numbers framing, explicit powers-of-10 STEP method, number-line ordering) and added one in-standard item — converting an *eventually*-repeating decimal (0.6333… → 19/30, 8.NS.A.1). Quality-over-quantity per standard: 27 → 28 items, no filler.
 - **2026-06-23** — **Engine v1.2: multi-subject hub.** Added a Subject layer above units (`SUBJECTS → units → topics`) with a subject switcher, per-subject stat tiles / homework / teacher assignments, and a subject-grouped teacher dashboard. Added `STORE_PREFIX` (default `g7.`, back-compat) and the subject-prefixed topic-id rule (Math keeps bare ids; new subjects use e.g. `sci.*`). Science added as a "coming soon" subject (Life / Physical / Earth & Space). No module edits required; existing student data preserved. Verified with `node --check`, brace/paren/bracket balance, getElementById-target check, and a headless jsdom render (student subject switch + back-compat homework + subject-grouped teacher view). Propagated the same engine to `Starter_Kit/Hub_Template.html` (generic `[SUBJECT]/[UNIT]/[TOPIC]` placeholders).
+- **2026-07-01** — **Engine v1.3: full audit + assessment-integrity release.** Found and fixed a fatal hub crash (PIN modal markup sat below the script that wired it → `wire()` threw → `boot()` never ran → blank page after the access gate). Engine elevations across both modules + `Module_Template.html`: MC feedback CSS-gated until answered, MC retry-with-elimination instead of lock-and-reveal, first-attempt-only exam stats (fill-in/MC/multi-select), disabled controls in locked steps, empty-Check no-op, Guest sign-in warning. Hub + `Hub_Template.html`: try/catch around `wire()`, ≥2-miss homework threshold, keyboard-accessible tiles/cards. All 57 answer keys recomputed and verified correct. Verified: `node --check` on every script, structure checks, and 30+ jsdom behavioral tests (cold start, PIN create/enter/wrong-PIN, module work, restore-on-reload, teacher dashboard). **Remember to push to GitHub Pages — the live site still has the broken hub until then.**
 - **2026-06-22** — Built **Expressions & Equations (8.EE)** as the second unit → `Expressions_and_Equations.html` (7 sections, 29 items, all 5 formats). Flow: integer exponents → scientific notation → proportional relationships & slope → solving linear equations → one/none/infinite solutions → systems. Grounded in enVision G8 TE Vol 1 (exponent properties, scientific notation, slope) and IM textbook Unit 4 (linear equations & systems). Four real MCAP items woven as exam capstones: 8⁻⁴·8³=1/8 (8.EE.A.1), 8×10⁹÷2×10⁸=40 (8.EE.A.3), 5(x−6)−2(x+3)=12→16 (8.EE.C.7), system-solution reasoning (8.EE.C.8). Wired into hub as `available`; all answers verified.
+
+## 11. Deployment & publishing rules
+- Repo: **https://github.com/Gabriel-on-the-hill/Grade-8** → GitHub Pages at **https://gabriel-on-the-hill.github.io/Grade-8/** (branch `main`, root). `index.html` redirects to `Grade_8_Math_Hub.html`.
+- **Publish only** the original web app + docs: `index.html`, the hub, the module HTML files, `README.md`, this standard, `Starter_Kit/`.
+- **NEVER publish copyrighted source material:** no `*.pdf`, no `Curriculum/`, no `MCAP MATHS/`, no `Textbooks/`. The `.gitignore` enforces this — keep it intact.
+- `git init`/commits do not work inside the synced project folder; build the deploy repo in a normal directory (e.g. `/tmp/deploy`), copy the publishable files in, and push from there. Gabriel pushes from his own machine.
+- After any fix that touches the hub or modules, the live site is stale until pushed — say so explicitly at the end of the session.
