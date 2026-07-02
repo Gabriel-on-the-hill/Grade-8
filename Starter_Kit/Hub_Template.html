@@ -284,6 +284,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
   function K(s){return STORE_PREFIX+s;}
   function jget(k,f){try{var v=JSON.parse(LS.getItem(k));return (v===null||v===undefined)?f:v;}catch(e){return f;}}
   function jset(k,v){LS.setItem(k,JSON.stringify(v));}
+  var _showAllNames=false;
   function getRoster(){return jget(K('roster'),[]);}
   function setRoster(r){jset(K('roster'),r);}
   function getData(){return jget(K('data'),{students:{}});}
@@ -414,13 +415,17 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
   // ---- sign in ----
   function renderSignIn(){
     var grid=document.getElementById('roster-grid');var roster=getRoster();
+    var dev=LS.getItem(K('device'))||'';
+    var mine=!_showAllNames && dev && roster.indexOf(dev)>=0;
+    var names=mine?[dev]:roster;
     document.getElementById('roster-empty').classList.toggle('hidden',roster.length>0);
-    grid.innerHTML=roster.map(function(n){
+    grid.innerHTML=names.map(function(n){
       return '<div class="name-tile" role="button" tabindex="0" data-n="'+esc(n)+'"><span class="av">'+esc(initials(n))+'</span><span class="nm">'+esc(n)+'</span></div>';
-    }).join('');
+    }).join('')+(mine?'<div style="grid-column:1/-1;margin-top:.3rem"><span id="show-all-names" style="font-size:.84rem;color:var(--green);font-weight:600;cursor:pointer">Someone else? Show all students</span></div>':'');
     Array.prototype.forEach.call(grid.querySelectorAll('.name-tile'),function(t){
-      t.onclick=function(){setCurrent(t.getAttribute('data-n'));boot();};t.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();setCurrent(t.getAttribute('data-n'));boot();}};
+      var go=function(){var n=t.getAttribute('data-n');setCurrent(n);LS.setItem(K('device'),n);_showAllNames=false;boot();};t.onclick=go;t.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};
     });
+    var sa=document.getElementById('show-all-names');if(sa)sa.onclick=function(){_showAllNames=true;renderSignIn();};
     show('view-signin');
   }
 

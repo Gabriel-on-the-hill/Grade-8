@@ -339,7 +339,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
   function getPin(n){var p=getPins();return p[n]||'';}
   function setPin(n,v){var p=getPins();if(v){p[n]=v;}else{delete p[n];}setPins(p);}
   function attemptSignIn(n){ openPinModal(n); }
-  var _pinName='', _pinMode='';
+  var _pinName='', _pinMode='', _showAllNames=false;
   function setPinReveal(show){var t=show?'text':'password';document.getElementById('pin1').type=t;document.getElementById('pin2').type=t;document.getElementById('pin-eye').textContent=show?'Hide':'Show';}
   function openPinModal(n){
     _pinName=n; _pinMode=getPin(n)?'enter':'create';
@@ -371,10 +371,10 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
       var v2=(document.getElementById('pin2').value||'').trim();
       if(!v1){err.textContent='Please enter a PIN.';return;}
       if(v1!==v2){err.textContent='The PINs do not match.';return;}
-      setPin(n,v1); closePinModal(); setCurrent(n); boot(); return;
+      setPin(n,v1); closePinModal(); setCurrent(n); LS.setItem(K('device'),n); _showAllNames=false; boot(); return;
     }
     if(v1!==getPin(n)){err.textContent='Incorrect PIN. If you forgot it, ask your teacher to reset it.';document.getElementById('pin1').focus();document.getElementById('pin1').select();return;}
-    closePinModal(); setCurrent(n); boot();
+    closePinModal(); setCurrent(n); LS.setItem(K('device'),n); _showAllNames=false; boot();
   }
   function getData(){return jget(K('data'),{students:{}});}
   function current(){return LS.getItem(K('current'))||'';}
@@ -524,13 +524,17 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
   // ---- sign in ----
   function renderSignIn(){
     var grid=document.getElementById('roster-grid');var roster=getRoster();
+    var dev=LS.getItem(K('device'))||'';
+    var mine=!_showAllNames && dev && roster.indexOf(dev)>=0;
+    var names=mine?[dev]:roster;
     document.getElementById('roster-empty').classList.toggle('hidden',roster.length>0);
-    grid.innerHTML=roster.map(function(n){
+    grid.innerHTML=names.map(function(n){
       return '<div class="name-tile" role="button" tabindex="0" data-n="'+esc(n)+'"><span class="av">'+esc(initials(n))+'</span><span class="nm">'+esc(n)+'</span></div>';
-    }).join('');
+    }).join('')+(mine?'<div style="grid-column:1/-1;margin-top:.3rem"><span id="show-all-names" style="font-size:.84rem;color:var(--green);font-weight:600;cursor:pointer">Someone else? Show all students</span></div>':'');
     Array.prototype.forEach.call(grid.querySelectorAll('.name-tile'),function(t){
       t.onclick=function(){attemptSignIn(t.getAttribute('data-n'));};t.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();attemptSignIn(t.getAttribute('data-n'));}};
     });
+    var sa=document.getElementById('show-all-names');if(sa)sa.onclick=function(){_showAllNames=true;renderSignIn();};
     show('view-signin');
   }
 
