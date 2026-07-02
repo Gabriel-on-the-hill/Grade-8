@@ -232,7 +232,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
       <p class="sub">Choose your name to open your work and pick up where you left off.</p>
       <div id="roster-grid" class="roster-grid"></div>
       <div id="roster-empty" class="empty-note hidden">
-        No students added yet. Open <strong>Teacher</strong> (top right) to add names to the roster.
+        No students on this device yet. If you're a student, ask your teacher to add your name &mdash; you'll never need to touch any setup yourself. Teachers: open <strong>Teacher</strong> (top right) &rarr; <strong>Manage roster</strong>.
       </div>
     </div>
   </section>
@@ -308,6 +308,18 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
       <input type="file" id="import-file" accept="application/json" style="display:none">
     </div>
     <div id="backup-status" class="statusline muted-note"></div>
+  </div>
+</div>
+
+<div id="teacherModal" class="modal-bg hidden">
+  <div class="modal" style="max-width:340px;border-top:5px solid var(--green)">
+    <h2 id="tm-title" style="margin:.1rem 0 .2rem">Teacher access</h2>
+    <p id="tm-sub">Enter the teacher passcode to open the dashboard.</p>
+    <input id="tm-pass" class="field" type="password" autocomplete="off" placeholder="Teacher passcode">
+    <input id="tm-pass2" class="field" type="password" autocomplete="off" placeholder="Confirm passcode" style="margin-top:.5rem">
+    <div id="tm-err" style="font-size:.8rem;color:var(--bad);min-height:1.1em;margin:.35rem 0 .2rem"></div>
+    <button class="btn" id="tm-go" style="width:100%">Open dashboard</button>
+    <div style="display:flex;justify-content:flex-end;margin-top:.7rem"><span id="tm-cancel" style="font-size:.8rem;color:var(--muted);cursor:pointer">Cancel</span></div>
   </div>
 </div>
 
@@ -440,6 +452,26 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
   /* Global skill-label lookup, merged across subjects (dashboard fallback). */
   var SKILL_LABELS={}; SUBJECTS.forEach(function(s){var m=s.skillLabels||{};Object.keys(m).forEach(function(k){SKILL_LABELS[k]=m[k];});});
 
+  /* ===== EDIT PER DEPLOYMENT: first-run seeds (zero-setup on student devices) =====
+     ROSTER_SEED bakes the class roster into the app: a fresh device shows the name
+     tiles immediately — no teacher setup on that device, ever. Merged whenever the
+     seed list changes (tracked via K('seedv')); teacher can still add/remove names
+     in Manage roster. TEACHER_PASS_SEED (optional) is THE deployment passcode: applied once per
+     seed value on EVERY device (overwriting any locally set passcode, incl. ones
+     students created during old forced setup). To change it for good, change the
+     seed and redeploy; Settings changes last only until the seed changes. */
+  var ROSTER_SEED=['Divine','Ayodeji'];
+  var TEACHER_PASS_SEED=atob('R2FiZQ==');  // lightly encoded; checked case-insensitively
+  function applySeeds(){
+    try{
+      var sv=JSON.stringify(ROSTER_SEED);
+      if(ROSTER_SEED.length && LS.getItem(K('seedv'))!==sv){
+        var r=getRoster();ROSTER_SEED.forEach(function(n){if(r.indexOf(n)<0)r.push(n);});setRoster(r);LS.setItem(K('seedv'),sv);
+      }
+      if(TEACHER_PASS_SEED && LS.getItem(K('passv'))!==TEACHER_PASS_SEED){LS.setItem(K('teacherPass'),TEACHER_PASS_SEED);LS.setItem(K('passv'),TEACHER_PASS_SEED);}
+    }catch(e){}
+  }
+
   function subjectById(id){for(var i=0;i<SUBJECTS.length;i++){if(SUBJECTS[i].id===id)return SUBJECTS[i];}return null;}
   function eachTopic(fn){SUBJECTS.forEach(function(s){s.units.forEach(function(u){u.topics.forEach(function(t){fn(t,u,s);});});});}
   function topicMeta(id){var found=null;eachTopic(function(t){if(t.id===id)found=t;});return found;}
@@ -459,8 +491,9 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
   var MASTERY_PCT=100;
   function examReadiness(t){var e=(t&&t.exam)||{attempts:0,correct:0};return {att:e.attempts||0,cor:e.correct||0,pct:e.attempts?Math.round((e.correct||0)/e.attempts*100):0};}
   function sectionProgress(t){var totals=(t&&t.sectionTotals)||{};var tree=(t&&t.tree)||{};var by={};Object.keys(tree).forEach(function(q){var sec=q.split('-')[0];var s=tree[q].steps||{};by[sec]=(by[sec]||0)+Object.keys(s).filter(function(k){return s[k];}).length;});return Object.keys(totals).sort(function(a,b){return (parseInt(a)||99)-(parseInt(b)||99);}).map(function(sec){return {sec:sec,total:totals[sec],done:Math.min(by[sec]||0,totals[sec])};});}
-  function suggestHomework(topics, ids, labels){var agg={};(ids||Object.keys(topics)).forEach(function(id){var to=topics[id];if(!to)return;var st=to.skillStats||{};Object.keys(st).forEach(function(k){if(st[k].misses>0){agg[k]=agg[k]||{misses:0};agg[k].misses+=st[k].misses;}});});return Object.keys(agg).filter(function(k){return agg[k].misses>=2;}).sort(function(a,b){return agg[b].misses-agg[a].misses;}).slice(0,3).map(function(k){return {label:(labels&&labels[k])||SKILL_LABELS[k]||k,misses:agg[k].misses};});}
+  function suggestHomework(topics, ids, labels){var agg={};(ids||Object.keys(topics)).forEach(function(id){var to=topics[id];if(!to)return;var st=to.skillStats||{};Object.keys(st).forEach(function(k){agg[k]=agg[k]||{misses:0,attempts:0};agg[k].misses+=st[k].misses||0;agg[k].attempts+=st[k].attempts||0;});});return Object.keys(agg).filter(function(k){return agg[k].misses>=2&&agg[k].misses/Math.max(agg[k].attempts,1)>=0.25;}).sort(function(a,b){return agg[b].misses-agg[a].misses;}).slice(0,3).map(function(k){return {label:(labels&&labels[k])||SKILL_LABELS[k]||k,misses:agg[k].misses};});}
   function getAssign(stu,sid){ if(stu&&stu.assignments&&stu.assignments[sid]&&stu.assignments[sid].text)return stu.assignments[sid].text; if(sid==='math'&&stu&&stu.assignment&&stu.assignment.text)return stu.assignment.text; return ''; }
+  function getAssignObj(stu,sid){ if(stu&&stu.assignments&&stu.assignments[sid]&&stu.assignments[sid].text)return stu.assignments[sid]; if(sid==='math'&&stu&&stu.assignment&&stu.assignment.text)return stu.assignment; return null; }
   function relTime(ts){
     if(!ts)return 'not started';
     var diff=Date.now()-ts, m=60000,h=3600000,d=86400000;
@@ -519,12 +552,13 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     renderSubjectTabs(subj.id);
     var topics=studentTopics(cur);
     var ids=subjectTopicIds(subj);
-    var started=0,mastered=0,skillsToReview={};
+    var started=0,mastered=0,skillsToReview={},agg={};
     ids.forEach(function(id){
       if(!topics[id])return;
       var p=topicProgress(topics[id]); if(p.last)started++; mastered+=p.done;
-      (topics[id].struggles||[]).forEach(function(s){ if(s.skill)skillsToReview[s.skill]=true; });
+      var st=topics[id].skillStats||{};Object.keys(st).forEach(function(k){agg[k]=agg[k]||{a:0,m:0};agg[k].a+=st[k].attempts||0;agg[k].m+=st[k].misses||0;});
     });
+    Object.keys(agg).forEach(function(k){if(agg[k].m>=2&&agg[k].m/Math.max(agg[k].a,1)>=0.25)skillsToReview[k]=true;});
     document.getElementById('greeting-sub').textContent=subj.label+' — pick a topic to begin, or carry on where you left off.';
     document.getElementById('stat-tiles').innerHTML=
       '<div class="stat"><div class="n">'+started+'</div><div class="l">Topics started</div></div>'+
@@ -576,23 +610,43 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
   function renderHomeworkBanner(cur, topics, subj){
     var el=document.getElementById('hw-banner'); if(!el)return;
     var data=getData(); var stu=(data.students&&data.students[cur])||{};
-    var assign=getAssign(stu, subj.id);
+    var ao=getAssignObj(stu, subj.id);
     var sugg=suggestHomework(topics, subjectTopicIds(subj), subj.skillLabels);
-    if(!assign && !sugg.length){ el.innerHTML=''; return; }
+    if(!ao && !sugg.length){ el.innerHTML=''; return; }
     var s='<div class="hw-card"><h3>Your '+esc(subj.label)+' homework</h3>';
-    if(assign) s+='<div class="item">From your teacher: '+esc(assign)+'</div>';
-    if(sugg.length) s+='<div class="item">Practice again: '+sugg.map(function(x){return esc(x.label)+' ('+x.misses+' missed)';}).join('; ')+'</div>';
+    if(ao){
+      s+='<div class="item">From your teacher: '+esc(ao.text)+(ao.doneTs?' <strong>— done \u2713</strong>':'')+'</div>';
+      s+='<div style="margin-top:.4rem"><button class="btn sm'+(ao.doneTs?' ghost':'')+'" id="hw-done">'+(ao.doneTs?'Mark as not done':'Mark done')+'</button></div>';
+    }
+    if(sugg.length) s+='<div class="item" style="margin-top:.45rem">Practice again: '+sugg.map(function(x){return esc(x.label)+' ('+x.misses+' missed)';}).join('; ')+'</div>';
     s+='</div>'; el.innerHTML=s;
+    var hb=document.getElementById('hw-done');
+    if(hb)hb.onclick=function(){var d=getData();d.students=d.students||{};d.students[cur]=d.students[cur]||{topics:{}};d.students[cur].assignments=d.students[cur].assignments||{};var cu=d.students[cur].assignments[subj.id]||{text:ao.text,ts:ao.ts||Date.now()};cu.doneTs=cu.doneTs?0:Date.now();d.students[cur].assignments[subj.id]=cu;jset(K('data'),d);renderApp();};
   }
 
   // ---- teacher ----
+  var _tmMode='';
   function enterTeacher(){
-    var pass=teacherPass();
-    if(!pass){ alert('Set a teacher passcode first (Settings).'); openSettings(); return; }
-    var entry=prompt('Enter teacher passcode:');
-    if(entry===null)return;
-    if(entry!==pass){ alert('Incorrect passcode.'); return; }
-    renderTeacher();
+    _tmMode=teacherPass()?'enter':'create';
+    document.getElementById('tm-pass').value='';document.getElementById('tm-pass2').value='';document.getElementById('tm-err').textContent='';
+    document.getElementById('tm-title').textContent=_tmMode==='create'?'Set a teacher passcode':'Teacher access';
+    document.getElementById('tm-sub').textContent=_tmMode==='create'?'First time here: choose a passcode for the teacher dashboard. Students never need this.':'Enter the teacher passcode to open the dashboard.';
+    document.getElementById('tm-pass2').style.display=_tmMode==='create'?'':'none';
+    document.getElementById('tm-go').textContent=_tmMode==='create'?'Set passcode & open':'Open dashboard';
+    document.getElementById('teacherModal').classList.remove('hidden');
+    setTimeout(function(){document.getElementById('tm-pass').focus();},40);
+  }
+  function closeTeacherModal(){document.getElementById('teacherModal').classList.add('hidden');}
+  function submitTeacher(){
+    var err=document.getElementById('tm-err');var v=document.getElementById('tm-pass').value;
+    if(_tmMode==='create'){
+      var v2=document.getElementById('tm-pass2').value;
+      if(!v){err.textContent='Please choose a passcode.';return;}
+      if(v!==v2){err.textContent='The passcodes do not match.';return;}
+      LS.setItem(K('teacherPass'),v);closeTeacherModal();renderTeacher();return;
+    }
+    if(String(v).trim().toLowerCase()!==String(teacherPass()).trim().toLowerCase()){err.textContent='Incorrect passcode.';return;}
+    closeTeacherModal();renderTeacher();
   }
   function missClass(ratio){ return ratio>=0.5?'miss-hi':(ratio>=0.25?'miss-mid':'miss-ok'); }
   function renderTeacher(){
@@ -649,20 +703,24 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
           var resp=to.responses||[];
           if(resp.length){
             var rid='rs-'+name.replace(/\W/g,'')+'-'+t.id.replace(/\W/g,'');
+            var rbase=Math.max(0,resp.length-20);
             html+='<span class="struggle-toggle" data-tg="'+rid+'">Show '+resp.length+' written response'+(resp.length>1?'s':'')+'</span>';
-            html+='<div class="resp-list hidden" id="'+rid+'">'+resp.slice(-20).map(function(r){return '<div><span class="q">'+esc(r.label||r.qid)+'</span>: '+esc(r.text)+'</div>';}).join('')+'</div>';
+            html+='<div class="resp-list hidden" id="'+rid+'">'+resp.slice(-20).map(function(r,ix){
+              return '<div><span class="q">'+esc(r.label||r.qid)+'</span>: '+esc(r.text)+' <button class="btn ghost sm cr-rev" data-n="'+esc(name)+'" data-t="'+esc(t.id)+'" data-i="'+(rbase+ix)+'" style="margin-left:.4rem;padding:.1rem .5rem;font-size:.72rem">'+(r.reviewed?'Reviewed \u2713':'Mark reviewed')+'</button></div>';
+            }).join('')+'</div>';
           }
           html+='</div>';
         });});
         if(!any) html+='<p class="muted-note">No activity yet in '+esc(subj.label)+'.</p>';
-        var av=getAssign(stuA, subj.id);
-        html+='<div class="assign-box"><input class="field assign-inp" data-s="'+esc(subj.id)+'" placeholder="Set '+esc(subj.label)+' homework for '+esc(name)+'..." value="'+esc(av)+'"/><button class="btn sm assign-save" data-n="'+esc(name)+'" data-s="'+esc(subj.id)+'">Save</button></div>';
+        var av=getAssign(stuA, subj.id);var avo=getAssignObj(stuA, subj.id);
+        html+='<div class="assign-box"><input class="field assign-inp" data-s="'+esc(subj.id)+'" placeholder="Set '+esc(subj.label)+' homework for '+esc(name)+'..." value="'+esc(av)+'"/><button class="btn sm assign-save" data-n="'+esc(name)+'" data-s="'+esc(subj.id)+'">Save</button></div>'+(avo&&avo.doneTs?'<div class="muted-note" style="margin-top:.25rem">Student marked this done '+relTime(avo.doneTs)+'.</div>':'');
       });
       if(!anyStudent) html+='<p class="muted-note">No activity yet.</p>';
       html+='</div></div>';
     });
     dash.innerHTML=html;
     Array.prototype.forEach.call(dash.querySelectorAll('.assign-save'),function(b){b.onclick=function(){var inp=b.parentNode.querySelector('.assign-inp');var n=b.getAttribute('data-n');var sid=b.getAttribute('data-s');var d=getData();d.students=d.students||{};d.students[n]=d.students[n]||{topics:{}};d.students[n].assignments=d.students[n].assignments||{};d.students[n].assignments[sid]={text:inp.value.trim(),ts:Date.now()};jset(K('data'),d);b.textContent='Saved';setTimeout(function(){b.textContent='Save';},1200);};});
+    Array.prototype.forEach.call(dash.querySelectorAll('.cr-rev'),function(b){b.onclick=function(){var d=getData();var n=b.getAttribute('data-n'),ti=b.getAttribute('data-t'),i=parseInt(b.getAttribute('data-i'),10);var to=d.students&&d.students[n]&&d.students[n].topics&&d.students[n].topics[ti];if(!to||!to.responses||!to.responses[i])return;to.responses[i].reviewed=to.responses[i].reviewed?0:Date.now();jset(K('data'),d);b.textContent=to.responses[i].reviewed?'Reviewed \u2713':'Mark reviewed';};});
     Array.prototype.forEach.call(dash.querySelectorAll('.struggle-toggle'),function(tg){
       tg.onclick=function(){var box=document.getElementById(tg.getAttribute('data-tg'));var hidden=box.classList.toggle('hidden');tg.textContent=(hidden?'Show ':'Hide ')+tg.textContent.replace(/^(Show|Hide)\s/,'');};
     });
@@ -726,6 +784,10 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
       document.getElementById('pass-status').textContent='Passcode saved.';
     };
     document.getElementById('settingsModal').addEventListener('click',function(e){if(e.target===this)closeSettings();});
+    document.getElementById('tm-go').onclick=submitTeacher;
+    document.getElementById('tm-cancel').onclick=closeTeacherModal;
+    document.getElementById('teacherModal').addEventListener('click',function(e){if(e.target===this)closeTeacherModal();});
+    ['tm-pass','tm-pass2'].forEach(function(id){document.getElementById(id).addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();submitTeacher();}});});
     document.getElementById('pin-go').onclick=submitPin;
     document.getElementById('pin-eye').onclick=function(){setPinReveal(document.getElementById('pin1').type==='password');};
     document.getElementById('pin-cancel').onclick=closePinModal;
@@ -749,6 +811,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     if(current()) renderApp(); else renderSignIn();
   }
   try{wire();}catch(e){if(window.console)console.error('wire() failed:',e);}
+  applySeeds();
   boot();
 })();
 </script>

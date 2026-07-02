@@ -63,6 +63,7 @@ section.topic > p.intro{margin:.4rem 0 .5rem;color:var(--muted);font-size:.95rem
 .mc-option.correct{background:var(--ok-bg);border-color:var(--ok);color:var(--ok);font-weight:600}
 .mc-option.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad);font-weight:600}
 .mc-option.disabled{pointer-events:none;opacity:.55} .mc-option.disabled.correct,.mc-option.disabled.wrong{opacity:1}
+.mc-option.cooldown{pointer-events:none;opacity:.7}
 .mc-feedback{display:none;margin-top:.4rem;font-size:.86rem;font-weight:500}
 .mc-feedback.correct,.mc-feedback.wrong{display:block}
 .mc-feedback.correct{color:var(--ok)} .mc-feedback.wrong{color:var(--bad)}
@@ -170,7 +171,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
       <li><strong>Negatives:</strong> include the minus sign, like <code>-5</code>.</li>
       <li><strong>Whole &amp; decimal numbers:</strong> digits only, no commas &mdash; type <code>53000</code>, not <code>53,000</code>.</li>
     </ul>
-    <p>On the real test, a symbol palette builds fractions, exponents and square roots for you. If you're unsure, fill in what you can &mdash; partial answers can still earn credit, and <em>Clear All</em> erases only the blanks.</p>
+    <p>On the real test, a symbol palette builds fractions, exponents and square roots for you. If you're unsure, fill in what you can &mdash; partial answers can still earn credit.</p>
   </div>
 
   <section class="topic" id="exponents">
@@ -196,7 +197,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qhead"><span class="qtag learn">Learn</span><span class="qtitle">Product of powers</span></div>
     <div class="qbody"><div class="step">
       <div class="step-label">Q1 &middot; <span class="math">2<sup>3</sup> &middot; 2<sup>4</sup> = 2<sup>?</sup></span> &mdash; enter the exponent.</div>
-      <div class="input-row"><input type="number" class="ans-input" data-answer="7" data-tol="0"/><span class="feedback"></span></div>
+      <div class="input-row"><input type="number" class="ans-input" data-answer="k1:Nw==" data-tol="0"/><span class="feedback"></span></div>
       <button class="check-btn">Check</button>
     </div></div>
   </div>
@@ -206,10 +207,10 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qbody"><div class="step">
       <div class="step-label">Q2 &middot; Which expression equals <span class="math">(x<sup>3</sup>)<sup>2</sup></span>?</div>
       <div class="mc-group">
-        <button class="mc-option" data-correct="false"><span class="math">x<sup>5</sup></span></button>
-        <button class="mc-option" data-correct="true"><span class="math">x<sup>6</sup></span></button>
-        <button class="mc-option" data-correct="false"><span class="math">x<sup>9</sup></span></button>
-        <button class="mc-option" data-correct="false"><span class="math">x<sup>1</sup></span></button>
+        <button class="mc-option" data-k="k1:NTF8MA=="><span class="math">x<sup>5</sup></span></button>
+        <button class="mc-option" data-k="k1:NTJ8MQ=="><span class="math">x<sup>6</sup></span></button>
+        <button class="mc-option" data-k="k1:NTN8MA=="><span class="math">x<sup>9</sup></span></button>
+        <button class="mc-option" data-k="k1:NTR8MA=="><span class="math">x<sup>1</sup></span></button>
       </div>
       <div class="mc-feedback">Power of a Power: multiply the exponents, <span class="math">3 &middot; 2 = 6</span>.</div>
     </div></div>
@@ -219,7 +220,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Quotient of powers</span></div>
     <div class="qbody"><div class="step">
       <div class="step-label">Q3 &middot; <span class="math">5<sup>7</sup> &divide; 5<sup>4</sup> = 5<sup>?</sup></span> &mdash; enter the exponent.</div>
-      <div class="input-row"><input type="number" class="ans-input" data-answer="3" data-tol="0"/><span class="feedback"></span></div>
+      <div class="input-row"><input type="number" class="ans-input" data-answer="k1:Mw==" data-tol="0"/><span class="feedback"></span></div>
       <button class="check-btn">Check</button>
     </div></div>
   </div>
@@ -228,7 +229,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Negative exponent</span></div>
     <div class="qbody"><div class="step">
       <div class="step-label">Q4 &middot; Write <span class="math">2<sup>&minus;3</sup></span> as a fraction in lowest terms.</div>
-      <div class="input-row"><input type="text" class="ans-input" data-type="text" placeholder="e.g. 5/11" data-answer="1/8"/><span class="feedback"></span></div>
+      <div class="input-row"><input type="text" class="ans-input" data-type="text" placeholder="e.g. 5/11" data-answer="k1:MS84"/><span class="feedback"></span></div>
       <button class="check-btn">Check</button>
       <button class="hint-btn">Hint</button>
       <div class="hint-content"><span class="math">a<sup>&minus;n</sup> = 1/a<sup>n</sup></span>, so <span class="math">2<sup>&minus;3</sup> = 1/2<sup>3</sup></span>.</div>
@@ -240,10 +241,10 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qbody"><div class="step">
       <div class="step-label">Q5 &middot; Which expression is equivalent to <span class="math">8<sup>&minus;4</sup> &middot; 8<sup>3</sup></span>?</div>
       <div class="mc-group">
-        <button class="mc-option" data-correct="false"><span class="math">&minus;8</span></button>
-        <button class="mc-option" data-correct="false"><span class="math">&minus;1/8</span></button>
-        <button class="mc-option" data-correct="true"><span class="math">1/8</span></button>
-        <button class="mc-option" data-correct="false"><span class="math">8</span></button>
+        <button class="mc-option" data-k="k1:NTV8MA=="><span class="math">&minus;8</span></button>
+        <button class="mc-option" data-k="k1:NTZ8MA=="><span class="math">&minus;1/8</span></button>
+        <button class="mc-option" data-k="k1:NTd8MQ=="><span class="math">1/8</span></button>
+        <button class="mc-option" data-k="k1:NTh8MA=="><span class="math">8</span></button>
       </div>
       <div class="mc-feedback">Add exponents: <span class="math">8<sup>&minus;4+3</sup> = 8<sup>&minus;1</sup> = 1/8</span>.</div>
     </div></div>
@@ -267,7 +268,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qhead"><span class="qtag learn">Learn</span><span class="qtitle">To standard form</span></div>
     <div class="qbody"><div class="step">
       <div class="step-label">Q6 &middot; Write <span class="math">5.3 &times; 10<sup>4</sup></span> in standard form.</div>
-      <div class="input-row"><input type="number" class="ans-input wide" data-answer="53000" data-tol="0"/><span class="feedback"></span></div>
+      <div class="input-row"><input type="number" class="ans-input wide" data-answer="k1:NTMwMDA=" data-tol="0"/><span class="feedback"></span></div>
       <button class="check-btn">Check</button>
     </div></div>
   </div>
@@ -277,10 +278,10 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qbody"><div class="step">
       <div class="step-label">Q7 &middot; Which is <span class="math">0.00072</span> written in scientific notation?</div>
       <div class="mc-group">
-        <button class="mc-option" data-correct="true"><span class="math">7.2 &times; 10<sup>&minus;4</sup></span></button>
-        <button class="mc-option" data-correct="false"><span class="math">72 &times; 10<sup>&minus;5</sup></span></button>
-        <button class="mc-option" data-correct="false"><span class="math">7.2 &times; 10<sup>4</sup></span></button>
-        <button class="mc-option" data-correct="false"><span class="math">0.72 &times; 10<sup>&minus;3</sup></span></button>
+        <button class="mc-option" data-k="k1:NTl8MQ=="><span class="math">7.2 &times; 10<sup>&minus;4</sup></span></button>
+        <button class="mc-option" data-k="k1:NjB8MA=="><span class="math">72 &times; 10<sup>&minus;5</sup></span></button>
+        <button class="mc-option" data-k="k1:NjF8MA=="><span class="math">7.2 &times; 10<sup>4</sup></span></button>
+        <button class="mc-option" data-k="k1:NjJ8MA=="><span class="math">0.72 &times; 10<sup>&minus;3</sup></span></button>
       </div>
       <div class="mc-feedback">Move the point 4 places right to get 7.2, so the exponent is <span class="math">&minus;4</span>. The coefficient must be between 1 and 10.</div>
     </div></div>
@@ -291,12 +292,12 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qbody">
       <div class="step">
         <div class="step-label">Q8 &middot; Part A &middot; <span class="math">(3 &times; 10<sup>5</sup>)(2 &times; 10<sup>2</sup>)</span>: coefficient =</div>
-        <div class="input-row"><input type="number" class="ans-input" data-answer="6" data-tol="0"/><span class="feedback"></span></div>
+        <div class="input-row"><input type="number" class="ans-input" data-answer="k1:Ng==" data-tol="0"/><span class="feedback"></span></div>
         <button class="check-btn">Check</button>
       </div>
       <div class="step locked">
         <div class="step-label">Part B &middot; power of 10 (enter the exponent) =</div>
-        <div class="input-row"><input type="number" class="ans-input" data-answer="7" data-tol="0"/><span class="feedback"></span></div>
+        <div class="input-row"><input type="number" class="ans-input" data-answer="k1:Nw==" data-tol="0"/><span class="feedback"></span></div>
         <button class="check-btn">Check</button>
       </div>
     </div>
@@ -306,7 +307,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">MCAP practice item &middot; 8.EE.A.3</span></div>
     <div class="qbody"><div class="step">
       <div class="step-label">Q9 &middot; The world population is about <span class="math">8 &times; 10<sup>9</sup></span>. A country's population is about <span class="math">2 &times; 10<sup>8</sup></span>. The world population is about how many times as large as the country's?</div>
-      <div class="input-row"><input type="number" class="ans-input" data-answer="40" data-tol="0"/><span class="feedback"></span></div>
+      <div class="input-row"><input type="number" class="ans-input" data-answer="k1:NDA=" data-tol="0"/><span class="feedback"></span></div>
       <button class="check-btn">Check</button>
     </div></div>
   </div>
@@ -329,7 +330,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qhead"><span class="qtag learn">Learn</span><span class="qtitle">Find the slope</span></div>
     <div class="qbody"><div class="step">
       <div class="step-label">Q10 &middot; A line passes through <span class="math">(0,0)</span> and <span class="math">(4,12)</span>. What is its slope?</div>
-      <div class="input-row"><input type="number" class="ans-input" data-answer="3" data-tol="0"/><span class="feedback"></span></div>
+      <div class="input-row"><input type="number" class="ans-input" data-answer="k1:Mw==" data-tol="0"/><span class="feedback"></span></div>
       <button class="check-btn">Check</button>
     </div></div>
   </div>
@@ -339,10 +340,10 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qbody"><div class="step">
       <div class="step-label">Q11 &middot; Which equation has slope 2 and y-intercept &minus;3?</div>
       <div class="mc-group">
-        <button class="mc-option" data-correct="true"><span class="math">y = 2x &minus; 3</span></button>
-        <button class="mc-option" data-correct="false"><span class="math">y = &minus;3x + 2</span></button>
-        <button class="mc-option" data-correct="false"><span class="math">y = 2x + 3</span></button>
-        <button class="mc-option" data-correct="false"><span class="math">y = &minus;2x &minus; 3</span></button>
+        <button class="mc-option" data-k="k1:NjN8MQ=="><span class="math">y = 2x &minus; 3</span></button>
+        <button class="mc-option" data-k="k1:NjR8MA=="><span class="math">y = &minus;3x + 2</span></button>
+        <button class="mc-option" data-k="k1:NjV8MA=="><span class="math">y = 2x + 3</span></button>
+        <button class="mc-option" data-k="k1:NjZ8MA=="><span class="math">y = &minus;2x &minus; 3</span></button>
       </div>
       <div class="mc-feedback">In <span class="math">y = mx + b</span>, <span class="math">m = 2</span> (slope) and <span class="math">b = &minus;3</span> (y-intercept).</div>
     </div></div>
@@ -353,12 +354,12 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qbody">
       <div class="step">
         <div class="step-label">Q12 &middot; Part A &middot; For <span class="math">y = 4x + 7</span>, the slope is</div>
-        <div class="input-row"><input type="number" class="ans-input" data-answer="4" data-tol="0"/><span class="feedback"></span></div>
+        <div class="input-row"><input type="number" class="ans-input" data-answer="k1:NA==" data-tol="0"/><span class="feedback"></span></div>
         <button class="check-btn">Check</button>
       </div>
       <div class="step locked">
         <div class="step-label">Part B &middot; the y-intercept is</div>
-        <div class="input-row"><input type="number" class="ans-input" data-answer="7" data-tol="0"/><span class="feedback"></span></div>
+        <div class="input-row"><input type="number" class="ans-input" data-answer="k1:Nw==" data-tol="0"/><span class="feedback"></span></div>
         <button class="check-btn">Check</button>
       </div>
     </div>
@@ -369,10 +370,10 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qbody"><div class="step">
       <div class="step-label">Q13 &middot; Apples cost $6 for 3 pounds (a proportional relationship). What is the unit rate, in dollars per pound?</div>
       <div class="mc-group">
-        <button class="mc-option" data-correct="true">$2</button>
-        <button class="mc-option" data-correct="false">$3</button>
-        <button class="mc-option" data-correct="false">$6</button>
-        <button class="mc-option" data-correct="false">$18</button>
+        <button class="mc-option" data-k="k1:Njd8MQ==">$2</button>
+        <button class="mc-option" data-k="k1:Njh8MA==">$3</button>
+        <button class="mc-option" data-k="k1:Njl8MA==">$6</button>
+        <button class="mc-option" data-k="k1:NzB8MA==">$18</button>
       </div>
       <div class="mc-feedback"><span class="math">6 &divide; 3 = 2</span> dollars per pound &mdash; this is the slope of the line <span class="math">y = 2x</span>.</div>
     </div></div>
@@ -396,7 +397,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qhead"><span class="qtag learn">Learn</span><span class="qtitle">One variable</span></div>
     <div class="qbody"><div class="step">
       <div class="step-label">Q14 &middot; Solve <span class="math">3x + 5 = 20</span>. <span class="math">x =</span></div>
-      <div class="input-row"><input type="number" class="ans-input" data-answer="5" data-tol="0"/><span class="feedback"></span></div>
+      <div class="input-row"><input type="number" class="ans-input" data-answer="k1:NQ==" data-tol="0"/><span class="feedback"></span></div>
       <button class="check-btn">Check</button>
     </div></div>
   </div>
@@ -405,7 +406,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Variables both sides</span></div>
     <div class="qbody"><div class="step">
       <div class="step-label">Q15 &middot; Solve <span class="math">4x &minus; 7 = 2x + 9</span>. <span class="math">x =</span></div>
-      <div class="input-row"><input type="number" class="ans-input" data-answer="8" data-tol="0"/><span class="feedback"></span></div>
+      <div class="input-row"><input type="number" class="ans-input" data-answer="k1:OA==" data-tol="0"/><span class="feedback"></span></div>
       <button class="check-btn">Check</button>
     </div></div>
   </div>
@@ -414,7 +415,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Distribute first</span></div>
     <div class="qbody"><div class="step">
       <div class="step-label">Q16 &middot; Solve <span class="math">2(x + 3) = 4x &minus; 2</span>. <span class="math">x =</span></div>
-      <div class="input-row"><input type="number" class="ans-input" data-answer="4" data-tol="0"/><span class="feedback"></span></div>
+      <div class="input-row"><input type="number" class="ans-input" data-answer="k1:NA==" data-tol="0"/><span class="feedback"></span></div>
       <button class="check-btn">Check</button>
     </div></div>
   </div>
@@ -423,7 +424,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">MCAP practice item &middot; 8.EE.C.7</span></div>
     <div class="qbody"><div class="step">
       <div class="step-label">Q17 &middot; What value of <span class="math">x</span> satisfies <span class="math">5(x &minus; 6) &minus; 2(x + 3) = 12</span>?</div>
-      <div class="input-row"><input type="number" class="ans-input" data-answer="16" data-tol="0"/><span class="feedback"></span></div>
+      <div class="input-row"><input type="number" class="ans-input" data-answer="k1:MTY=" data-tol="0"/><span class="feedback"></span></div>
       <button class="check-btn">Check</button>
       <button class="hint-btn">Hint</button>
       <div class="hint-content">Distribute both: <span class="math">5x &minus; 30 &minus; 2x &minus; 6 = 12</span>, then combine.</div>
@@ -453,9 +454,9 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qbody"><div class="step">
       <div class="step-label">Q18 &middot; How many solutions does <span class="math">2x + 1 = 2x + 1</span> have?</div>
       <div class="mc-group">
-        <button class="mc-option" data-correct="false">One</button>
-        <button class="mc-option" data-correct="false">None</button>
-        <button class="mc-option" data-correct="true">Infinitely many</button>
+        <button class="mc-option" data-k="k1:NzF8MA==">One</button>
+        <button class="mc-option" data-k="k1:NzJ8MA==">None</button>
+        <button class="mc-option" data-k="k1:NzN8MQ==">Infinitely many</button>
       </div>
       <div class="mc-feedback">Both sides are identical &mdash; true for every <span class="math">x</span>, so infinitely many solutions.</div>
     </div></div>
@@ -466,9 +467,9 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qbody"><div class="step">
       <div class="step-label">Q19 &middot; How many solutions does <span class="math">x + 4 = x &minus; 4</span> have?</div>
       <div class="mc-group">
-        <button class="mc-option" data-correct="false">One</button>
-        <button class="mc-option" data-correct="true">None</button>
-        <button class="mc-option" data-correct="false">Infinitely many</button>
+        <button class="mc-option" data-k="k1:NzR8MA==">One</button>
+        <button class="mc-option" data-k="k1:NzV8MQ==">None</button>
+        <button class="mc-option" data-k="k1:NzZ8MA==">Infinitely many</button>
       </div>
       <div class="mc-feedback">Subtract <span class="math">x</span> from both sides: <span class="math">4 = &minus;4</span>, which is false &mdash; no solution.</div>
     </div></div>
@@ -479,10 +480,10 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qbody"><div class="step">
       <div class="step-label">Q20 &middot; Select every equation that has <em>exactly one</em> solution.</div>
       <div class="ms-group">
-        <button class="ms-option" data-correct="true"><span class="box"></span><span class="math">3x + 2 = 14</span></button>
-        <button class="ms-option" data-correct="false"><span class="box"></span><span class="math">5x = 5x + 1</span></button>
-        <button class="ms-option" data-correct="false"><span class="box"></span><span class="math">2(x + 1) = 2x + 2</span></button>
-        <button class="ms-option" data-correct="true"><span class="box"></span><span class="math">7x &minus; 3 = 4x + 9</span></button>
+        <button class="ms-option" data-k="k1:Nzd8MQ=="><span class="box"></span><span class="math">3x + 2 = 14</span></button>
+        <button class="ms-option" data-k="k1:Nzh8MA=="><span class="box"></span><span class="math">5x = 5x + 1</span></button>
+        <button class="ms-option" data-k="k1:Nzl8MA=="><span class="box"></span><span class="math">2(x + 1) = 2x + 2</span></button>
+        <button class="ms-option" data-k="k1:ODB8MQ=="><span class="box"></span><span class="math">7x &minus; 3 = 4x + 9</span></button>
       </div>
       <button class="check-btn ms-check">Check</button>
       <button class="hint-btn">Hint</button>
@@ -518,12 +519,12 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qbody">
       <div class="step">
         <div class="step-label">Q22 &middot; Part A &middot; Solve <span class="math">y = x + 1</span> and <span class="math">y = 2x &minus; 1</span>. <span class="math">x =</span></div>
-        <div class="input-row"><input type="number" class="ans-input" data-answer="2" data-tol="0"/><span class="feedback"></span></div>
+        <div class="input-row"><input type="number" class="ans-input" data-answer="k1:Mg==" data-tol="0"/><span class="feedback"></span></div>
         <button class="check-btn">Check</button>
       </div>
       <div class="step locked">
         <div class="step-label">Part B &middot; <span class="math">y =</span></div>
-        <div class="input-row"><input type="number" class="ans-input" data-answer="3" data-tol="0"/><span class="feedback"></span></div>
+        <div class="input-row"><input type="number" class="ans-input" data-answer="k1:Mw==" data-tol="0"/><span class="feedback"></span></div>
         <button class="check-btn">Check</button>
       </div>
     </div>
@@ -534,10 +535,10 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qbody"><div class="step">
       <div class="step-label">Q23 &middot; The solution to a system of two linear equations is the point where the two lines</div>
       <div class="mc-group">
-        <button class="mc-option" data-correct="true">intersect</button>
-        <button class="mc-option" data-correct="false">have the same y-intercept</button>
-        <button class="mc-option" data-correct="false">cross the x-axis</button>
-        <button class="mc-option" data-correct="false">are steepest</button>
+        <button class="mc-option" data-k="k1:ODF8MQ==">intersect</button>
+        <button class="mc-option" data-k="k1:ODJ8MA==">have the same y-intercept</button>
+        <button class="mc-option" data-k="k1:ODN8MA==">cross the x-axis</button>
+        <button class="mc-option" data-k="k1:ODR8MA==">are steepest</button>
       </div>
       <div class="mc-feedback">The solution satisfies both equations at once, so it is the point where the graphs intersect.</div>
     </div></div>
@@ -548,10 +549,10 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qbody"><div class="step">
       <div class="step-label">Q24 &middot; The graphs of two linear equations cross at the point <span class="math">(2, 7)</span>. What is the solution to the system, and why?</div>
       <div class="mc-group">
-        <button class="mc-option" data-correct="true">(2, 7) &mdash; the solution must satisfy both equations simultaneously</button>
-        <button class="mc-option" data-correct="false">(1, 6) &mdash; the solution must satisfy one equation or the other</button>
-        <button class="mc-option" data-correct="false">(3, 5) &mdash; the solution is the y-intercepts of both lines</button>
-        <button class="mc-option" data-correct="false">(&minus;1.5, &minus;5) &mdash; the solution is the x-intercepts of both lines</button>
+        <button class="mc-option" data-k="k1:ODV8MQ==">(2, 7) &mdash; the solution must satisfy both equations simultaneously</button>
+        <button class="mc-option" data-k="k1:ODZ8MA==">(1, 6) &mdash; the solution must satisfy one equation or the other</button>
+        <button class="mc-option" data-k="k1:ODd8MA==">(3, 5) &mdash; the solution is the y-intercepts of both lines</button>
+        <button class="mc-option" data-k="k1:ODh8MA==">(&minus;1.5, &minus;5) &mdash; the solution is the x-intercepts of both lines</button>
       </div>
       <div class="mc-feedback">The solution is the intersection point, which makes both equations true at the same time.</div>
     </div></div>
@@ -567,7 +568,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">Mixed check</span></div>
     <div class="qbody"><div class="step">
       <div class="step-label">Q25 &middot; <span class="math">3<sup>2</sup> &middot; 3<sup>3</sup> = 3<sup>?</sup></span> &mdash; enter the exponent.</div>
-      <div class="input-row"><input type="number" class="ans-input" data-answer="5" data-tol="0"/><span class="feedback"></span></div>
+      <div class="input-row"><input type="number" class="ans-input" data-answer="k1:NQ==" data-tol="0"/><span class="feedback"></span></div>
       <button class="check-btn">Check</button>
     </div></div>
   </div>
@@ -576,7 +577,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">Mixed check</span></div>
     <div class="qbody"><div class="step">
       <div class="step-label">Q26 &middot; Write <span class="math">6.1 &times; 10<sup>&minus;3</sup></span> in standard form.</div>
-      <div class="input-row"><input type="number" class="ans-input wide" data-answer="0.0061" data-tol="0.00001"/><span class="feedback"></span></div>
+      <div class="input-row"><input type="number" class="ans-input wide" data-answer="k1:MC4wMDYx" data-tol="0.00001"/><span class="feedback"></span></div>
       <button class="check-btn">Check</button>
     </div></div>
   </div>
@@ -585,7 +586,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">Mixed check</span></div>
     <div class="qbody"><div class="step">
       <div class="step-label">Q27 &middot; A line passes through <span class="math">(0,2)</span> and <span class="math">(3,11)</span>. What is its slope?</div>
-      <div class="input-row"><input type="number" class="ans-input" data-answer="3" data-tol="0"/><span class="feedback"></span></div>
+      <div class="input-row"><input type="number" class="ans-input" data-answer="k1:Mw==" data-tol="0"/><span class="feedback"></span></div>
       <button class="check-btn">Check</button>
     </div></div>
   </div>
@@ -594,7 +595,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">Mixed check</span></div>
     <div class="qbody"><div class="step">
       <div class="step-label">Q28 &middot; Solve <span class="math">5x + 8 = 3x + 20</span>. <span class="math">x =</span></div>
-      <div class="input-row"><input type="number" class="ans-input" data-answer="6" data-tol="0"/><span class="feedback"></span></div>
+      <div class="input-row"><input type="number" class="ans-input" data-answer="k1:Ng==" data-tol="0"/><span class="feedback"></span></div>
       <button class="check-btn">Check</button>
     </div></div>
   </div>
@@ -604,9 +605,9 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qbody"><div class="step">
       <div class="step-label">Q29 &middot; How many solutions does <span class="math">4(x + 1) = 4x + 4</span> have?</div>
       <div class="mc-group">
-        <button class="mc-option" data-correct="false">One</button>
-        <button class="mc-option" data-correct="false">None</button>
-        <button class="mc-option" data-correct="true">Infinitely many</button>
+        <button class="mc-option" data-k="k1:ODl8MA==">One</button>
+        <button class="mc-option" data-k="k1:OTB8MA==">None</button>
+        <button class="mc-option" data-k="k1:OTF8MQ==">Infinitely many</button>
       </div>
       <div class="mc-feedback">It simplifies to <span class="math">4x + 4 = 4x + 4</span>, true for every <span class="math">x</span>.</div>
     </div></div>
@@ -652,17 +653,20 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
   function loadData(){return g7topic(g7all()).tree;}
   function saveData(tree){var o=g7all();var t=g7topic(o);t.tree=tree;t.totalSteps=document.querySelectorAll('.qcard .step').length;t.sectionTotals=g7sectionTotals();t.lastPracticed=Date.now();g7save(o);}
   function g7sheet(event,question,detail){var url=localStorage.getItem('g7.sheetURL');if(!url)return;try{fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({student:g7current(),topic:G7_TOPIC_TITLE,question:question||'',event:event,detail:detail||'',ts:Date.now()})});}catch(e){}}
-  function g7log(qid,wrong,label,your,exam){var o=g7all();var t=g7topic(o);var sk=G7_SKILLS[qid]||'reasoning';t.skillStats[sk]=t.skillStats[sk]||{attempts:0,misses:0};t.skillStats[sk].attempts++;t.attempts=(t.attempts||0)+1;if(wrong){t.skillStats[sk].misses++;t.struggles.push({qid:qid,label:(label||qid).trim(),skill:sk,skillLabel:G7_SKILL_LABELS[sk],your:your||'',ts:Date.now()});}else{t.correct=(t.correct||0)+1;}if(exam){t.exam=t.exam||{attempts:0,correct:0};t.exam.attempts++;if(!wrong)t.exam.correct++;}t.lastPracticed=Date.now();g7save(o);g7sheet(wrong?'struggle':'step_complete',(label||qid).trim(),wrong?('typed "'+(your||'')+'"'):'');}
+  function g7log(qid,wrong,label,your,exam){var o=g7all();var t=g7topic(o);var sk=G7_SKILLS[qid]||'reasoning';t.skillStats[sk]=t.skillStats[sk]||{attempts:0,misses:0};t.skillStats[sk].attempts++;t.attempts=(t.attempts||0)+1;if(wrong){t.skillStats[sk].misses++;t.struggles.push({qid:qid,label:(label||qid).trim(),skill:sk,skillLabel:G7_SKILL_LABELS[sk],your:your||'',ts:Date.now()});if(t.struggles.length>120)t.struggles=t.struggles.slice(-120);}else{t.correct=(t.correct||0)+1;}if(exam){t.exam=t.exam||{attempts:0,correct:0};t.exam.attempts++;if(!wrong)t.exam.correct++;}t.lastPracticed=Date.now();g7save(o);g7sheet(wrong?'struggle':'step_complete',(label||qid).trim(),wrong?('typed "'+(your||'')+'"'):'');}
 
   // ===== answer helpers =====
+  function kdec(s){try{return atob(s);}catch(e){return '';}}
+  function ansVal(inp){var a=(inp&&inp.dataset&&inp.dataset.answer)||'';return a.slice(0,3)==='k1:'?kdec(a.slice(3)):a;}
+  function optCorrect(el){if(!el||!el.dataset)return false;var k=String(el.dataset.k||'');if(k.slice(0,3)==='k1:'){var d=kdec(k.slice(3));return d.slice(d.indexOf('|')+1)==='1';}return el.dataset.correct==='true';}
   function normalizeText(s){s=String(s).toLowerCase().trim();var neg=/^[-–—]/.test(s);s=s.replace(/[\s–—-]+/g,'-').replace(/^-|-$/g,'').replace(/\s+/g,' ');return (neg?'-':'')+s;}
   function g7fracVal(s){s=String(s).trim().replace(/\s+/g,'');var m=s.match(/^(-?\d+)\/(-?\d+)$/);if(m){var d=parseFloat(m[2]);if(d===0)return null;return parseFloat(m[1])/d;}if(/^-?\d+(?:\.\d+)?$/.test(s))return parseFloat(s);return null;}
   function g7isLowest(s){var m=String(s).trim().match(/^-?(\d+)\/(\d+)$/);if(!m)return true;var a=parseInt(m[1],10),b=parseInt(m[2],10);function g(x,y){x=Math.abs(x);y=Math.abs(y);while(y){var t=y;y=x%y;x=t;}return x;}return g(a,b)===1;}
   function checkInput(input){
     var val=input.value.trim(); if(val==='')return null;
     var type=input.dataset.type||'numeric'; var correct=false;
-    if(type==='numeric'){var ex=parseFloat(input.dataset.answer),tol=parseFloat(input.dataset.tol||'0.01'),v=parseFloat(val);correct=!isNaN(v)&&Math.abs(v-ex)<=tol;}
-    else{var raw=input.dataset.answer||'';var ans=raw.split('|');correct=ans.map(function(a){return normalizeText(a);}).indexOf(normalizeText(val))>=0;input.dataset.simplify='';
+    if(type==='numeric'){var ex=parseFloat(ansVal(input)),tol=parseFloat(input.dataset.tol||'0.01'),v=parseFloat(val);correct=!isNaN(v)&&Math.abs(v-ex)<=tol;}
+    else{var raw=ansVal(input);var ans=raw.split('|');correct=ans.map(function(a){return normalizeText(a);}).indexOf(normalizeText(val))>=0;input.dataset.simplify='';
       if(!correct){var ev=g7fracVal(ans[0]),uv=g7fracVal(val);if(ev!==null&&uv!==null&&Math.abs(ev-uv)<1e-9){correct=true;if(!g7isLowest(val))input.dataset.simplify='1';}}}
     input.classList.remove('correct','wrong');input.classList.add(correct?'correct':'wrong');
     var fb=input.parentElement.querySelector('.feedback');if(!fb){var row=input.closest('.input-row, td');if(row)fb=row.querySelector('.feedback');}
@@ -685,7 +689,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     }
     if(e.target.closest('.mc-option')){
       var opt=e.target.closest('.mc-option');var group=opt.closest('.mc-group');if(!group||group.classList.contains('answered')||opt.classList.contains('disabled'))return;
-      var correct=opt.dataset.correct==='true';
+      var correct=optCorrect(opt);
       var fb=group.parentElement.querySelector('.mc-feedback');if(fb&&fb.dataset.exp===undefined)fb.dataset.exp=fb.textContent||'';
       var mcStep=group.closest('.step');var mcCard=group.closest('.qcard');var mcQid=mcCard?mcCard.dataset.qid:'';var mcLbl=mcStep?((mcStep.querySelector('.step-label')||{}).textContent||''):'';var mcExam=mcCard&&mcCard.dataset.exam==='1';
       var mcFirst=mcStep&&!mcStep.dataset.att;if(mcStep)mcStep.dataset.att='1';
@@ -696,7 +700,10 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
         if(mcStep){mcStep.classList.add('completed');unlockNext(mcStep);if(mcCard)saveStepDone(mcCard,mcStep);}
       }else{
         opt.classList.add('wrong');opt.classList.add('disabled');
-        if(fb){fb.textContent='✗ Not quite — rule that one out and try again.';fb.classList.remove('correct');fb.classList.add('wrong');}
+        if(fb){fb.textContent='✗ Not quite — re-read the question, rule that one out, and try again.';fb.classList.remove('correct');fb.classList.add('wrong');}
+        var rest=Array.prototype.filter.call(group.querySelectorAll('.mc-option'),function(b){return !b.classList.contains('disabled');});
+        rest.forEach(function(b){b.classList.add('cooldown');});
+        setTimeout(function(){rest.forEach(function(b){b.classList.remove('cooldown');});},1600);
       }
     }
     var mso=e.target.closest('.ms-option');
@@ -704,17 +711,17 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     if(e.target.matches('.ms-check')){
       var st=e.target.closest('.step');if(!st)return;var grp=st.querySelector('.ms-group');if(!grp||grp.classList.contains('answered'))return;
       var opts=Array.prototype.slice.call(grp.querySelectorAll('.ms-option'));if(!opts.some(function(o){return o.classList.contains('sel');}))return;
-      var ok=opts.every(function(o){return (o.dataset.correct==='true')===o.classList.contains('sel');});
+      var ok=opts.every(function(o){return optCorrect(o)===o.classList.contains('sel');});
       var card2=st.closest('.qcard');var qid2=card2?card2.dataset.qid:'';var lbl2=(st.querySelector('.step-label')||{}).textContent||'';var exam2=card2&&card2.dataset.exam==='1';
       var msFirst=!st.dataset.att;st.dataset.att='1';
-      if(ok){grp.classList.add('answered');opts.forEach(function(o){o.classList.add('disabled');if(o.dataset.correct==='true')o.classList.add('correct');});st.classList.add('completed');e.target.classList.add('done');e.target.textContent='Correct';unlockNext(st);if(card2)saveStepDone(card2,st);if(!st.dataset.logged){g7log(qid2,false,lbl2,'',exam2&&msFirst);st.dataset.logged='1';}}
-      else{var your2=opts.filter(function(o){return o.classList.contains('sel');}).map(function(o){return (o.textContent||'').trim().slice(0,24);}).join('; ');opts.forEach(function(o){if(o.classList.contains('sel')&&o.dataset.correct!=='true')o.classList.add('wrong');});g7log(qid2,true,lbl2,your2,exam2&&msFirst);setTimeout(function(){opts.forEach(function(o){o.classList.remove('wrong');});},1100);}
+      if(ok){grp.classList.add('answered');opts.forEach(function(o){o.classList.add('disabled');if(optCorrect(o))o.classList.add('correct');});st.classList.add('completed');e.target.classList.add('done');e.target.textContent='Correct';unlockNext(st);if(card2)saveStepDone(card2,st);if(!st.dataset.logged){g7log(qid2,false,lbl2,'',exam2&&msFirst);st.dataset.logged='1';}}
+      else{var your2=opts.filter(function(o){return o.classList.contains('sel');}).map(function(o){return (o.textContent||'').trim().slice(0,24);}).join('; ');opts.forEach(function(o){if(o.classList.contains('sel')&&!optCorrect(o))o.classList.add('wrong');});g7log(qid2,true,lbl2,your2,exam2&&msFirst);setTimeout(function(){opts.forEach(function(o){o.classList.remove('wrong');});},1100);}
       return;
     }
     if(e.target.matches('.cr-save')){
       var st3=e.target.closest('.step');if(!st3)return;var ta=st3.querySelector('.cr-area');if(!ta||!ta.value.trim())return;
       var card3=st3.closest('.qcard');var qid3=card3?card3.dataset.qid:'';var lbl3=(st3.querySelector('.step-label')||{}).textContent||'';
-      var o=g7all();var t=g7topic(o);t.responses=t.responses||[];t.responses.push({qid:qid3,label:lbl3.trim(),text:ta.value.trim(),ts:Date.now()});g7save(o);
+      var o=g7all();var t=g7topic(o);t.responses=t.responses||[];t.responses.push({qid:qid3,label:lbl3.trim(),text:ta.value.trim(),ts:Date.now()});if(t.responses.length>60)t.responses=t.responses.slice(-60);g7save(o);
       g7sheet('constructed_response',lbl3.trim(),ta.value.trim().slice(0,180));
       st3.classList.add('completed');e.target.classList.add('done');e.target.textContent='Saved';unlockNext(st3);if(card3)saveStepDone(card3,st3);
       if(!st3.querySelector('.cr-saved')){var sv=document.createElement('div');sv.className='cr-saved';sv.textContent='Saved — your teacher will review this.';st3.appendChild(sv);}
@@ -724,6 +731,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
   });
   document.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.matches('.ans-input')){e.preventDefault();var step=e.target.closest('.step');if(step){var b=step.querySelector('.check-btn');if(b&&!b.classList.contains('ms-check')&&!b.classList.contains('cr-save'))b.click();else checkInput(e.target);}else checkInput(e.target);}});
   document.querySelectorAll('.step.locked').forEach(function(s){setStepDisabled(s,true);});
+  document.addEventListener('wheel',function(e){if(e.target&&e.target.matches&&e.target.matches('.ans-input')&&document.activeElement===e.target)e.target.blur();},{passive:true});
 
   function countAllSteps(){return document.querySelectorAll('.qcard .step').length;}
   function refreshOverall(){var d=loadData(),done=0;document.querySelectorAll('.qcard').forEach(function(c){var q=c.dataset.qid;if(q&&d[q]&&d[q].steps)done+=Object.keys(d[q].steps).filter(function(k){return d[q].steps[k];}).length;});var tot=countAllSteps();document.getElementById('op-done').textContent=done;document.getElementById('op-total').textContent=tot;document.getElementById('op-pct').textContent=(tot?Math.round(done/tot*100):0)+'%';}
@@ -740,10 +748,10 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
           step.classList.add('completed');step.classList.remove('locked');setStepDisabled(step,false);step.dataset.logged='1';step.dataset.att='1';
           if(idx+1<steps.length){steps[idx+1].classList.remove('locked');setStepDisabled(steps[idx+1],false);}
           var b=step.querySelector('.check-btn');if(b){b.classList.add('done');b.textContent=b.classList.contains('cr-save')?'Saved':'Step complete';}
-          var mc=step.querySelector('.mc-group');if(mc){mc.classList.add('answered');mc.querySelectorAll('.mc-option').forEach(function(o){o.classList.add('disabled');if(o.dataset.correct==='true')o.classList.add('correct');});var mfb=mc.parentElement.querySelector('.mc-feedback');if(mfb)mfb.classList.add('correct');}
-          var ms=step.querySelector('.ms-group');if(ms){ms.classList.add('answered');ms.querySelectorAll('.ms-option').forEach(function(o){o.classList.add('disabled');if(o.dataset.correct==='true')o.classList.add('correct');});}
-          var ta=step.querySelector('.cr-area');if(ta){var rs=(topic.responses||[]).filter(function(r){return r.qid===qid;});if(rs.length)ta.value=rs[rs.length-1].text;}
-          step.querySelectorAll('.ans-input').forEach(function(i){i.classList.add('correct');i.value=(i.dataset.answer||'').split('|')[0];});
+          var mc=step.querySelector('.mc-group');if(mc){mc.classList.add('answered');mc.querySelectorAll('.mc-option').forEach(function(o){o.classList.add('disabled');if(optCorrect(o))o.classList.add('correct');});var mfb=mc.parentElement.querySelector('.mc-feedback');if(mfb)mfb.classList.add('correct');}
+          var ms=step.querySelector('.ms-group');if(ms){ms.classList.add('answered');ms.querySelectorAll('.ms-option').forEach(function(o){o.classList.add('disabled');if(optCorrect(o))o.classList.add('correct');});}
+          var ta=step.querySelector('.cr-area');if(ta){var rs=(topic.responses||[]).filter(function(r){return r.qid===qid;});if(rs.length){ta.value=rs[rs.length-1].text;if(rs[rs.length-1].reviewed&&!step.querySelector('.cr-saved')){var rv=document.createElement('div');rv.className='cr-saved';rv.textContent='✓ Reviewed by your teacher';step.appendChild(rv);}}}
+          step.querySelectorAll('.ans-input').forEach(function(i){i.classList.add('correct');i.value=ansVal(i).split('|')[0];});
         }
       });
     });
