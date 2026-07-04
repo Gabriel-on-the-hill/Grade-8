@@ -9,3 +9,7 @@ _synctest.txt
 outputs/
 *.log
 .DS_Store
+
+# session backups / test deps
+*.v*bak
+node_modules/

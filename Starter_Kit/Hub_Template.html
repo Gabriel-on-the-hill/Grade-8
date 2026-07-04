@@ -381,7 +381,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
   }
   var MASTERY_PCT=100;
   function examReadiness(t){var e=(t&&t.exam)||{attempts:0,correct:0};return {att:e.attempts||0,cor:e.correct||0,pct:e.attempts?Math.round((e.correct||0)/e.attempts*100):0};}
-  function sectionProgress(t){var totals=(t&&t.sectionTotals)||{};var tree=(t&&t.tree)||{};var by={};Object.keys(tree).forEach(function(q){var sec=q.split('-')[0];var s=tree[q].steps||{};by[sec]=(by[sec]||0)+Object.keys(s).filter(function(k){return s[k];}).length;});return Object.keys(totals).sort(function(a,b){return (parseInt(a)||99)-(parseInt(b)||99);}).map(function(sec){return {sec:sec,total:totals[sec],done:Math.min(by[sec]||0,totals[sec])};});}
+  function sectionProgress(t){var totals=(t&&t.sectionTotals)||{};var tree=(t&&t.tree)||{};var by={};Object.keys(tree).forEach(function(q){var sec=q.split('-')[0];var s=tree[q].steps||{};by[sec]=(by[sec]||0)+Object.keys(s).filter(function(k){return s[k];}).length;});return Object.keys(totals).sort(function(a,b){function n(x){return parseInt(String(x).replace(/\D/g,''),10)||99;}return n(a)-n(b);}).map(function(sec){return {sec:sec,total:totals[sec],done:Math.min(by[sec]||0,totals[sec])};});}
   function suggestHomework(topics, ids, labels){var agg={};(ids||Object.keys(topics)).forEach(function(id){var to=topics[id];if(!to)return;var st=to.skillStats||{};Object.keys(st).forEach(function(k){agg[k]=agg[k]||{misses:0,attempts:0};agg[k].misses+=st[k].misses||0;agg[k].attempts+=st[k].attempts||0;});});return Object.keys(agg).filter(function(k){return agg[k].misses>=2&&agg[k].misses/Math.max(agg[k].attempts,1)>=0.25;}).sort(function(a,b){return agg[b].misses-agg[a].misses;}).slice(0,3).map(function(k){return {label:(labels&&labels[k])||SKILL_LABELS[k]||k,misses:agg[k].misses};});}
   function getAssign(stu,sid){ if(stu&&stu.assignments&&stu.assignments[sid]&&stu.assignments[sid].text)return stu.assignments[sid].text; if(sid==='math'&&stu&&stu.assignment&&stu.assignment.text)return stu.assignment.text; return ''; }
   function getAssignObj(stu,sid){ if(stu&&stu.assignments&&stu.assignments[sid]&&stu.assignments[sid].text)return stu.assignments[sid]; if(sid==='math'&&stu&&stu.assignment&&stu.assignment.text)return stu.assignment; return null; }
@@ -409,7 +409,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     el.innerHTML=h;
     var sw=document.getElementById('tb-switch'); if(sw)sw.onclick=function(){setCurrent('');boot();};
     document.getElementById('tb-teacher').onclick=enterTeacher;
-    document.getElementById('tb-settings').onclick=openSettings;
+    document.getElementById('tb-settings').onclick=function(){enterTeacher('settings');};
   }
 
   // ---- sign in ----
@@ -478,6 +478,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
             '<span class="badge av" style="margin-left:auto">Available</span></div>'+
             '<p class="desc">'+esc(t.desc)+'</p>'+
             '<div class="pbar"><span style="width:'+p.pct+'%"></span></div>'+
+            (function(){var ss=sectionProgress(topics[t.id]);return ss.length?'<div class="secbars">'+ss.map(function(s){return '<span class="sb" title="Section '+String(s.sec).replace(/^\D+/,'')+': '+s.done+'/'+s.total+'"><span style="width:'+(s.total?Math.round(s.done/s.total*100):0)+'%"></span></span>';}).join('')+'</div>':'';})()+
             '<div class="tmeta"><span>'+p.pct+'% · '+p.done+(p.total?('/'+p.total):'')+' steps</span>'+chip+'</div>'+
             '<div class="tmeta"><span>Last: '+relTime(p.last)+'</span>'+(er.att?('<span class="exam-line">'+esc(subj.examLabel)+': <b>'+er.cor+'/'+er.att+'</b></span>'):'')+'</div>'+
           '</div>';
@@ -520,14 +521,15 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
   }
 
   // ---- teacher ----
-  var _tmMode='';
-  function enterTeacher(){
+  var _tmMode='',_tmNext='dash';
+  function enterTeacher(next){
+    _tmNext=(next==='settings')?'settings':'dash';
     _tmMode=teacherPass()?'enter':'create';
     document.getElementById('tm-pass').value='';document.getElementById('tm-pass2').value='';document.getElementById('tm-err').textContent='';
     document.getElementById('tm-title').textContent=_tmMode==='create'?'Set a teacher passcode':'Teacher access';
-    document.getElementById('tm-sub').textContent=_tmMode==='create'?'First time here: choose a passcode for the teacher dashboard. Students never need this.':'Enter the teacher passcode to open the dashboard.';
+    document.getElementById('tm-sub').textContent=_tmMode==='create'?'First time here: choose a passcode for the teacher dashboard. Students never need this.':(_tmNext==='settings'?'Enter the teacher passcode to open Settings.':'Enter the teacher passcode to open the dashboard.');
     document.getElementById('tm-pass2').style.display=_tmMode==='create'?'':'none';
-    document.getElementById('tm-go').textContent=_tmMode==='create'?'Set passcode & open':'Open dashboard';
+    document.getElementById('tm-go').textContent=_tmMode==='create'?'Set passcode & open':(_tmNext==='settings'?'Open Settings':'Open dashboard');
     document.getElementById('teacherModal').classList.remove('hidden');
     setTimeout(function(){document.getElementById('tm-pass').focus();},40);
   }
@@ -538,10 +540,10 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
       var v2=document.getElementById('tm-pass2').value;
       if(!v){err.textContent='Please choose a passcode.';return;}
       if(v!==v2){err.textContent='The passcodes do not match.';return;}
-      LS.setItem(K('teacherPass'),v);closeTeacherModal();renderTeacher();return;
+      LS.setItem(K('teacherPass'),v);closeTeacherModal();if(_tmNext==='settings')openSettings();else renderTeacher();return;
     }
     if(String(v).trim().toLowerCase()!==String(teacherPass()).trim().toLowerCase()){err.textContent='Incorrect passcode.';return;}
-    closeTeacherModal();renderTeacher();
+    closeTeacherModal();if(_tmNext==='settings')openSettings();else renderTeacher();
   }
   function missClass(ratio){ return ratio>=0.5?'miss-hi':(ratio>=0.25?'miss-mid':'miss-ok'); }
   function renderTeacher(){
@@ -572,7 +574,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
           var er=examReadiness(to); var mastered=p.total>0&&p.pct>=MASTERY_PCT;
           html+='<div class="topic-row"><div class="tr-top"><span class="t">'+esc(t.title)+'</span>'+(mastered?'<span class="badge mastered">Mastered</span>':'')+'<span class="pct">'+p.pct+'%</span></div>';
           html+='<div class="pbar" style="margin:.4rem 0"><span style="width:'+p.pct+'%"></span></div>';
-          var secs=sectionProgress(to); if(secs.length){html+='<div class="secbars">'+secs.map(function(s){return '<span class="sb" title="Section '+s.sec+': '+s.done+'/'+s.total+'"><span style="width:'+(s.total?Math.round(s.done/s.total*100):0)+'%"></span></span>';}).join('')+'</div>';}
+          var secs=sectionProgress(to); if(secs.length){html+='<div class="secbars">'+secs.map(function(s){return '<span class="sb" title="Section '+String(s.sec).replace(/^\D+/,'')+': '+s.done+'/'+s.total+'"><span style="width:'+(s.total?Math.round(s.done/s.total*100):0)+'%"></span></span>';}).join('')+'</div>';}
           if(er.att){html+='<div class="exam-line">'+esc(subj.examLabelLong)+': <b>'+er.cor+'/'+er.att+'</b> ('+er.pct+'%)</div>';}
           var stats=to.skillStats||{};
           var keys=Object.keys(stats).filter(function(k){return stats[k].attempts>0;});
@@ -676,6 +678,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     document.getElementById('tm-cancel').onclick=closeTeacherModal;
     document.getElementById('teacherModal').addEventListener('click',function(e){if(e.target===this)closeTeacherModal();});
     ['tm-pass','tm-pass2'].forEach(function(id){document.getElementById(id).addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();submitTeacher();}});});
+    document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeTeacherModal();closeSettings();}});
     document.getElementById('btn-export-data').onclick=function(){
       var blob=new Blob([JSON.stringify({roster:getRoster(),data:getData(),sheetURL:sheetURL(),exported:Date.now()},null,2)],{type:'application/json'});
       var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='hub-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(a.href);

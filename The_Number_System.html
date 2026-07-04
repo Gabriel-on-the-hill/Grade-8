@@ -94,6 +94,18 @@ table.gtable th{background:var(--pitch-green);color:#fff;font-weight:600} table.
 .challenge{background:#F3EEFB;border:1px solid #D6C9F0;border-left:5px solid var(--purple);border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem}
 .challenge h3{margin:0 0 .5rem;color:var(--purple);font-size:1.04rem}
 .legend{font-size:.86rem;color:var(--muted);margin:.5rem 0 1rem} .legend strong{color:var(--pitch-green)}
+/* v1.4.2 anti-cheat: question text unselectable (typing areas exempt) */
+.qcard{-webkit-user-select:none;-moz-user-select:none;user-select:none}
+.qcard input,.qcard textarea{-webkit-user-select:text;-moz-user-select:text;user-select:text}
+/* v1.4.3 student section report card */
+.sec-report{background:#fff;border:1px solid var(--border);border-radius:10px;padding:.85rem 1rem;margin-bottom:1.2rem}
+.sec-report h3{margin:0 0 .5rem;font-size:.95rem;color:var(--pitch-green)}
+.sec-row{display:flex;align-items:center;gap:.6rem;margin:.3rem 0;font-size:.85rem}
+.sec-row a{flex:none;width:220px;max-width:44%;color:var(--navy);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sec-row a:hover{color:var(--pitch-green)}
+.sec-row .bar{flex:1;height:7px;background:#EDEBE2;border-radius:99px;overflow:hidden}
+.sec-row .bar>span{display:block;height:100%;background:var(--gold);border-radius:99px}
+.sec-row.full .bar>span{background:var(--ok)}
 footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;border-top:1px solid var(--border);margin-top:3rem}
 @media(max-width:640px){main{padding:1rem .75rem 3rem}.qcard,.tcard,.challenge,.guide{padding:.85rem}.qtitle{margin-left:0;width:100%;font-size:.93rem}header.mod h1{font-size:1.25rem}}
 </style>
@@ -294,7 +306,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
         <div class="input-row"><input type="text" class="ans-input wide" data-type="text" placeholder="e.g. 5/11" data-answer="k1:NS8xMQ=="/><span class="feedback"></span></div>
         <button class="check-btn">Check</button>
         <button class="hint-btn">Hint</button>
-        <div class="hint-content">Two repeating digits &rarr; put 45 over 99, then simplify <span class="math">45/99</span>.</div>
+        <div class="hint-content">How many digits repeat? A block of that many digits sits over 9, 99, &hellip; &mdash; then reduce to lowest terms.</div>
       </div>
     </div>
   </div>
@@ -306,7 +318,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
         <div class="input-row"><input type="text" class="ans-input wide" data-type="text" placeholder="e.g. 5/11" data-answer="k1:MTkvMzA="/><span class="feedback"></span></div>
         <button class="check-btn">Check</button>
         <button class="hint-btn">Hint</button>
-        <div class="hint-content">Use <span class="math">10x</span> and <span class="math">100x</span>, then subtract to get <span class="math">90x = 57</span>.</div>
+        <div class="hint-content">Only the 3 repeats, and a non-repeating digit comes first &mdash; multiply by two different powers of 10 so the repeats line up, then subtract.</div>
       </div>
     </div>
   </div>
@@ -360,7 +372,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
         </div>
         <button class="check-btn ms-check">Check</button>
         <button class="hint-btn">Hint</button>
-        <div class="hint-content"><span class="math">&radic;36 = 6</span> and <span class="math">0.333&hellip; = 1/3</span> are rational. The roots of non-perfect-squares and <span class="math">&pi;</span> are irrational.</div>
+        <div class="hint-content">Test each one: can it be written as a fraction of integers? Watch for perfect squares hiding under root signs, and for repeating decimals.</div>
       </div>
     </div>
   </div>
@@ -370,7 +382,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qbody">
       <div class="step">
         <div class="step-label">Q10 &middot; Which of the following numbers are <em>rational</em>? Select all that apply.</div>
-        <div class="ms-group">
+        <div class="ms-group" data-noshuffle>
           <button class="ms-option" data-k="k1:MTl8MQ=="><span class="box"></span><span class="math">&minus;72</span></button>
           <button class="ms-option" data-k="k1:MjB8MQ=="><span class="box"></span><span class="math">4/5</span></button>
           <button class="ms-option" data-k="k1:MjF8MA=="><span class="box"></span><span class="math">&radic;6</span></button>
@@ -494,7 +506,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qbody">
       <div class="step">
         <div class="step-label">Q17 &middot; Which is the best estimate of <span class="math">&radic;40</span>?</div>
-        <div class="mc-group">
+        <div class="mc-group" data-noshuffle>
           <button class="mc-option" data-k="k1:MjR8MA==">5.5</button>
           <button class="mc-option" data-k="k1:MjV8MQ==">6.3</button>
           <button class="mc-option" data-k="k1:MjZ8MA==">8</button>
@@ -521,14 +533,14 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qbody">
       <div class="step">
         <div class="step-label">Q19 &middot; Between which two integers does <span class="math">&radic;83</span> lie?</div>
-        <div class="mc-group">
+        <div class="mc-group" data-noshuffle>
           <button class="mc-option" data-k="k1:Mjh8MA==">8 and 9</button>
           <button class="mc-option" data-k="k1:Mjl8MQ==">9 and 10</button>
           <button class="mc-option" data-k="k1:MzB8MA==">40 and 43</button>
           <button class="mc-option" data-k="k1:MzF8MA==">41 and 42</button>
         </div>
         <button class="hint-btn">Hint</button>
-        <div class="hint-content">Find the perfect squares around 83: <span class="math">81 = 9&sup2;</span> and <span class="math">100 = 10&sup2;</span>.</div>
+        <div class="hint-content">Which perfect square sits just below 83, and which sits just above it? Their roots trap the answer.</div>
         <div class="mc-feedback"><span class="math">81 &lt; 83 &lt; 100</span>, so <span class="math">9 &lt; &radic;83 &lt; 10</span>.</div>
       </div>
     </div>
@@ -576,7 +588,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
         </div>
         <button class="check-btn ms-check">Check</button>
         <button class="hint-btn">Hint</button>
-        <div class="hint-content">Estimate: <span class="math">&radic;2 &asymp; 1.41</span>, <span class="math">&pi; &asymp; 3.14</span>, <span class="math">&radic;5 &asymp; 2.24</span>.</div>
+        <div class="hint-content">Swap each irrational number for a decimal estimate (the teach card lists the handy values), then test each statement one at a time.</div>
       </div>
     </div>
   </div>
@@ -589,7 +601,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
         <div class="input-row"><input type="number" class="ans-input" data-answer="k1:MTA=" data-tol="0"/><span class="feedback"></span></div>
         <button class="check-btn">Check</button>
         <button class="hint-btn">Hint</button>
-        <div class="hint-content">Use <span class="math">&pi; &asymp; 3.14</span>, so <span class="math">&pi;&sup2; &asymp; 3.14 &times; 3.14 = 9.86&hellip;</span></div>
+        <div class="hint-content">Estimate <span class="math">&pi;</span> first, then multiply that estimate by itself and round.</div>
       </div>
     </div>
   </div>
@@ -599,7 +611,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qbody">
       <div class="step">
         <div class="step-label">Q23 &middot; Which fraction is the best estimate for the value of <span class="math">&radic;(65/122)</span>?</div>
-        <div class="mc-group">
+        <div class="mc-group" data-noshuffle>
           <button class="mc-option" data-k="k1:Mzh8MA=="><span class="math">1/2</span></button>
           <button class="mc-option" data-k="k1:Mzl8MA=="><span class="math">33/61</span></button>
           <button class="mc-option" data-k="k1:NDB8MA=="><span class="math">2/3</span></button>
@@ -632,7 +644,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qbody">
       <div class="step">
         <div class="step-label">Q25 &middot; Which number is <em>irrational</em>?</div>
-        <div class="mc-group">
+        <div class="mc-group" data-noshuffle>
           <button class="mc-option" data-k="k1:NDJ8MA=="><span class="math">0.25</span></button>
           <button class="mc-option" data-k="k1:NDN8MA=="><span class="math">&radic;49</span></button>
           <button class="mc-option" data-k="k1:NDR8MQ=="><span class="math">&radic;15</span></button>
@@ -670,7 +682,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qbody">
       <div class="step">
         <div class="step-label">Q28 &middot; Select every number that is <em>rational</em>.</div>
-        <div class="ms-group">
+        <div class="ms-group" data-noshuffle>
           <button class="ms-option" data-k="k1:NDZ8MQ=="><span class="box"></span><span class="math">&radic;64</span></button>
           <button class="ms-option" data-k="k1:NDd8MA=="><span class="box"></span><span class="math">&pi;</span></button>
           <button class="ms-option" data-k="k1:NDh8MQ=="><span class="box"></span><span class="math">0.171717&hellip;</span></button>
@@ -800,9 +812,29 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
   document.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.matches('.ans-input')){e.preventDefault();var step=e.target.closest('.step');if(step){var b=step.querySelector('.check-btn');if(b&&!b.classList.contains('ms-check')&&!b.classList.contains('cr-save'))b.click();else checkInput(e.target);}else checkInput(e.target);}});
   document.querySelectorAll('.step.locked').forEach(function(s){setStepDisabled(s,true);});
   document.addEventListener('wheel',function(e){if(e.target&&e.target.matches&&e.target.matches('.ans-input')&&document.activeElement===e.target)e.target.blur();},{passive:true});
+  /* v1.4.2 anti-cheat: block copy/cut from question cards (typing areas exempt) */
+  ['copy','cut'].forEach(function(ev){document.addEventListener(ev,function(e){var t=e.target;if(t&&t.closest&&t.closest('.qcard')&&!(t.matches&&t.matches('input,textarea')))e.preventDefault();});});
+  /* v1.4.2 anti-cheat: shuffle MC/MS options on load (3+ options; data-noshuffle opts out — exam capstones and numeric/semantic scales keep their real order) */
+  document.querySelectorAll('.mc-group,.ms-group').forEach(function(g){if(g.hasAttribute('data-noshuffle'))return;var o=Array.prototype.slice.call(g.querySelectorAll('.mc-option,.ms-option'));if(o.length<3)return;for(var i=o.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=o[i];o[i]=o[j];o[j]=t;}o.forEach(function(b){g.appendChild(b);});});
 
   function countAllSteps(){return document.querySelectorAll('.qcard .step').length;}
-  function refreshOverall(){var d=loadData(),done=0;document.querySelectorAll('.qcard').forEach(function(c){var q=c.dataset.qid;if(q&&d[q]&&d[q].steps)done+=Object.keys(d[q].steps).filter(function(k){return d[q].steps[k];}).length;});var tot=countAllSteps();document.getElementById('op-done').textContent=done;document.getElementById('op-total').textContent=tot;document.getElementById('op-pct').textContent=(tot?Math.round(done/tot*100):0)+'%';}
+  function refreshOverall(){var d=loadData(),done=0;document.querySelectorAll('.qcard').forEach(function(c){var q=c.dataset.qid;if(q&&d[q]&&d[q].steps)done+=Object.keys(d[q].steps).filter(function(k){return d[q].steps[k];}).length;});var tot=countAllSteps();document.getElementById('op-done').textContent=done;document.getElementById('op-total').textContent=tot;document.getElementById('op-pct').textContent=(tot?Math.round(done/tot*100):0)+'%';renderSecReport();}
+
+  /* v1.4.3: student-facing per-section report card, injected after the overall progress box */
+  function renderSecReport(){
+    var host=document.querySelector('.overall-progress');if(!host)return;
+    var box=document.getElementById('sec-report');
+    if(!box){box=document.createElement('div');box.id='sec-report';box.className='sec-report';host.parentNode.insertBefore(box,host.nextSibling);}
+    var rows='';
+    document.querySelectorAll('section.topic').forEach(function(sec){
+      var steps=sec.querySelectorAll('.qcard .step');if(!steps.length)return;
+      var done=sec.querySelectorAll('.qcard .step.completed').length;
+      var h=sec.querySelector('h2');var name=(h?h.textContent:sec.id).replace(/[<>&]/g,'').trim();
+      var pct=steps.length?Math.round(done/steps.length*100):0;
+      rows+='<div class="sec-row'+(pct>=100?' full':'')+'"><a href="#'+sec.id+'">'+name+'</a><span class="bar"><span style="width:'+pct+'%"></span></span><span class="val">'+done+'/'+steps.length+' \u00b7 '+pct+'%</span></div>';
+    });
+    if(rows)box.innerHTML='<h3>Your section scores</h3>'+rows; else box.style.display='none';
+  }
 
   function restoreProgress(){
     var nm=document.getElementById('g7name');if(nm)nm.textContent=g7current();

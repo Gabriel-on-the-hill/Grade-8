@@ -94,6 +94,18 @@ table.gtable th{background:var(--pitch-green);color:#fff;font-weight:600} table.
 .challenge{background:#F3EEFB;border:1px solid #D6C9F0;border-left:5px solid var(--purple);border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem}
 .challenge h3{margin:0 0 .5rem;color:var(--purple);font-size:1.04rem}
 .legend{font-size:.86rem;color:var(--muted);margin:.5rem 0 1rem} .legend strong{color:var(--pitch-green)}
+/* v1.4.2 anti-cheat: question text unselectable (typing areas exempt) */
+.qcard{-webkit-user-select:none;-moz-user-select:none;user-select:none}
+.qcard input,.qcard textarea{-webkit-user-select:text;-moz-user-select:text;user-select:text}
+/* v1.4.3 student section report card */
+.sec-report{background:#fff;border:1px solid var(--border);border-radius:10px;padding:.85rem 1rem;margin-bottom:1.2rem}
+.sec-report h3{margin:0 0 .5rem;font-size:.95rem;color:var(--pitch-green)}
+.sec-row{display:flex;align-items:center;gap:.6rem;margin:.3rem 0;font-size:.85rem}
+.sec-row a{flex:none;width:220px;max-width:44%;color:var(--navy);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sec-row a:hover{color:var(--pitch-green)}
+.sec-row .bar{flex:1;height:7px;background:#EDEBE2;border-radius:99px;overflow:hidden}
+.sec-row .bar>span{display:block;height:100%;background:var(--gold);border-radius:99px}
+.sec-row.full .bar>span{background:var(--ok)}
 footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;border-top:1px solid var(--border);margin-top:3rem}
 @media(max-width:640px){main{padding:1rem .75rem 3rem}.qcard,.tcard,.challenge,.guide{padding:.85rem}.qtitle{margin-left:0;width:100%;font-size:.93rem}header.mod h1{font-size:1.25rem}}
 </style>
@@ -232,7 +244,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
       <div class="input-row"><input type="text" class="ans-input" data-type="text" placeholder="e.g. 5/11" data-answer="k1:MS84"/><span class="feedback"></span></div>
       <button class="check-btn">Check</button>
       <button class="hint-btn">Hint</button>
-      <div class="hint-content"><span class="math">a<sup>&minus;n</sup> = 1/a<sup>n</sup></span>, so <span class="math">2<sup>&minus;3</sup> = 1/2<sup>3</sup></span>.</div>
+      <div class="hint-content">A negative exponent flips the power into a fraction: <span class="math">a<sup>&minus;n</sup> = 1/a<sup>n</sup></span>. Then evaluate that power.</div>
     </div></div>
   </div>
 
@@ -240,7 +252,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">MCAP practice item &middot; 8.EE.A.1</span></div>
     <div class="qbody"><div class="step">
       <div class="step-label">Q5 &middot; Which expression is equivalent to <span class="math">8<sup>&minus;4</sup> &middot; 8<sup>3</sup></span>?</div>
-      <div class="mc-group">
+      <div class="mc-group" data-noshuffle>
         <button class="mc-option" data-k="k1:NTV8MA=="><span class="math">&minus;8</span></button>
         <button class="mc-option" data-k="k1:NTZ8MA=="><span class="math">&minus;1/8</span></button>
         <button class="mc-option" data-k="k1:NTd8MQ=="><span class="math">1/8</span></button>
@@ -369,7 +381,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qhead"><span class="qtag apply">Apply</span><span class="qtitle">Unit rate as slope</span></div>
     <div class="qbody"><div class="step">
       <div class="step-label">Q13 &middot; Apples cost $6 for 3 pounds (a proportional relationship). What is the unit rate, in dollars per pound?</div>
-      <div class="mc-group">
+      <div class="mc-group" data-noshuffle>
         <button class="mc-option" data-k="k1:Njd8MQ==">$2</button>
         <button class="mc-option" data-k="k1:Njh8MA==">$3</button>
         <button class="mc-option" data-k="k1:Njl8MA==">$6</button>
@@ -426,8 +438,6 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
       <div class="step-label">Q17 &middot; What value of <span class="math">x</span> satisfies <span class="math">5(x &minus; 6) &minus; 2(x + 3) = 12</span>?</div>
       <div class="input-row"><input type="number" class="ans-input" data-answer="k1:MTY=" data-tol="0"/><span class="feedback"></span></div>
       <button class="check-btn">Check</button>
-      <button class="hint-btn">Hint</button>
-      <div class="hint-content">Distribute both: <span class="math">5x &minus; 30 &minus; 2x &minus; 6 = 12</span>, then combine.</div>
     </div></div>
   </div>
   </section>
@@ -453,7 +463,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qhead"><span class="qtag learn">Learn</span><span class="qtitle">How many?</span></div>
     <div class="qbody"><div class="step">
       <div class="step-label">Q18 &middot; How many solutions does <span class="math">2x + 1 = 2x + 1</span> have?</div>
-      <div class="mc-group">
+      <div class="mc-group" data-noshuffle>
         <button class="mc-option" data-k="k1:NzF8MA==">One</button>
         <button class="mc-option" data-k="k1:NzJ8MA==">None</button>
         <button class="mc-option" data-k="k1:NzN8MQ==">Infinitely many</button>
@@ -466,7 +476,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">How many?</span></div>
     <div class="qbody"><div class="step">
       <div class="step-label">Q19 &middot; How many solutions does <span class="math">x + 4 = x &minus; 4</span> have?</div>
-      <div class="mc-group">
+      <div class="mc-group" data-noshuffle>
         <button class="mc-option" data-k="k1:NzR8MA==">One</button>
         <button class="mc-option" data-k="k1:NzV8MQ==">None</button>
         <button class="mc-option" data-k="k1:NzZ8MA==">Infinitely many</button>
@@ -548,7 +558,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">MCAP practice item &middot; 8.EE.C.8</span></div>
     <div class="qbody"><div class="step">
       <div class="step-label">Q24 &middot; The graphs of two linear equations cross at the point <span class="math">(2, 7)</span>. What is the solution to the system, and why?</div>
-      <div class="mc-group">
+      <div class="mc-group" data-noshuffle>
         <button class="mc-option" data-k="k1:ODV8MQ==">(2, 7) &mdash; the solution must satisfy both equations simultaneously</button>
         <button class="mc-option" data-k="k1:ODZ8MA==">(1, 6) &mdash; the solution must satisfy one equation or the other</button>
         <button class="mc-option" data-k="k1:ODd8MA==">(3, 5) &mdash; the solution is the y-intercepts of both lines</button>
@@ -604,7 +614,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">Mixed check</span></div>
     <div class="qbody"><div class="step">
       <div class="step-label">Q29 &middot; How many solutions does <span class="math">4(x + 1) = 4x + 4</span> have?</div>
-      <div class="mc-group">
+      <div class="mc-group" data-noshuffle>
         <button class="mc-option" data-k="k1:ODl8MA==">One</button>
         <button class="mc-option" data-k="k1:OTB8MA==">None</button>
         <button class="mc-option" data-k="k1:OTF8MQ==">Infinitely many</button>
@@ -732,9 +742,29 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
   document.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.matches('.ans-input')){e.preventDefault();var step=e.target.closest('.step');if(step){var b=step.querySelector('.check-btn');if(b&&!b.classList.contains('ms-check')&&!b.classList.contains('cr-save'))b.click();else checkInput(e.target);}else checkInput(e.target);}});
   document.querySelectorAll('.step.locked').forEach(function(s){setStepDisabled(s,true);});
   document.addEventListener('wheel',function(e){if(e.target&&e.target.matches&&e.target.matches('.ans-input')&&document.activeElement===e.target)e.target.blur();},{passive:true});
+  /* v1.4.2 anti-cheat: block copy/cut from question cards (typing areas exempt) */
+  ['copy','cut'].forEach(function(ev){document.addEventListener(ev,function(e){var t=e.target;if(t&&t.closest&&t.closest('.qcard')&&!(t.matches&&t.matches('input,textarea')))e.preventDefault();});});
+  /* v1.4.2 anti-cheat: shuffle MC/MS options on load (3+ options; data-noshuffle opts out — exam capstones and numeric/semantic scales keep their real order) */
+  document.querySelectorAll('.mc-group,.ms-group').forEach(function(g){if(g.hasAttribute('data-noshuffle'))return;var o=Array.prototype.slice.call(g.querySelectorAll('.mc-option,.ms-option'));if(o.length<3)return;for(var i=o.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=o[i];o[i]=o[j];o[j]=t;}o.forEach(function(b){g.appendChild(b);});});
 
   function countAllSteps(){return document.querySelectorAll('.qcard .step').length;}
-  function refreshOverall(){var d=loadData(),done=0;document.querySelectorAll('.qcard').forEach(function(c){var q=c.dataset.qid;if(q&&d[q]&&d[q].steps)done+=Object.keys(d[q].steps).filter(function(k){return d[q].steps[k];}).length;});var tot=countAllSteps();document.getElementById('op-done').textContent=done;document.getElementById('op-total').textContent=tot;document.getElementById('op-pct').textContent=(tot?Math.round(done/tot*100):0)+'%';}
+  function refreshOverall(){var d=loadData(),done=0;document.querySelectorAll('.qcard').forEach(function(c){var q=c.dataset.qid;if(q&&d[q]&&d[q].steps)done+=Object.keys(d[q].steps).filter(function(k){return d[q].steps[k];}).length;});var tot=countAllSteps();document.getElementById('op-done').textContent=done;document.getElementById('op-total').textContent=tot;document.getElementById('op-pct').textContent=(tot?Math.round(done/tot*100):0)+'%';renderSecReport();}
+
+  /* v1.4.3: student-facing per-section report card, injected after the overall progress box */
+  function renderSecReport(){
+    var host=document.querySelector('.overall-progress');if(!host)return;
+    var box=document.getElementById('sec-report');
+    if(!box){box=document.createElement('div');box.id='sec-report';box.className='sec-report';host.parentNode.insertBefore(box,host.nextSibling);}
+    var rows='';
+    document.querySelectorAll('section.topic').forEach(function(sec){
+      var steps=sec.querySelectorAll('.qcard .step');if(!steps.length)return;
+      var done=sec.querySelectorAll('.qcard .step.completed').length;
+      var h=sec.querySelector('h2');var name=(h?h.textContent:sec.id).replace(/[<>&]/g,'').trim();
+      var pct=steps.length?Math.round(done/steps.length*100):0;
+      rows+='<div class="sec-row'+(pct>=100?' full':'')+'"><a href="#'+sec.id+'">'+name+'</a><span class="bar"><span style="width:'+pct+'%"></span></span><span class="val">'+done+'/'+steps.length+' \u00b7 '+pct+'%</span></div>';
+    });
+    if(rows)box.innerHTML='<h3>Your section scores</h3>'+rows; else box.style.display='none';
+  }
 
   function restoreProgress(){
     var nm=document.getElementById('g7name');if(nm)nm.textContent=g7current();
