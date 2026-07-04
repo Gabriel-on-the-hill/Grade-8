@@ -4,7 +4,8 @@
  * (dashboard + gated Settings), Escape-to-close, passcode takeover, homework decay +
  * mark-done, CR mark-reviewed, module wrong→retry→correct with cooldown, shuffle +
  * data-noshuffle, copy-block, exam first-attempt-only stats, fraction equivalence,
- * locked steps, persistence + section report card, hint integrity. Exit 0 = all pass.
+ * locked steps, persistence + section report card, hint integrity, and v1.5 cloud
+ * sync (merge rules, teacher/student pushes, module merge + debounced push). Exit 0 = all pass.
  */
 const {JSDOM}=require('jsdom');const fs=require('fs');const path=require('path');
 const DIR=(process.argv[2]||'.').replace(/\/?$/,'/');
@@ -16,7 +17,7 @@ function load(file,seed,rnd){
     beforeParse(w){const store=Object.assign({'g8.gate':'ok'},seed||{});
       w.localStorage.clear();Object.keys(store).forEach(k=>w.localStorage.setItem(k,store[k]));
       if(rnd)w.Math.random=rnd;
-      w.fetch=()=>Promise.resolve();w.confirm=()=>true;w.scrollTo=()=>{};
+      w.fetch=(u,o)=>{if(w.__spy&&o&&o.body){try{w.__spy.push(JSON.parse(o.body));}catch(e){}}return Promise.resolve();};w.confirm=()=>true;w.scrollTo=()=>{};
       w.alert=()=>{throw new Error('alert() used');};w.prompt=()=>{throw new Error('prompt() used');};}});
   dom.window.dispatchEvent(new dom.window.Event('load'));return dom;
 }
@@ -192,6 +193,51 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
   ok(d.getElementById('sec-report').querySelectorAll('.sec-row').length===7,'EE: section report card rows');
   const semantic=[...d.querySelector('[data-qid="5-1"] .mc-group').children].map(e=>e.textContent.trim());
   ok(semantic.join('|')==='One|None|Infinitely many','EE: solution-count options keep semantic order');
+}
+// ===== SYNC v1.5: hub merge rules =====
+{ const data={students:{Divine:{topics:{'number-system':{title:'t',tree:{},totalSteps:31,sectionTotals:{},lastPracticed:5,attempts:0,correct:0,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[{qid:'3-4',label:'Q11',text:'r',ts:77}]}},assignments:{math:{text:'old',ts:5}}}}};
+  const w=load(HUB,{'g7.current':'Divine','g7.roster':JSON.stringify(['Divine']),'g7.pins':JSON.stringify({Divine:'1'}),'g7.data':JSON.stringify(data),'g7.sheetURL':'https://sheet.test/exec'}).window;
+  ok(!!w.__hubSync,'sync: hub exposes sync API');
+  const res=w.__hubSync.applyCloud({pins:{Divine:{v:'42',ts:9e15}},assign:{Divine:{math:{text:'cloud hw',ts:9e15}}},
+    topics:{Divine:{'number-system':{title:'t',tree:{'1-1':{steps:{0:true}}},totalSteps:31,sectionTotals:{},lastPracticed:9e15,attempts:1,correct:1,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[{qid:'3-4',label:'Q11',text:'r',ts:77}]}}},
+    reviews:{Divine:{'number-system':{'77':123}}}});
+  ok(res.changed===true,'sync: cloud changes applied');
+  const d2=JSON.parse(w.localStorage.getItem('g7.data'));
+  ok(JSON.parse(w.localStorage.getItem('g7.pins')).Divine==='42','sync: newer cloud PIN wins (LWW)');
+  ok(d2.students.Divine.assignments.math.text==='cloud hw','sync: newer cloud assignment wins (LWW)');
+  ok(d2.students.Divine.topics['number-system'].lastPracticed===9e15,'sync: newer cloud topic replaces local');
+  ok(d2.students.Divine.topics['number-system'].responses[0].reviewed===123,'sync: review overlay applied to responses');
+  const res2=w.__hubSync.applyCloud({topics:{Divine:{'number-system':{lastPracticed:1}}},pins:{},assign:{},reviews:{}});
+  ok(res2.pushTopics.some(p=>p.n==='Divine'&&p.tid==='number-system'),'sync: local-newer topic queued for push');
+}
+// ===== SYNC v1.5: teacher actions push =====
+{ const w=load(HUB,{'g7.sheetURL':'https://sheet.test/exec','g7.current':'Divine','g7.roster':JSON.stringify(['Divine']),'g7.pins':JSON.stringify({Divine:'1'}),
+    'g7.data':JSON.stringify({students:{Divine:{topics:{'number-system':{title:'t',tree:{},totalSteps:31,sectionTotals:{},lastPracticed:5,attempts:1,correct:1,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[{qid:'3-4',label:'Q',text:'r',ts:77}]}},assignments:{}}}})}).window,d=w.document;
+  w.__spy=[];
+  d.getElementById('tb-teacher').click();d.getElementById('tm-pass').value='gabe';d.getElementById('tm-go').click();
+  const inp=d.querySelector('.assign-inp');inp.value='Do 5 problems';d.querySelector('.assign-save').click();
+  ok(w.__spy.some(b=>b.op==='put'&&b.kind==='assign'&&b.hub==='grade8'&&b.payload.text==='Do 5 problems'),'sync: assignment pushed with hub namespace');
+  d.querySelector('.cr-rev').click();
+  ok(w.__spy.some(b=>b.kind==='review'&&b.sub==='number-system'&&b.payload['77']>0),'sync: review map pushed');
+  d.getElementById('btn-roster').click();
+  d.querySelector('.reset-pin').click();
+  ok(w.__spy.some(b=>b.kind==='pin'&&b.payload.v===''),'sync: PIN reset pushed');
+}
+// ===== SYNC v1.5: student pushes + module merge =====
+{ const w=load(HUB,{'g7.sheetURL':'https://sheet.test/exec'}).window,d=w.document;
+  w.__spy=[];
+  d.querySelector('.name-tile').click();d.getElementById('pin1').value='7';d.getElementById('pin2').value='7';d.getElementById('pin-go').click();
+  ok(w.__spy.some(b=>b.kind==='pin'&&b.payload.v==='7'&&b.hub==='grade8'),'sync: PIN creation pushed');
+  const wm=load(NS,{'g7.current':'Divine','g7.sheetURL':'https://sheet.test/exec'}).window;
+  ok(!!wm.__modSync,'sync: module exposes sync API');
+  const changed=wm.__modSync.mergeCloudTopic({topics:{Divine:{'number-system':{title:'The Number System',tree:{'1-1':{steps:{0:true}}},totalSteps:31,sectionTotals:{'1':5},lastPracticed:9e15,attempts:1,correct:1,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[]}}},reviews:{}});
+  ok(changed===true,'sync: module merges newer cloud topic');
+  ok(JSON.parse(wm.localStorage.getItem('g7.data')).students.Divine.topics['number-system'].tree['1-1'].steps[0]===true,'sync: merge lands in local store');
+  wm.__spy=[];
+  const q=wm.document.querySelector('[data-qid="4-1"]');
+  q.querySelector('.ans-input').value='9';q.querySelector('.check-btn').click();
+  await sleep(1700);
+  ok(wm.__spy.some(b=>b.kind==='topic'&&b.sub==='number-system'&&b.hub==='grade8'&&b.payload.tree),'sync: module work pushed to cloud (debounced)');
 }
 console.log('\n'+pass+' passed, '+fail+' failed');process.exit(fail?1:0);
 })();

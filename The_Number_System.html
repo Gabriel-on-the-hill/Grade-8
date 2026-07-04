@@ -703,6 +703,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
 </main>
 <script>
   // ===== Per-module identity (change these per unit) =====
+  var G7_SYNC_HUB='grade8'; // shared-cloud namespace for this deployment
   const G7_TOPIC_ID='number-system';
   const G7_TOPIC_TITLE='The Number System';
   const G7_SKILLS={
@@ -731,9 +732,28 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
   function g7topic(o){o.students=o.students||{};var s=g7current();o.students[s]=o.students[s]||{topics:{}};var T=o.students[s].topics;T[G7_TOPIC_ID]=T[G7_TOPIC_ID]||{title:G7_TOPIC_TITLE,tree:{},totalSteps:0,sectionTotals:{},lastPracticed:0,attempts:0,correct:0,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[]};return T[G7_TOPIC_ID];}
   function g7sectionTotals(){var m={};document.querySelectorAll('.qcard[data-qid]').forEach(function(c){var sec=(c.dataset.qid||'').split('-')[0];m[sec]=(m[sec]||0)+c.querySelectorAll('.step').length;});return m;}
   function loadData(){return g7topic(g7all()).tree;}
-  function saveData(tree){var o=g7all();var t=g7topic(o);t.tree=tree;t.totalSteps=document.querySelectorAll('.qcard .step').length;t.sectionTotals=g7sectionTotals();t.lastPracticed=Date.now();g7save(o);}
-  function g7sheet(event,question,detail){var url=localStorage.getItem('g7.sheetURL');if(!url)return;try{fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({student:g7current(),topic:G7_TOPIC_TITLE,question:question||'',event:event,detail:detail||'',ts:Date.now()})});}catch(e){}}
-  function g7log(qid,wrong,label,your,exam){var o=g7all();var t=g7topic(o);var sk=G7_SKILLS[qid]||'reasoning';t.skillStats[sk]=t.skillStats[sk]||{attempts:0,misses:0};t.skillStats[sk].attempts++;t.attempts=(t.attempts||0)+1;if(wrong){t.skillStats[sk].misses++;t.struggles.push({qid:qid,label:(label||qid).trim(),skill:sk,skillLabel:G7_SKILL_LABELS[sk],your:your||'',ts:Date.now()});if(t.struggles.length>120)t.struggles=t.struggles.slice(-120);}else{t.correct=(t.correct||0)+1;}if(exam){t.exam=t.exam||{attempts:0,correct:0};t.exam.attempts++;if(!wrong)t.exam.correct++;}t.lastPracticed=Date.now();g7save(o);g7sheet(wrong?'struggle':'step_complete',(label||qid).trim(),wrong?('typed "'+(your||'')+'"'):'');}
+  function saveData(tree){var o=g7all();var t=g7topic(o);t.tree=tree;t.totalSteps=document.querySelectorAll('.qcard .step').length;t.sectionTotals=g7sectionTotals();t.lastPracticed=Date.now();g7save(o);schedulePush();}
+  function g7sheet(event,question,detail){var url=localStorage.getItem('g7.sheetURL');if(!url)return;try{fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({hub:G7_SYNC_HUB||'default',student:g7current(),topic:G7_TOPIC_TITLE,question:question||'',event:event,detail:detail||'',ts:Date.now()})});}catch(e){}}
+  function g7log(qid,wrong,label,your,exam){var o=g7all();var t=g7topic(o);var sk=G7_SKILLS[qid]||'reasoning';t.skillStats[sk]=t.skillStats[sk]||{attempts:0,misses:0};t.skillStats[sk].attempts++;t.attempts=(t.attempts||0)+1;if(wrong){t.skillStats[sk].misses++;t.struggles.push({qid:qid,label:(label||qid).trim(),skill:sk,skillLabel:G7_SKILL_LABELS[sk],your:your||'',ts:Date.now()});if(t.struggles.length>120)t.struggles=t.struggles.slice(-120);}else{t.correct=(t.correct||0)+1;}if(exam){t.exam=t.exam||{attempts:0,correct:0};t.exam.attempts++;if(!wrong)t.exam.correct++;}t.lastPracticed=Date.now();g7save(o);g7sheet(wrong?'struggle':'step_complete',(label||qid).trim(),wrong?('typed "'+(your||'')+'"'):'');schedulePush();}
+
+  /* ===== v1.5 cloud sync (offline-first; shared multi-hub backend) ===== */
+  function syncPush(kind,name,sub,payload){var u=localStorage.getItem('g7.sheetURL');if(!u)return;try{fetch(u,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({op:'put',hub:G7_SYNC_HUB||'default',kind:kind,name:name,sub:sub||'',payload:payload,ts:Date.now()})}).catch(function(){});}catch(e){}}
+  function syncPull(cb){var u=localStorage.getItem('g7.sheetURL');if(!u){cb(null);return;}try{var nm='__modcb'+Math.floor(Math.random()*1e9);var s=document.createElement('script');
+    window[nm]=function(doc){try{cb(doc||null);}finally{try{delete window[nm];}catch(e2){}if(s.parentNode)s.parentNode.removeChild(s);}};
+    s.onerror=function(){try{delete window[nm];}catch(e2){}if(s.parentNode)s.parentNode.removeChild(s);cb(null);};
+    s.src=u+(u.indexOf('?')>=0?'&':'?')+'op=pull&hub='+encodeURIComponent(G7_SYNC_HUB||'default')+'&cb='+nm;document.head.appendChild(s);}catch(e){cb(null);}}
+  var _pushT=null;
+  function schedulePush(){if(!localStorage.getItem('g7.sheetURL'))return;clearTimeout(_pushT);_pushT=setTimeout(function(){try{var o=g7all();var s=g7current();var to=o.students&&o.students[s]&&o.students[s].topics&&o.students[s].topics[G7_TOPIC_ID];if(to)syncPush('topic',s,G7_TOPIC_ID,to);}catch(e){}},1500);}
+  function mergeCloudTopic(doc){if(!doc)return false;var s=g7current();var changed=false;
+    var o=g7all();var t=g7topic(o);
+    var c=doc.topics&&doc.topics[s]&&doc.topics[s][G7_TOPIC_ID];
+    if(c&&((c.lastPracticed||0)>(t.lastPracticed||0))){o.students[s].topics[G7_TOPIC_ID]=c;changed=true;}
+    var m=doc.reviews&&doc.reviews[s]&&doc.reviews[s][G7_TOPIC_ID];
+    if(m){var to=o.students[s].topics[G7_TOPIC_ID];((to&&to.responses)||[]).forEach(function(r){var k=String(r.ts);if(Object.prototype.hasOwnProperty.call(m,k)&&(r.reviewed||0)!==(m[k]||0)){r.reviewed=m[k]||0;changed=true;}});}
+    if(changed){g7save(o);}else if((t.lastPracticed||0)>((c&&c.lastPracticed)||0)){schedulePush();}
+    return changed;}
+  window.__modSync={mergeCloudTopic:mergeCloudTopic,schedulePush:schedulePush};
+  window.addEventListener('load',function(){syncPull(function(doc){if(mergeCloudTopic(doc))restoreProgress();});});
 
   // ===== answer helpers =====
   function kdec(s){try{return atob(s);}catch(e){return '';}}

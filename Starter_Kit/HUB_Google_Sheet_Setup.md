@@ -1,88 +1,50 @@
-# Grade 7 Hub — Google Sheet logging (Apps Script) setup
+# Cloud sync setup (ONE time, ~5 minutes — shared by ALL hubs)
 
-This connects the Hub and lessons to a Google Sheet so you (the teacher) can see, in one place,
-**who practiced what, when, and where they struggled** — across every student and topic.
+Cloud sync makes the hubs truly multi-device: students' progress appears on the
+teacher dashboard anywhere, and homework you set, PINs you reset, and responses
+you mark reviewed appear on the students' devices. It runs on a Google Sheet
+**you own** — no accounts for the students, nothing to install.
 
-The hub works fully **without** this (everything saves in the browser). The Sheet just gives you a
-cloud copy you can open from anywhere and filter/sort.
+**One backend for everything:** this same Sheet + URL serves the SAT hub,
+Grade 7, Grade 8, and any future hub. Each app identifies itself with a hub id
+(`SYNC_HUB_ID`, e.g. `grade8`), so programs never collide — and one student can
+be in several programs at once. Set this up once; give every hub the same URL.
 
----
+## Steps
 
-## What you'll do (about 5 minutes)
-
-1. Create a new Google Sheet. Name it e.g. **"Grade 7 Hub — Activity Log"**.
-2. In the menu: **Extensions → Apps Script**. Delete any code there.
-3. Paste in the script below. Click **Save**.
-4. Click **Deploy → New deployment**.
-   - Click the gear → **Web app**.
-   - **Description:** Grade 7 Hub
-   - **Execute as:** *Me*
-   - **Who has access:** *Anyone*  (this lets the lesson pages post to it; no one can read your sheet from the URL)
-   - Click **Deploy**, authorise when prompted (choose your account → Advanced → Go to project → Allow).
+1. Go to **sheets.new** (creates a new Google Sheet). Name it e.g. `Study Hubs Cloud`.
+2. In the Sheet: **Extensions → Apps Script**. Delete any code in the editor.
+3. Open `Starter_Kit/HUB_Sync_Apps_Script.gs` from this project, copy ALL of it,
+   paste it into the Apps Script editor, and **save** (Ctrl+S).
+4. Click **Deploy → New deployment** → gear icon → **Web app**.
+   - Description: anything.
+   - **Execute as: Me**
+   - **Who has access: Anyone**
+   - Click **Deploy**, approve the permissions prompt (it's your own script).
 5. Copy the **Web app URL** (ends in `/exec`).
-6. Open the **Hub** → **Settings (gear icon)** → paste the URL → **Save**.
+6. Either:
+   - **Best:** give the URL to your assistant to bake in as `SHEET_URL_SEED`
+     and redeploy — every device then syncs with zero setup; or
+   - Paste it on each device: Teacher → Settings → "Google Sheet web app URL" → Save.
 
-That's it. Each completed step and each wrong attempt now also appears as a row in your sheet.
+## What syncs
 
----
+- **Students → teacher:** all practice progress, struggles, exam-readiness,
+  written responses (pushed ~1.5 s after work happens; pulled when the hub or a
+  module opens, and every 60 s while the hub is open).
+- **Teacher → students:** homework assignments (and their done-state), PIN
+  resets, "Mark reviewed" on written responses.
+- **Not synced:** the roster and passcodes — those are baked into the deployed
+  app (`ROSTER_SEED` / `TEACHER_PASS_SEED`) so they're identical everywhere.
 
-## The Apps Script code
+## Notes
 
-```javascript
-// Grade 7 Hub — receives activity events and appends them to the sheet.
-function doPost(e) {
-  try {
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Log')
-              || SpreadsheetApp.getActiveSpreadsheet().insertSheet('Log');
-    if (sheet.getLastRow() === 0) {
-      sheet.appendRow(['Timestamp', 'Student', 'Topic', 'Question', 'Event', 'Detail']);
-    }
-    var d = JSON.parse(e.postData.contents);
-    sheet.appendRow([
-      new Date(d.ts || Date.now()),
-      d.student || '',
-      d.topic   || '',
-      d.question || '',
-      d.event   || '',
-      d.detail  || ''
-    ]);
-    return ContentService.createTextOutput('ok');
-  } catch (err) {
-    return ContentService.createTextOutput('error: ' + err);
-  }
-}
-
-// Optional: lets you test from the editor (Run ▸ doGet).
-function doGet() {
-  return ContentService.createTextOutput('Grade 7 Hub logger is running.');
-}
-```
-
-The sheet will build a tab called **Log** with these columns:
-
-| Timestamp | Student | Topic | Question | Event | Detail |
-|---|---|---|---|---|---|
-| 2026-06-20 14:02 | Damilare | Number System Connections | Q4.2a | struggle | typed "1/4" (answer -1/4) |
-| 2026-06-20 14:03 | Damilare | Number System Connections | Q4.2a | step_complete | — |
-
-**Event types:** `step_complete` (got it right), `struggle` (a wrong attempt — Detail shows what they typed),
-`topic_opened`, `topic_finished`.
-
-To make a quick teacher view, add a second tab and use a `FILTER` or a Pivot Table on **Log**
-(e.g. group by Student + Event to see each student's struggle list).
-
----
-
-## Data contract (for reference / future cloud upgrade)
-
-The hub and every lesson share these browser keys (same browser), so progress flows between them:
-
-- `g7.roster` — JSON array of student names (you edit this in the Hub).
-- `g7.current` — the name of the student currently signed in.
-- `g7.sheetURL` — your Apps Script `/exec` URL (set in Hub Settings).
-- `g7.data` — all progress: `{ students: { "<name>": { topics: { "<topicId>": {
-    title, stepsDone:{"<qid>::<stepIndex>":true}, totalSteps, lastPracticed,
-    attempts, correct, struggles:[ {qid, label, your, ts} ] } } } } }`
-
-Each lesson declares its own `topicId` (e.g. `number-system`). Because the shape is stable,
-moving to a real cloud backend later just means swapping where `g7.data` is read/written.
+- Offline-first: with no URL set (or no internet) everything keeps working on
+  the device; sync resumes when it can.
+- The `SyncStore` tab is machine-managed — don't edit it. The `Log` tab is a
+  human-readable activity feed you can watch or chart.
+- If two devices edit the same thing, the newest change wins (per topic /
+  per assignment / per PIN).
+- Redeploying the Apps Script (after edits) creates a NEW URL — re-bake it.
+- The `Log` tab's `hub` column tells you which program each event came from —
+  one feed across SAT, Grade 7 and Grade 8.

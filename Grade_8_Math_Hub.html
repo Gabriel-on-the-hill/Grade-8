@@ -284,7 +284,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
 <div id="settingsModal" class="modal-bg hidden">
   <div class="modal">
     <h2>Settings</h2>
-    <p>Connect a Google Sheet to keep a cloud log of activity (optional). See the setup guide for how to get this link.</p>
+    <p>Connect the shared Google Sheet web app to enable <strong>cloud sync</strong> — student progress reaches your dashboard from any device, and homework, PIN resets and reviews reach the students — plus an activity log. One URL serves all hubs (see the setup guide).</p>
     <label class="muted-note">Google Sheet web app URL</label>
     <input id="sheet-url" class="field" placeholder="https://script.google.com/.../exec" style="margin-top:.3rem"/>
     <div class="row">
@@ -371,7 +371,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
       var v2=(document.getElementById('pin2').value||'').trim();
       if(!v1){err.textContent='Please enter a PIN.';return;}
       if(v1!==v2){err.textContent='The PINs do not match.';return;}
-      setPin(n,v1); closePinModal(); setCurrent(n); LS.setItem(K('device'),n); _showAllNames=false; boot(); return;
+      setPin(n,v1); syncPush('pin',n,'',{v:v1,ts:markPinTs(n)}); closePinModal(); setCurrent(n); LS.setItem(K('device'),n); _showAllNames=false; boot(); return;
     }
     if(v1!==getPin(n)){err.textContent='Incorrect PIN. If you forgot it, ask your teacher to reset it.';document.getElementById('pin1').focus();document.getElementById('pin1').select();return;}
     closePinModal(); setCurrent(n); LS.setItem(K('device'),n); _showAllNames=false; boot();
@@ -385,7 +385,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
   function setSubject(id){LS.setItem(K('subject'),id);}
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function initials(n){return String(n||'?').trim().split(/\s+/).map(function(w){return w[0]||'';}).slice(0,2).join('').toUpperCase();}
-  function postSheet(p){var u=sheetURL();if(!u)return Promise.resolve();return fetch(u,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(p)}).catch(function(){});}
+  function postSheet(p){var u=sheetURL();if(!u)return Promise.resolve();p=p||{};p.hub=SYNC_HUB_ID||'default';return fetch(u,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(p)}).catch(function(){});}
 
   /* Per-subject skill labels (drive the struggle dashboard). Merged into SKILL_LABELS below. */
   var MATH_SKILLS={
@@ -462,6 +462,8 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
      seed and redeploy; Settings changes last only until the seed changes. */
   var ROSTER_SEED=['Divine','Ayodeji'];
   var TEACHER_PASS_SEED=atob('R2FiZQ==');  // lightly encoded; checked case-insensitively
+  var SYNC_HUB_ID='grade8';   /* namespace in the shared multi-hub cloud backend (SAT / Grade 7 / Grade 8 share one Sheet) */
+  var SHEET_URL_SEED='';      /* Apps Script web-app URL baked into the deployment -> zero-setup sync on every device (applied once per value via g7.urlv; Settings may override until the seed changes) */
   function applySeeds(){
     try{
       var sv=JSON.stringify(ROSTER_SEED);
@@ -469,8 +471,46 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
         var r=getRoster();ROSTER_SEED.forEach(function(n){if(r.indexOf(n)<0)r.push(n);});setRoster(r);LS.setItem(K('seedv'),sv);
       }
       if(TEACHER_PASS_SEED && LS.getItem(K('passv'))!==TEACHER_PASS_SEED){LS.setItem(K('teacherPass'),TEACHER_PASS_SEED);LS.setItem(K('passv'),TEACHER_PASS_SEED);}
+      if(SHEET_URL_SEED && LS.getItem(K('urlv'))!==SHEET_URL_SEED){LS.setItem(K('sheetURL'),SHEET_URL_SEED);LS.setItem(K('urlv'),SHEET_URL_SEED);}
     }catch(e){}
   }
+
+  /* ===== v1.5 cloud sync (offline-first; shared multi-hub Apps Script backend — see Starter_Kit/HUB_Google_Sheet_Setup.md) ===== */
+  function syncPush(kind,name,sub,payload){if(!sheetURL())return;try{fetch(sheetURL(),{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({op:'put',hub:SYNC_HUB_ID||'default',kind:kind,name:name,sub:sub||'',payload:payload,ts:Date.now()})}).catch(function(){});}catch(e){}}
+  function syncPull(cb){if(!sheetURL()){cb(null);return;}try{var nm='__hubcb'+Math.floor(Math.random()*1e9);var s=document.createElement('script');
+    window[nm]=function(doc){try{cb(doc||null);}finally{try{delete window[nm];}catch(e2){}if(s.parentNode)s.parentNode.removeChild(s);}};
+    s.onerror=function(){try{delete window[nm];}catch(e2){}if(s.parentNode)s.parentNode.removeChild(s);cb(null);};
+    s.src=sheetURL()+(sheetURL().indexOf('?')>=0?'&':'?')+'op=pull&hub='+encodeURIComponent(SYNC_HUB_ID||'default')+'&cb='+nm;document.head.appendChild(s);}catch(e){cb(null);}}
+  function recTs(r){return Math.max((r&&r.ts)||0,(r&&r.mts)||0,(r&&r.doneTs)||0);}
+  function markPinTs(n){var m=jget(K('pints'),{});m[n]=Date.now();jset(K('pints'),m);return m[n];}
+  function applyCloud(doc){
+    if(!doc)return {changed:false,pushTopics:[]};
+    var changed=false,pushTopics=[];
+    var d=getData();d.students=d.students||{};
+    var pins=getPins(),pints=jget(K('pints'),{}),cp=doc.pins||{};
+    Object.keys(cp).forEach(function(n){var c=cp[n]||{};if((c.ts||0)>(pints[n]||0)){if(c.v)pins[n]=c.v;else delete pins[n];pints[n]=c.ts||0;changed=true;}});
+    setPins(pins);jset(K('pints'),pints);
+    var ca=doc.assign||{};
+    Object.keys(ca).forEach(function(n){var subs=ca[n]||{};d.students[n]=d.students[n]||{topics:{}};d.students[n].assignments=d.students[n].assignments||{};
+      Object.keys(subs).forEach(function(sid){var c=subs[sid];var l=d.students[n].assignments[sid];if(recTs(c)>recTs(l)){d.students[n].assignments[sid]=c;changed=true;}});});
+    var ct=doc.topics||{};
+    Object.keys(ct).forEach(function(n){var tps=ct[n]||{};d.students[n]=d.students[n]||{topics:{}};d.students[n].topics=d.students[n].topics||{};
+      Object.keys(tps).forEach(function(tid){var c=tps[tid],l=d.students[n].topics[tid];
+        if(((c&&c.lastPracticed)||0)>((l&&l.lastPracticed)||0)){d.students[n].topics[tid]=c;changed=true;}
+        else if(l&&((l.lastPracticed||0)>((c&&c.lastPracticed)||0))){pushTopics.push({n:n,tid:tid});}});});
+    Object.keys(d.students).forEach(function(n){var tps=(d.students[n]&&d.students[n].topics)||{};Object.keys(tps).forEach(function(tid){if(!(ct[n]&&ct[n][tid])&&((tps[tid]&&tps[tid].lastPracticed)||0)>0)pushTopics.push({n:n,tid:tid});});});
+    var cr=doc.reviews||{};
+    Object.keys(cr).forEach(function(n){var tmap=cr[n]||{};var st=d.students[n];if(!st||!st.topics)return;
+      Object.keys(tmap).forEach(function(tid){var m=tmap[tid]||{};var to=st.topics[tid];if(!to||!to.responses)return;
+        to.responses.forEach(function(r){var k=String(r.ts);if(Object.prototype.hasOwnProperty.call(m,k)&&(r.reviewed||0)!==(m[k]||0)){r.reviewed=m[k]||0;changed=true;}});});});
+    jset(K('data'),d);
+    return {changed:changed,pushTopics:pushTopics};
+  }
+  function reviewMapFor(n,tid){var d=getData();var to=d.students&&d.students[n]&&d.students[n].topics&&d.students[n].topics[tid];var m={};((to&&to.responses)||[]).forEach(function(r){if(r.reviewed)m[String(r.ts)]=r.reviewed;});return m;}
+  function runSync(after){syncPull(function(doc){var res=applyCloud(doc);var seen={};(res.pushTopics||[]).forEach(function(p){var k=p.n+'|'+p.tid;if(seen[k])return;seen[k]=1;var d=getData();var to=d.students[p.n]&&d.students[p.n].topics&&d.students[p.n].topics[p.tid];if(to)syncPush('topic',p.n,p.tid,to);});if(res.changed&&after)after();});}
+  function rerenderView(){try{if(!document.getElementById('view-teacher').classList.contains('hidden')){renderTeacher();}else if(!document.getElementById('view-app').classList.contains('hidden')){renderApp();}}catch(e){}}
+  window.__hubSync={applyCloud:applyCloud,recTs:recTs,reviewMapFor:reviewMapFor};
+
 
   function subjectById(id){for(var i=0;i<SUBJECTS.length;i++){if(SUBJECTS[i].id===id)return SUBJECTS[i];}return null;}
   function eachTopic(fn){SUBJECTS.forEach(function(s){s.units.forEach(function(u){u.topics.forEach(function(t){fn(t,u,s);});});});}
@@ -626,7 +666,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     if(sugg.length) s+='<div class="item" style="margin-top:.45rem">Practice again: '+sugg.map(function(x){return esc(x.label)+' ('+x.misses+' missed)';}).join('; ')+'</div>';
     s+='</div>'; el.innerHTML=s;
     var hb=document.getElementById('hw-done');
-    if(hb)hb.onclick=function(){var d=getData();d.students=d.students||{};d.students[cur]=d.students[cur]||{topics:{}};d.students[cur].assignments=d.students[cur].assignments||{};var cu=d.students[cur].assignments[subj.id]||{text:ao.text,ts:ao.ts||Date.now()};cu.doneTs=cu.doneTs?0:Date.now();d.students[cur].assignments[subj.id]=cu;jset(K('data'),d);renderApp();};
+    if(hb)hb.onclick=function(){var d=getData();d.students=d.students||{};d.students[cur]=d.students[cur]||{topics:{}};d.students[cur].assignments=d.students[cur].assignments||{};var cu=d.students[cur].assignments[subj.id]||{text:ao.text,ts:ao.ts||Date.now()};cu.doneTs=cu.doneTs?0:Date.now();cu.mts=Date.now();d.students[cur].assignments[subj.id]=cu;jset(K('data'),d);syncPush('assign',cur,subj.id,cu);renderApp();};
   }
 
   // ---- teacher ----
@@ -725,8 +765,8 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
       html+='</div></div>';
     });
     dash.innerHTML=html;
-    Array.prototype.forEach.call(dash.querySelectorAll('.assign-save'),function(b){b.onclick=function(){var inp=b.parentNode.querySelector('.assign-inp');var n=b.getAttribute('data-n');var sid=b.getAttribute('data-s');var d=getData();d.students=d.students||{};d.students[n]=d.students[n]||{topics:{}};d.students[n].assignments=d.students[n].assignments||{};d.students[n].assignments[sid]={text:inp.value.trim(),ts:Date.now()};jset(K('data'),d);b.textContent='Saved';setTimeout(function(){b.textContent='Save';},1200);};});
-    Array.prototype.forEach.call(dash.querySelectorAll('.cr-rev'),function(b){b.onclick=function(){var d=getData();var n=b.getAttribute('data-n'),ti=b.getAttribute('data-t'),i=parseInt(b.getAttribute('data-i'),10);var to=d.students&&d.students[n]&&d.students[n].topics&&d.students[n].topics[ti];if(!to||!to.responses||!to.responses[i])return;to.responses[i].reviewed=to.responses[i].reviewed?0:Date.now();jset(K('data'),d);b.textContent=to.responses[i].reviewed?'Reviewed \u2713':'Mark reviewed';};});
+    Array.prototype.forEach.call(dash.querySelectorAll('.assign-save'),function(b){b.onclick=function(){var inp=b.parentNode.querySelector('.assign-inp');var n=b.getAttribute('data-n');var sid=b.getAttribute('data-s');var d=getData();d.students=d.students||{};d.students[n]=d.students[n]||{topics:{}};d.students[n].assignments=d.students[n].assignments||{};d.students[n].assignments[sid]={text:inp.value.trim(),ts:Date.now(),mts:Date.now()};jset(K('data'),d);syncPush('assign',n,sid,d.students[n].assignments[sid]);b.textContent='Saved';setTimeout(function(){b.textContent='Save';},1200);};});
+    Array.prototype.forEach.call(dash.querySelectorAll('.cr-rev'),function(b){b.onclick=function(){var d=getData();var n=b.getAttribute('data-n'),ti=b.getAttribute('data-t'),i=parseInt(b.getAttribute('data-i'),10);var to=d.students&&d.students[n]&&d.students[n].topics&&d.students[n].topics[ti];if(!to||!to.responses||!to.responses[i])return;to.responses[i].reviewed=to.responses[i].reviewed?0:Date.now();jset(K('data'),d);syncPush('review',n,ti,reviewMapFor(n,ti));b.textContent=to.responses[i].reviewed?'Reviewed \u2713':'Mark reviewed';};});
     Array.prototype.forEach.call(dash.querySelectorAll('.struggle-toggle'),function(tg){
       tg.onclick=function(){var box=document.getElementById(tg.getAttribute('data-tg'));var hidden=box.classList.toggle('hidden');tg.textContent=(hidden?'Show ':'Hide ')+tg.textContent.replace(/^(Show|Hide)\s/,'');};
     });
@@ -744,7 +784,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
         '<button class="x" data-n="'+esc(n)+'" style="margin-left:0">Remove</button></span></div>';
     }).join(''):'<p class="muted-note">No names yet.</p>';
     Array.prototype.forEach.call(list.querySelectorAll('.reset-pin'),function(b){
-      b.onclick=function(){var n=b.getAttribute('data-n');if(!confirm('Reset '+n+"'s PIN? They will create a new one next time they sign in."))return;setPin(n,'');renderRosterPanel();};
+      b.onclick=function(){var n=b.getAttribute('data-n');if(!confirm('Reset '+n+"'s PIN? They will create a new one next time they sign in."))return;setPin(n,'');syncPush('pin',n,'',{v:'',ts:markPinTs(n)});renderRosterPanel();};
     });
     Array.prototype.forEach.call(list.querySelectorAll('.x'),function(b){
       b.onclick=function(){var n=b.getAttribute('data-n');setRoster(getRoster().filter(function(x){return x!==n;}));setPin(n,'');renderRosterPanel();};
@@ -820,6 +860,8 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
   try{wire();}catch(e){if(window.console)console.error('wire() failed:',e);}
   applySeeds();
   boot();
+  runSync(rerenderView);
+  setInterval(function(){runSync(rerenderView);},60000);
 })();
 </script>
 
