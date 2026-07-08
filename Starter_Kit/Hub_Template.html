@@ -354,7 +354,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
   var ROSTER_SEED=[];        // e.g. ['Ada Obi','Sam Eze']
   var TEACHER_PASS_SEED='';  // e.g. 'lion8' — leave '' to require manual setup
   var SYNC_HUB_ID='';         /* EDIT PER DEPLOYMENT: this hub's namespace in the shared cloud backend, e.g. 'grade9' */
-  var SHEET_URL_SEED='';      /* Apps Script web-app URL baked into the deployment -> zero-setup sync on every device */
+  var SHEET_URL_SEED='https://script.google.com/macros/s/AKfycbxvMWvqeUlHxw1VGFd2-IKQi6BDMU62iaHUzzypK2OPnlS2rcDq0C97nMcANCcvmDCf/exec';      /* Apps Script web-app URL baked into the deployment -> zero-setup sync on every device */
   function applySeeds(){
     try{
       var sv=JSON.stringify(ROSTER_SEED);

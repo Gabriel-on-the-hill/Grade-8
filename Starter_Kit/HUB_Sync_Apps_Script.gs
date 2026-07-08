@@ -13,7 +13,12 @@ var SHEET_LOG = 'Log', SHEET_SYNC = 'SyncStore';
 function _sheet(name, headers) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sh = ss.getSheetByName(name);
-  if (!sh) { sh = ss.insertSheet(name); sh.appendRow(headers); }
+  if (!sh) { 
+    sh = ss.insertSheet(name); 
+    if (headers && headers.length > 0) {
+      sh.appendRow(headers); 
+    }
+  }
   return sh;
 }
 
