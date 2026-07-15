@@ -1,0 +1,12 @@
+{
+  "name": "grade8-math-hub",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Grade 8 Math Hub — static HTML study/practice hub. Node is used only to run the behavioral verification suite (PROJECT_STANDARD §7.4).",
+  "scripts": {
+    "test": "node tests/behavioral_test_suite.js"
+  },
+  "devDependencies": {
+    "jsdom": "^24.1.0"
+  }
+}

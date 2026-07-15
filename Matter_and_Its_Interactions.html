@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matter and Its Interactions — Grade 8 Science Hub</title>
+<style>
+:root{
+  --pitch-green:#14532D; --gold:#FAC415; --navy:#0F172A; --bg:#F5F4EE; --card:#FFFFFF; --muted:#64748B;
+  --green-light:#E7F0EA; --gold-light:#FEF3C7; --border:#E5E7EB; --teach-bg:#F0F7F3; --teach-accent:#0F3D22;
+  --ok:#15803D; --ok-bg:#DCFCE7; --bad:#DC2626; --bad-bg:#FEE2E2; --blue:#1D4ED8; --orange:#B45309; --purple:#6D28D9;
+}
+.math{font-family:"Cambria Math","Times New Roman",Georgia,serif;font-style:italic;white-space:nowrap}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--navy);line-height:1.55}
+header.mod{background:var(--pitch-green);color:#fff;padding:1.3rem 1.5rem;border-bottom:5px solid var(--gold)}
+header.mod h1{margin:0 0 .2rem;font-size:1.5rem;font-weight:600;letter-spacing:-.01em}
+header.mod p{margin:0;opacity:.85;font-size:.92rem}
+#g7bar{background:#fff;border-bottom:1px solid var(--border);padding:.5rem 1rem;font-size:.86rem;color:var(--muted);display:flex;align-items:center;gap:.6rem}
+#g7bar a{color:var(--pitch-green);text-decoration:none;font-weight:600}
+nav.topics{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--border);padding:.55rem 1rem;z-index:50;box-shadow:0 1px 3px rgba(0,0,0,.04);overflow-x:auto;white-space:nowrap}
+nav.topics a{display:inline-block;padding:.35rem .8rem;margin-right:.3rem;color:var(--pitch-green);text-decoration:none;border-radius:6px;font-weight:500;font-size:.86rem;border:1px solid transparent}
+nav.topics a:hover{background:var(--green-light)} nav.topics a.active{background:var(--pitch-green);color:#fff}
+main{max-width:1000px;margin:0 auto;padding:1.3rem 1rem 4rem}
+section.topic{margin-top:2.2rem;scroll-margin-top:80px}
+section.topic > h2{color:var(--pitch-green);font-size:1.45rem;margin:0 0 .3rem;padding-bottom:.35rem;border-bottom:3px solid var(--gold);display:inline-block;padding-right:1rem}
+section.topic > p.intro{margin:.4rem 0 .5rem;color:var(--muted);font-size:.95rem}
+.objective{margin:.1rem 0 1.1rem;font-size:.88rem;color:var(--teach-accent);background:var(--teach-bg);border-left:3px solid var(--pitch-green);padding:.45rem .7rem;border-radius:5px}
+.tcard{background:var(--teach-bg);border:1px solid #C5D8CB;border-left:5px solid var(--pitch-green);border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem}
+.tcard h3{margin:0 0 .55rem;color:var(--teach-accent);font-size:1.04rem}
+.tcard p{margin:.45rem 0} .tcard ul,.tcard ol{margin:.4rem 0;padding-left:1.4rem}
+.worked{background:#fff;border:1px dashed #B7CBBE;border-radius:8px;padding:.6rem .8rem;margin:.5rem 0;font-size:.9rem}
+.worked .wl{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--pitch-green)}
+.qcard{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem;border-left:5px solid var(--gold);box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.qhead{display:flex;align-items:center;flex-wrap:wrap;gap:.5rem;margin-bottom:.55rem}
+.qtag{color:#fff;font-size:.7rem;font-weight:600;padding:.18rem .55rem;border-radius:4px;letter-spacing:.02em;background:var(--pitch-green)}
+.qtag.learn{background:#14532D}.qtag.guided{background:#0F766E}.qtag.practice{background:#1D4ED8}.qtag.apply{background:#15803D}.qtag.exam{background:#B45309}.qtag.stretch{background:#6D28D9}
+.qtitle{font-weight:600;color:var(--pitch-green);font-size:1rem;margin-left:auto}
+.qbody{font-size:.95rem} .qbody p{margin:.45rem 0}
+.step{margin:.65rem 0;padding:.65rem .85rem;background:#FBFBF7;border:1px solid #E8E4D2;border-radius:6px;transition:.3s}
+.step.locked{opacity:.35;pointer-events:none;background:#F5F4EE}
+.step.completed{background:#F0FAF3;border-color:#A7D8B6}
+.step .step-label{font-size:.76rem;font-weight:600;color:var(--pitch-green);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.25rem}
+.step p{margin:.3rem 0}
+.input-row{display:inline-flex;align-items:center;gap:.4rem;margin:.2rem .8rem .2rem 0}
+.input-row .lbl{font-size:.92rem}
+.ans-input{border:2px solid var(--border);padding:.3rem .5rem;border-radius:5px;font-size:.92rem;width:96px;font-family:inherit;background:#fff;transition:.2s}
+.ans-input.wide{width:170px}
+.ans-input:focus{outline:none;border-color:var(--pitch-green)}
+.ans-input.correct{border-color:var(--ok);background:var(--ok-bg)} .ans-input.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.feedback{display:inline-block;font-size:.95rem;font-weight:700;min-width:16px}
+.feedback.correct{color:var(--ok)} .feedback.wrong{color:var(--bad)}
+.check-btn{background:var(--pitch-green);color:#fff;border:none;padding:.38rem .85rem;border-radius:6px;cursor:pointer;font-size:.84rem;font-weight:500;margin-top:.5rem;font-family:inherit;transition:.15s}
+.check-btn:hover{background:#0F3D22} .check-btn.done{background:var(--ok)} .check-btn.done::before{content:'\2713 '}
+.hint-btn{background:transparent;color:var(--muted);border:1px solid var(--border);padding:.28rem .7rem;border-radius:6px;cursor:pointer;font-size:.78rem;margin-left:.4rem;font-family:inherit}
+.hint-btn:hover{color:var(--pitch-green);border-color:var(--pitch-green)}
+.hint-content{display:none;font-size:.85rem;color:var(--muted);font-style:italic;margin-top:.4rem;padding:.4rem .6rem;background:#fff;border-left:3px solid #94A3B8;border-radius:3px}
+.hint-content.show{display:block}
+.mc-group{display:flex;flex-wrap:wrap;gap:.45rem;margin:.4rem 0}
+.mc-option{background:#fff;border:2px solid var(--border);padding:.45rem .9rem;border-radius:6px;cursor:pointer;font-size:.88rem;font-family:inherit;transition:.2s;text-align:left}
+.mc-option:hover{border-color:var(--pitch-green);background:var(--green-light)}
+.mc-option.correct{background:var(--ok-bg);border-color:var(--ok);color:var(--ok);font-weight:600}
+.mc-option.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad);font-weight:600}
+.mc-option.disabled{pointer-events:none;opacity:.55} .mc-option.disabled.correct,.mc-option.disabled.wrong{opacity:1}
+.mc-option.cooldown{pointer-events:none;opacity:.7}
+.mc-feedback{display:none;margin-top:.4rem;font-size:.86rem;font-weight:500}
+.mc-feedback.correct,.mc-feedback.wrong{display:block}
+.mc-feedback.correct{color:var(--ok)} .mc-feedback.wrong{color:var(--bad)}
+.ms-group{display:flex;flex-direction:column;gap:.4rem;margin:.4rem 0}
+.ms-option{display:flex;align-items:center;gap:.55rem;background:#fff;border:2px solid var(--border);padding:.45rem .8rem;border-radius:7px;cursor:pointer;font-size:.9rem;font-family:inherit;text-align:left}
+.ms-option .box{width:18px;height:18px;border:2px solid #9aa5b1;border-radius:4px;flex:none;display:grid;place-items:center;font-size:.78rem;color:#fff;font-weight:700}
+.ms-option.sel{border-color:var(--pitch-green);background:var(--green-light)}
+.ms-option.sel .box{background:var(--pitch-green);border-color:var(--pitch-green)} .ms-option.sel .box::after{content:'\2713'}
+.ms-option.correct{border-color:var(--ok);background:var(--ok-bg)} .ms-option.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.ms-option.disabled{pointer-events:none;opacity:.8}
+.cr-area{width:100%;min-height:84px;border:2px solid var(--border);border-radius:8px;padding:.55rem;font:inherit;font-size:.92rem;resize:vertical;background:#fff}
+.cr-area:focus{outline:none;border-color:var(--pitch-green)}
+.cr-saved{color:var(--ok);font-size:.84rem;font-weight:600;margin-top:.3rem}
+table.gtable{border-collapse:collapse;margin:.65rem 0;font-size:.88rem}
+table.gtable th,table.gtable td{border:1px solid #B5C5BB;padding:.35rem .65rem;text-align:center}
+table.gtable th{background:var(--pitch-green);color:#fff;font-weight:600} table.gtable td.label{background:var(--green-light);font-weight:600;text-align:left}
+.keyfact{background:var(--gold-light);border-left:4px solid var(--gold);padding:.5rem .8rem;margin:.55rem 0;border-radius:4px;font-size:.92rem}
+.keyfact strong{color:#7C5E11}
+.guide{background:#Eef4ff;border:1px solid #C7D7F5;border-left:5px solid var(--blue);border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem;font-size:.9rem}
+.guide h3{margin:0 0 .5rem;color:var(--blue);font-size:1rem}
+.guide code{background:#fff;border:1px solid #d6e0f5;border-radius:4px;padding:.05rem .3rem;font-size:.85rem}
+.overall-progress{background:#fff;border:1px solid var(--border);border-radius:10px;padding:.85rem 1rem;margin-bottom:1.2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.7rem}
+.op-counts{display:flex;gap:1rem;flex-wrap:wrap} .op-stat{text-align:center}
+.op-stat .num{font-size:1.45rem;font-weight:700;line-height:1} .op-stat .lbl{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.op-stat.done .num{color:var(--ok)} .op-stat.total .num{color:var(--navy)} .op-stat.pct .num{color:var(--pitch-green)}
+.btn-export{background:var(--pitch-green);color:#fff;border:none;padding:.4rem .85rem;border-radius:6px;cursor:pointer;font-size:.83rem;font-weight:500;font-family:inherit}
+.btn-reset-all{background:#fff;color:var(--muted);border:1px solid var(--border);padding:.4rem .85rem;border-radius:6px;cursor:pointer;font-size:.83rem;font-family:inherit}
+.challenge{background:#F3EEFB;border:1px solid #D6C9F0;border-left:5px solid var(--purple);border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem}
+.challenge h3{margin:0 0 .5rem;color:var(--purple);font-size:1.04rem}
+.legend{font-size:.86rem;color:var(--muted);margin:.5rem 0 1rem} .legend strong{color:var(--pitch-green)}
+/* v1.4.2 anti-cheat: question text unselectable (typing areas exempt) */
+.qcard{-webkit-user-select:none;-moz-user-select:none;user-select:none}
+.qcard input,.qcard textarea{-webkit-user-select:text;-moz-user-select:text;user-select:text}
+/* v1.4.3 student section report card */
+.sec-report{background:#fff;border:1px solid var(--border);border-radius:10px;padding:.85rem 1rem;margin-bottom:1.2rem}
+.sec-report h3{margin:0 0 .5rem;font-size:.95rem;color:var(--pitch-green)}
+.sec-row{display:flex;align-items:center;gap:.6rem;margin:.3rem 0;font-size:.85rem}
+.sec-row a{flex:none;width:220px;max-width:44%;color:var(--navy);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sec-row a:hover{color:var(--pitch-green)}
+.sec-row .bar{flex:1;height:7px;background:#EDEBE2;border-radius:99px;overflow:hidden}
+.sec-row .bar>span{display:block;height:100%;background:var(--gold);border-radius:99px}
+.sec-row.full .bar>span{background:var(--ok)}
+footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;border-top:1px solid var(--border);margin-top:3rem}
+@media(max-width:640px){main{padding:1rem .75rem 3rem}.qcard,.tcard,.challenge,.guide{padding:.85rem}.qtitle{margin-left:0;width:100%;font-size:.93rem}header.mod h1{font-size:1.25rem}}
+</style>
+</head>
+<body>
+<!-- Access gate (light client-side deterrent; password is case-insensitive) -->
+<div id="g8gate" style="position:fixed;inset:0;z-index:99999;background:#14532D;display:grid;place-items:center;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif">
+  <div style="background:#fff;border-radius:16px;padding:1.8rem 1.6rem;max-width:340px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center">
+    <div style="width:54px;height:54px;margin:0 auto .8rem;border-radius:14px;background:#FAC415;display:grid;place-items:center">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#14532D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+    </div>
+    <h2 style="margin:.2rem 0 .3rem;font-size:1.15rem;color:#16241C">Grade 8 Study Hub</h2>
+    <p style="margin:0 0 1rem;color:#6B7280;font-size:.88rem">Enter the access password to continue.</p>
+    <input id="g8pw" type="password" placeholder="Password" autocomplete="off" style="width:100%;box-sizing:border-box;border:1.5px solid #E4E1D6;border-radius:9px;padding:.6rem .7rem;font-size:.95rem"/>
+    <div id="g8err" style="color:#C2410C;font-size:.8rem;min-height:1rem;margin:.35rem 0 .2rem"></div>
+    <button id="g8go" style="width:100%;background:#14532D;color:#fff;border:none;border-radius:9px;padding:.6rem;font-size:.95rem;font-weight:600;cursor:pointer">Enter</button>
+  </div>
+</div>
+<script>
+(function(){
+  var PW="divine", KEY="g8.gate";
+  var g=document.getElementById("g8gate");
+  function unlock(){ try{localStorage.setItem(KEY,"ok");}catch(e){} document.body.style.overflow=""; if(g&&g.parentNode)g.parentNode.removeChild(g); }
+  try{ if(localStorage.getItem(KEY)==="ok"){ unlock(); return; } }catch(e){}
+  document.body.style.overflow="hidden";
+  var inp=document.getElementById("g8pw"), err=document.getElementById("g8err");
+  function tryit(){ if(String(inp.value||"").trim().toLowerCase()===PW){ unlock(); } else { err.textContent="Incorrect password."; inp.value=""; inp.focus(); } }
+  document.getElementById("g8go").onclick=tryit;
+  inp.addEventListener("keydown",function(e){ if(e.key==="Enter")tryit(); });
+  inp.focus();
+})();
+</script>
+
+<header class="mod">
+  <h1>Matter and Its Interactions</h1>
+  <p>Grade 8 Science &middot; Physical Science &middot; NGSS MS-PS1 &middot; Atoms &amp; molecules, states of matter, changes, and conservation of mass</p>
+</header>
+
+<div id="g7bar">
+  <a href="Grade_8_Math_Hub.html">&#8592; Back to Hub</a>
+  <span style="margin-left:auto">Student: <strong id="g7name" style="color:var(--pitch-green)">Guest</strong></span>
+</div>
+
+<nav class="topics" id="topnav">
+  <a href="#atoms" class="navlink">1 &middot; Atoms &amp; molecules</a>
+  <a href="#states" class="navlink">2 &middot; States of matter</a>
+  <a href="#thermal" class="navlink">3 &middot; Heat &amp; phase change</a>
+  <a href="#changes" class="navlink">4 &middot; Physical &amp; chemical</a>
+  <a href="#conservation" class="navlink">5 &middot; Conservation of mass</a>
+  <a href="#synthetic" class="navlink">6 &middot; Materials &amp; energy</a>
+  <a href="#check" class="navlink">7 &middot; Module Check</a>
+</nav>
+
+<main>
+  <p class="legend"><strong>How to use:</strong> work top to bottom. Answer, then press <em>Check</em> (or Enter). Green = correct, red = try again. Steps unlock as you go, and your progress saves automatically.</p>
+
+  <div class="overall-progress">
+    <div class="op-counts">
+      <div class="op-stat done"><div class="num" id="op-done">0</div><div class="lbl">Steps done</div></div>
+      <div class="op-stat total"><div class="num" id="op-total">0</div><div class="lbl">Total</div></div>
+      <div class="op-stat pct"><div class="num" id="op-pct">0%</div><div class="lbl">Mastery</div></div>
+    </div>
+    <div style="display:flex;gap:.5rem">
+      <button class="btn-export" id="btn-export">Export progress</button>
+      <button class="btn-reset-all" id="btn-reset-all">Reset all</button>
+    </div>
+  </div>
+
+  <div class="guide">
+    <h3>How to answer in this module</h3>
+    <ul>
+      <li><strong>Word answers:</strong> type the single best term, like <code>condensation</code>. Capital letters and extra spaces don&rsquo;t matter.</li>
+      <li><strong>Number answers:</strong> digits only, no units &mdash; type <code>44</code>, not <code>44 g</code>.</li>
+      <li><strong>Multiple choice:</strong> tap an option. A wrong tap is ruled out and you try again &mdash; mastery stays reachable.</li>
+      <li><strong>Select-all:</strong> tap every choice that applies, then press <em>Check</em>.</li>
+      <li><strong>Explain questions:</strong> write in full sentences and press <em>Save</em> &mdash; your teacher reads these.</li>
+    </ul>
+  </div>
+
+  <section class="topic" id="atoms">
+  <h2>1 &middot; Atoms, Elements, Molecules &amp; Compounds</h2>
+  <p class="intro">All matter is built from atoms. How they combine decides what a substance is.</p>
+  <p class="objective"><strong>By the end:</strong> you can read a chemical formula and tell atoms, elements, molecules and compounds apart.</p>
+
+  <div class="tcard">
+    <h3>The building blocks of matter</h3>
+    <p>Everything is made of <strong>atoms</strong>. An <strong>element</strong> is a substance made of only one kind of atom (hydrogen, oxygen, carbon, gold). When two or more atoms bond, they form a <strong>molecule</strong>. A <strong>compound</strong> is a molecule made of two or more <em>different</em> elements.</p>
+    <p>A <strong>chemical formula</strong> names the elements and counts the atoms: the small <em>subscript</em> tells how many atoms of the element before it. In water, H₂O, there are 2 hydrogen atoms and 1 oxygen atom.</p>
+    <p>A <strong>pure substance</strong> is made of one kind of particle (water, copper). A <strong>mixture</strong> is two or more substances physically together, not chemically bonded (salt water, air). Some substances stay as separate simple molecules; others repeat a unit over and over into an <strong>extended structure</strong>.</p>
+    <div class="worked"><div class="wl">Worked example</div>
+      <p>Glucose is C₆H₁₂O₆. Count each element: 6 carbon + 12 hydrogen + 6 oxygen = <strong>24 atoms</strong> in one molecule.</p>
+    </div>
+    <div class="keyfact"><strong>Read it this way:</strong> a letter with no subscript means one atom (the O in H₂O).</div>
+  </div>
+  <div class="qcard" data-qid="1-1">
+    <div class="qhead"><span class="qtag learn">Learn</span><span class="qtitle">Element or compound?</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Which of these is a compound?</div>
+        <div class="mc-group">
+          <button class="mc-option" data-k="k1:MTB8MQ==">Water (H₂O)</button>
+          <button class="mc-option" data-k="k1:MTd8MA==">Oxygen (O₂)</button>
+          <button class="mc-option" data-k="k1:MjR8MA==">Carbon (C)</button>
+          <button class="mc-option" data-k="k1:MzF8MA==">Gold (Au)</button>
+        </div>
+        <div class="mc-feedback">A compound contains two or more <em>different</em> elements chemically bonded. Water is hydrogen + oxygen. O₂, C and Au are each a single element.</div>
+      </div>
+    </div>
+  </div>
+  <div class="qcard" data-qid="1-2">
+    <div class="qhead"><span class="qtag guided">Guided</span><span class="qtitle">Count the atoms</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Methane is CH₄. How many atoms are in one methane molecule in total?</div>
+        <div class="input-row"><input type="number" class="ans-input" data-answer="k1:NQ==" data-tol="0" placeholder="a number"/><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+      </div>
+    </div>
+  </div>
+  <div class="qcard" data-qid="1-3">
+    <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Pure substance or mixture?</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Select every <strong>pure substance</strong>.</div>
+        <div class="ms-group">
+          <button class="ms-option" data-k="k1:Mzh8MQ=="><span class="box"></span>Water (H₂O)</button>
+          <button class="ms-option" data-k="k1:NDV8MQ=="><span class="box"></span>Oxygen (O₂)</button>
+          <button class="ms-option" data-k="k1:NTJ8MA=="><span class="box"></span>Salt water</button>
+          <button class="ms-option" data-k="k1:NTl8MA=="><span class="box"></span>Air</button>
+          <button class="ms-option" data-k="k1:NjZ8MQ=="><span class="box"></span>Copper (Cu)</button>
+        </div>
+        <button class="check-btn ms-check">Check</button>
+        <button class="hint-btn">Hint</button>
+        <div class="hint-content">A pure substance is one kind of particle. If it can be physically separated into different parts, it is a mixture.</div>
+      </div>
+    </div>
+  </div>
+  <div class="qcard" data-qid="1-4">
+    <div class="qhead"><span class="qtag apply">Apply</span><span class="qtitle">Extended structures</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Table sugar molecules can link into repeating units; water molecules cannot. This means table sugar can form &mdash;</div>
+        <div class="mc-group">
+          <button class="mc-option" data-k="k1:NzN8MQ==">an extended (repeating) structure</button>
+          <button class="mc-option" data-k="k1:ODB8MA==">a mixture</button>
+          <button class="mc-option" data-k="k1:ODd8MA==">a new element</button>
+          <button class="mc-option" data-k="k1:OTR8MA==">a single atom</button>
+        </div>
+        <div class="mc-feedback">Some substances repeat one molecular unit over and over to build an extended structure; others exist as separate simple molecules.</div>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <section class="topic" id="states">
+  <h2>2 &middot; States of Matter &amp; the Particle Model</h2>
+  <p class="intro">The same particles can be a solid, a liquid or a gas &mdash; what changes is how they are arranged and how they move.</p>
+  <p class="objective"><strong>By the end:</strong> you can use the particle model to explain the properties of solids, liquids and gases.</p>
+
+  <div class="tcard">
+    <h3>Solids, liquids and gases &mdash; at the particle level</h3>
+    <ul>
+      <li><strong>Solid:</strong> particles packed closely in a fixed arrangement, vibrating in place &mdash; definite shape and volume.</li>
+      <li><strong>Liquid:</strong> particles still close but able to slide past each other &mdash; definite volume, takes the shape of its container.</li>
+      <li><strong>Gas:</strong> particles far apart, moving fast and freely &mdash; spreads to fill its whole container.</li>
+    </ul>
+    <p>The particles themselves never change &mdash; only their spacing, arrangement and motion.</p>
+    <div class="worked"><div class="wl">Worked example</div>
+      <p>Why does ice float? In most substances the solid is denser than the liquid, but when water freezes its molecules lock into an open pattern that spreads them slightly <em>farther apart</em>. The same mass fills more space, so ice is <strong>less dense</strong> than liquid water and floats.</p>
+    </div>
+  </div>
+  <div class="qcard" data-qid="2-1">
+    <div class="qhead"><span class="qtag learn">Learn</span><span class="qtitle">Name the state</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">In which state are the particles far apart and moving freely, spreading to fill any container?</div>
+        <div class="mc-group">
+          <button class="mc-option" data-k="k1:MTAxfDE=">Gas</button>
+          <button class="mc-option" data-k="k1:MTA4fDA=">Liquid</button>
+          <button class="mc-option" data-k="k1:MTE1fDA=">Solid</button>
+        </div>
+        <div class="mc-feedback">In a gas the particles have the most energy and space, so they spread to fill the whole container.</div>
+      </div>
+    </div>
+  </div>
+  <div class="qcard" data-qid="2-2">
+    <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Read the properties</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">A sample keeps the same volume but takes the shape of whatever container it is poured into. Which state is it?</div>
+        <div class="mc-group">
+          <button class="mc-option" data-k="k1:MTIyfDE=">Liquid</button>
+          <button class="mc-option" data-k="k1:MTI5fDA=">Solid</button>
+          <button class="mc-option" data-k="k1:MTM2fDA=">Gas</button>
+        </div>
+        <div class="mc-feedback">Liquid particles stay close together (fixed volume) but slide past one another (no fixed shape).</div>
+      </div>
+    </div>
+  </div>
+  <div class="qcard" data-qid="2-3">
+    <div class="qhead"><span class="qtag apply">Apply</span><span class="qtitle">Explain with the model</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Ice floats on liquid water. Using the particle model, this is because in ice the water molecules are &mdash;</div>
+        <div class="mc-group">
+          <button class="mc-option" data-k="k1:MTQzfDE=">arranged farther apart, making ice less dense</button>
+          <button class="mc-option" data-k="k1:MTUwfDA=">packed closer together than in liquid water</button>
+          <button class="mc-option" data-k="k1:MTU3fDA=">heavier than liquid water molecules</button>
+          <button class="mc-option" data-k="k1:MTY0fDA=">a completely different compound than liquid water</button>
+        </div>
+        <div class="mc-feedback">Freezing arranges water molecules into an open pattern that spreads them apart, so ice is less dense and floats.</div>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <section class="topic" id="thermal">
+  <h2>3 &middot; Thermal Energy &amp; Changes of State</h2>
+  <p class="intro">Adding or removing thermal energy changes how fast particles move &mdash; and can change the state of a substance.</p>
+  <p class="objective"><strong>By the end:</strong> you can predict how particle motion, temperature and state change as thermal energy is added or removed, and name each phase change.</p>
+
+  <div class="tcard">
+    <h3>Energy in, energy out</h3>
+    <p>Adding <strong>thermal energy</strong> makes particles move faster; <strong>temperature</strong> measures the average motion (kinetic energy) of the particles. Add enough energy and the particles break free of their arrangement &mdash; the substance changes state. Remove energy and they slow down and draw closer.</p>
+    <p>The changes of state: <strong>melting</strong> (solid&rarr;liquid), <strong>freezing</strong> (liquid&rarr;solid), <strong>boiling / vaporizing</strong> (liquid&rarr;gas), <strong>condensation</strong> (gas&rarr;liquid), and <strong>sublimation</strong> (solid&rarr;gas). A change of state is a <em>physical</em> change &mdash; the substance stays the same substance.</p>
+    <div class="worked"><div class="wl">Worked example</div>
+      <p>Heat ice: the molecules vibrate faster until, at 0&deg;C, they break the fixed arrangement and <strong>melt</strong> to liquid. Keep heating: at 100&deg;C they move fast enough to escape and <strong>boil</strong> to gas. Through it all it is still H₂O &mdash; the mass and identity never change.</p>
+    </div>
+  </div>
+  <div class="qcard" data-qid="3-1">
+    <div class="qhead"><span class="qtag learn">Learn</span><span class="qtitle">Name the change of state</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">The change of state from a <strong>gas to a liquid</strong> is called ___.</div>
+        <div class="input-row"><input type="text" class="ans-input" data-type="text" data-answer="k1:Y29uZGVuc2F0aW9u" placeholder="one word"/><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+      </div>
+    </div>
+  </div>
+  <div class="qcard" data-qid="3-2">
+    <div class="qhead"><span class="qtag guided">Guided</span><span class="qtitle">Predict the particles</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">You remove thermal energy from liquid water. Its particles &mdash;</div>
+        <div class="mc-group">
+          <button class="mc-option" data-k="k1:MTcxfDE=">slow down and move closer together</button>
+          <button class="mc-option" data-k="k1:MTc4fDA=">speed up and spread apart</button>
+          <button class="mc-option" data-k="k1:MTg1fDA=">gain mass</button>
+          <button class="mc-option" data-k="k1:MTkyfDA=">turn into a different element</button>
+        </div>
+        <div class="mc-feedback">Removing thermal energy lowers particle motion; the particles slow and draw closer, and can freeze into a solid.</div>
+      </div>
+    </div>
+  </div>
+  <div class="qcard" data-qid="3-3">
+    <div class="qhead"><span class="qtag apply">Apply</span><span class="qtitle">A trickier change of state</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Dry ice (solid CO₂) turns directly into a gas without ever becoming a liquid. This change of state is called ___.</div>
+        <div class="input-row"><input type="text" class="ans-input" data-type="text" data-answer="k1:c3VibGltYXRpb24=" placeholder="one word"/><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <section class="topic" id="changes">
+  <h2>4 &middot; Physical &amp; Chemical Changes</h2>
+  <p class="intro">Some changes only rearrange a substance; others make a brand-new substance. Learning to tell them apart is a core skill.</p>
+  <p class="objective"><strong>By the end:</strong> you can classify a change as physical or chemical, use properties to identify a substance, and spot the evidence of a chemical reaction.</p>
+
+  <div class="tcard">
+    <h3>Same substance, or new substance?</h3>
+    <p>A <strong>physical change</strong> alters form but not identity &mdash; no new substance is made (melting, dissolving, tearing, changing state). A <strong>chemical change</strong> (a chemical reaction) forms one or more <em>new</em> substances with new properties.</p>
+    <p><strong>Physical properties</strong> &mdash; density, melting/boiling point, solubility, color, hardness &mdash; help identify a substance without changing it. <strong>Evidence a chemical reaction happened:</strong> a color change, gas bubbles (not from boiling), a temperature change you did not cause, light or an odor produced, or a solid <em>precipitate</em> forming &mdash; and the change is usually hard to reverse.</p>
+    <div class="worked"><div class="wl">Worked example</div>
+      <p>Melting an ice cube vs. burning a log. The melted ice is still water &mdash; a <strong>physical</strong> change. The burning log gives off light and heat and leaves ash and smoke (new substances) &mdash; a <strong>chemical</strong> change.</p>
+    </div>
+  </div>
+  <div class="qcard" data-qid="4-1">
+    <div class="qhead"><span class="qtag learn">Learn</span><span class="qtitle">Physical or chemical?</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Which of these is a <strong>chemical</strong> change?</div>
+        <div class="mc-group">
+          <button class="mc-option" data-k="k1:MTk5fDE=">An iron nail rusting</button>
+          <button class="mc-option" data-k="k1:MjA2fDA=">An ice cube melting</button>
+          <button class="mc-option" data-k="k1:MjEzfDA=">Sugar dissolving in water</button>
+          <button class="mc-option" data-k="k1:MjIwfDA=">Crushing an aluminum can</button>
+        </div>
+        <div class="mc-feedback">Rusting forms a new substance (iron oxide). Melting, dissolving and crushing change only the form &mdash; the substance stays the same.</div>
+      </div>
+    </div>
+  </div>
+  <div class="qcard" data-qid="4-2">
+    <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Evidence of a reaction</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Select every observation that is <strong>evidence a chemical reaction</strong> has occurred.</div>
+        <div class="ms-group">
+          <button class="ms-option" data-k="k1:MjI3fDE="><span class="box"></span>An unexpected color change</button>
+          <button class="ms-option" data-k="k1:MjM0fDE="><span class="box"></span>Bubbles of gas form as two liquids are mixed</button>
+          <button class="ms-option" data-k="k1:MjQxfDE="><span class="box"></span>The temperature rises even though nothing was heated</button>
+          <button class="ms-option" data-k="k1:MjQ4fDA="><span class="box"></span>An ice cube melts into water</button>
+          <button class="ms-option" data-k="k1:MjU1fDA="><span class="box"></span>Sugar dissolves and seems to disappear into water</button>
+        </div>
+        <button class="check-btn ms-check">Check</button>
+        <button class="hint-btn">Hint</button>
+        <div class="hint-content">Look for a NEW substance or an energy change you did not cause. Melting and dissolving are physical &mdash; nothing new is made.</div>
+      </div>
+    </div>
+  </div>
+  <div class="qcard" data-qid="4-3">
+    <div class="qhead"><span class="qtag apply">Apply</span><span class="qtitle">Use a property to identify</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">One clear liquid boils at 100&deg;C; another clear liquid boils at 78&deg;C. Boiling point is a property that identifies a substance. The best conclusion is &mdash;</div>
+        <div class="mc-group">
+          <button class="mc-option" data-k="k1:MjYyfDE=">the two liquids are different substances</button>
+          <button class="mc-option" data-k="k1:MjY5fDA=">the two liquids are the same substance</button>
+          <button class="mc-option" data-k="k1:Mjc2fDA=">one of the liquids must be an element</button>
+          <button class="mc-option" data-k="k1:MjgzfDA=">mass was destroyed when the liquids boiled</button>
+        </div>
+        <div class="mc-feedback">A characteristic property such as boiling point identifies a substance. Different boiling points mean different substances.</div>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <section class="topic" id="conservation">
+  <h2>5 &middot; Conservation of Mass</h2>
+  <p class="intro">In a chemical reaction atoms are only rearranged &mdash; never created or destroyed. That single idea lets you predict masses.</p>
+  <p class="objective"><strong>By the end:</strong> you can apply conservation of mass to find an unknown mass and explain an apparent mass change.</p>
+
+  <div class="tcard">
+    <h3>Atoms are rearranged, never lost</h3>
+    <p>During a chemical reaction, the atoms in the <strong>reactants</strong> come apart and recombine into the <strong>products</strong>. Every atom is still there afterward &mdash; so the total number of each kind of atom, and the <strong>total mass</strong>, is the same before and after.</p>
+    <p>In a <strong>closed system</strong>: mass of reactants = mass of products. If a reaction <em>seems</em> to lose mass, a gas escaped from an open container &mdash; weigh the gas too and the mass is unchanged.</p>
+    <div class="worked"><div class="wl">Worked example</div>
+      <p>In a sealed flask, 4 g of hydrogen reacts with 32 g of oxygen to make water. No atoms are lost, so the water produced has mass 4 g + 32 g = <strong>36 g</strong>.</p>
+    </div>
+  </div>
+  <div class="qcard" data-qid="5-1">
+    <div class="qhead"><span class="qtag learn">Learn</span><span class="qtitle">Find the product mass</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">In a sealed flask, 12 g of carbon reacts completely with 32 g of oxygen to form carbon dioxide. What is the mass of the carbon dioxide, in grams?</div>
+        <div class="input-row"><input type="number" class="ans-input" data-answer="k1:NDQ=" data-tol="0" placeholder="grams"/><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+        <button class="hint-btn">Hint</button>
+        <div class="hint-content">Atoms are only rearranged, never lost, so total mass before equals total mass after. Add the two masses you are given.</div>
+      </div>
+    </div>
+  </div>
+  <div class="qcard" data-qid="5-2">
+    <div class="qhead"><span class="qtag guided">Guided</span><span class="qtitle">Where did the mass go?</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">A candle burns down and the leftover wax weighs less than the original candle. How is mass still conserved?</div>
+        <div class="mc-group">
+          <button class="mc-option" data-k="k1:MjkwfDE=">gases such as carbon dioxide and water vapor escaped into the air</button>
+          <button class="mc-option" data-k="k1:Mjk3fDA=">atoms were destroyed as the candle burned</button>
+          <button class="mc-option" data-k="k1:MzA0fDA=">the wax was converted directly into energy</button>
+          <button class="mc-option" data-k="k1:MzExfDA=">new atoms were created in the flame</button>
+        </div>
+        <div class="mc-feedback">In an open container the gas products drift away. Weigh everything &mdash; including the escaping gases &mdash; and the mass is unchanged.</div>
+      </div>
+    </div>
+  </div>
+  <div class="qcard" data-qid="5-3">
+    <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Work backward</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">In a closed system, 36 g of water is broken down into hydrogen gas and 32 g of oxygen gas. What mass of hydrogen forms, in grams?</div>
+        <div class="input-row"><input type="number" class="ans-input" data-answer="k1:NA==" data-tol="0" placeholder="grams"/><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+      </div>
+    </div>
+  </div>
+  <div class="qcard" data-qid="5-4">
+    <div class="qhead"><span class="qtag stretch">Reasoning</span><span class="qtitle">Explain the reading</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">A student mixes baking soda and vinegar in an <strong>open</strong> cup on a scale. During the reaction the scale reading goes down. Explain, using conservation of mass, why the mass appears to decrease even though no atoms were destroyed.</div>
+        <textarea class="cr-area" placeholder="Type your explanation in full sentences..."></textarea>
+        <button class="check-btn cr-save">Save response</button>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <section class="topic" id="synthetic">
+  <h2>6 &middot; Synthetic Materials &amp; Energy in Reactions</h2>
+  <p class="intro">Reactions build the materials we use and move energy in or out &mdash; the science behind a hand-warmer and a cold pack.</p>
+  <p class="objective"><strong>By the end:</strong> you can describe where synthetic materials come from, classify reactions as endothermic or exothermic, and judge a design's criteria and constraints.</p>
+
+  <div class="tcard">
+    <h3>Making materials, moving energy</h3>
+    <p><strong>Synthetic materials</strong> &mdash; plastics, medicines, fuels &mdash; are manufactured by chemically processing <strong>natural resources</strong> (crude oil, ores, plants). They bring benefits and impacts (cost, waste, pollution): a design trade-off.</p>
+    <p>Reactions also transfer thermal energy. An <strong>exothermic</strong> reaction <em>releases</em> energy and warms its surroundings (a hand-warmer). An <strong>endothermic</strong> reaction <em>absorbs</em> energy and cools its surroundings (an instant cold pack). Engineers define the <strong>criteria</strong> (what it must do) and <strong>constraints</strong> (limits it must respect), then test and improve the design.</p>
+    <div class="worked"><div class="wl">Worked example</div>
+      <p>An instant cold pack: squeezing it breaks an inner pouch, a salt dissolves, and the process <em>absorbs</em> thermal energy from its surroundings &mdash; so the pack turns cold. That is an <strong>endothermic</strong> change.</p>
+    </div>
+  </div>
+  <div class="qcard" data-qid="6-1">
+    <div class="qhead"><span class="qtag learn">Learn</span><span class="qtitle">Energy out</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">A reaction that releases thermal energy and warms its surroundings is &mdash;</div>
+        <div class="mc-group">
+          <button class="mc-option" data-k="k1:MzE4fDE=">exothermic</button>
+          <button class="mc-option" data-k="k1:MzI1fDA=">endothermic</button>
+          <button class="mc-option" data-k="k1:MzMyfDA=">a physical change</button>
+          <button class="mc-option" data-k="k1:MzM5fDA=">a mixture</button>
+        </div>
+        <div class="mc-feedback">Exothermic means energy exits the reaction into the surroundings, so they warm up &mdash; the way a hand-warmer works.</div>
+      </div>
+    </div>
+  </div>
+  <div class="qcard" data-qid="6-2">
+    <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Energy in</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">An instant cold pack turns cold right after you squeeze it. The reaction inside must be &mdash;</div>
+        <div class="mc-group">
+          <button class="mc-option" data-k="k1:MzQ2fDE=">endothermic &mdash; it absorbs thermal energy from its surroundings</button>
+          <button class="mc-option" data-k="k1:MzUzfDA=">exothermic &mdash; it releases thermal energy</button>
+          <button class="mc-option" data-k="k1:MzYwfDA=">only a physical change, with no energy involved</button>
+          <button class="mc-option" data-k="k1:MzY3fDA=">a mixture that cannot react</button>
+        </div>
+        <div class="mc-feedback">Endothermic reactions pull thermal energy in, so the surroundings &mdash; and the pack &mdash; get colder.</div>
+      </div>
+    </div>
+  </div>
+  <div class="qcard" data-qid="6-3">
+    <div class="qhead"><span class="qtag apply">Apply</span><span class="qtitle">Judge the design</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Engineers design a hand-warmer for hikers. Which of these are sensible <strong>criteria or constraints</strong> for the design? Select all that apply.</div>
+        <div class="ms-group">
+          <button class="ms-option" data-k="k1:Mzc0fDE="><span class="box"></span>It must reach a safe, comfortable temperature</button>
+          <button class="ms-option" data-k="k1:MzgxfDE="><span class="box"></span>It must stay warm long enough to be useful on a hike</button>
+          <button class="ms-option" data-k="k1:Mzg4fDE="><span class="box"></span>It must be made of non-toxic, skin-safe materials</button>
+          <button class="ms-option" data-k="k1:Mzk1fDA="><span class="box"></span>It must be as expensive as possible to make</button>
+        </div>
+        <button class="check-btn ms-check">Check</button>
+        <button class="hint-btn">Hint</button>
+        <div class="hint-content">A criterion states what the design must DO or how it keeps the user safe. Making something cost as much as possible is never a design goal.</div>
+      </div>
+    </div>
+  </div>
+  <div class="qcard" data-qid="6-4">
+    <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Where materials come from</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Plastic is a synthetic material. Where do its raw materials originally come from?</div>
+        <div class="mc-group">
+          <button class="mc-option" data-k="k1:NDAyfDE=">natural resources such as crude oil</button>
+          <button class="mc-option" data-k="k1:NDA5fDA=">nothing &mdash; plastic is made from pure energy</button>
+          <button class="mc-option" data-k="k1:NDE2fDA=">a single element found in the air</button>
+          <button class="mc-option" data-k="k1:NDIzfDA=">minerals that form only in rivers</button>
+        </div>
+        <div class="mc-feedback">Synthetic materials are manufactured by chemically processing natural resources; most plastics start from crude oil.</div>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <section class="topic" id="check">
+  <h2>7 &middot; Module Check &mdash; Show What You Know</h2>
+  <p class="intro">Real released Maryland MISA items on the Water and Sugar phenomenon. No hints here &mdash; this is where you show the unit is yours. First attempts count toward exam-readiness.</p>
+  <p class="objective"><strong>By the end:</strong> you can apply the whole unit to an unfamiliar scenario, the way the state test asks.</p>
+
+  <div class="guide">
+    <h3>Phenomenon: the Water and Sugar investigation</h3>
+    <p>Students placed 50&nbsp;mL of water (H₂O) and 50&nbsp;mL of table sugar (C₁₂H₂₂O₁₁) at 0&deg;C, 20&deg;C and 100&deg;C. The <strong>water</strong> was solid at 0&deg;C (taking up <em>more</em> than 50&nbsp;mL), liquid at 20&deg;C, and boiling at 100&deg;C. The <strong>sugar</strong> stayed a solid at all three temperatures. The questions below are real released MISA items built on this phenomenon.</p>
+  </div>
+
+  <div class="qcard" data-qid="7-1" data-exam="1">
+    <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">MISA &middot; structure of table sugar</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Table sugar (C₁₂H₂₂O₁₁) is composed of &mdash;</div>
+        <div class="mc-group" data-noshuffle>
+          <button class="mc-option" data-k="k1:NDMwfDA=">carbon dioxide (CO₂) and water (H₂O) atoms</button>
+          <button class="mc-option" data-k="k1:NDM3fDE=">carbon (C), hydrogen (H), and oxygen (O) atoms</button>
+          <button class="mc-option" data-k="k1:NDQ0fDA=">carbon dioxide (CO₂) and water (H₂O) molecules</button>
+          <button class="mc-option" data-k="k1:NDUxfDA=">carbon (C), hydrogen (H), and oxygen (O) molecules</button>
+        </div>
+        <div class="mc-feedback">A chemical formula lists the elements that make up the substance. C₁₂H₂₂O₁₁ is built from carbon, hydrogen and oxygen atoms.</div>
+      </div>
+    </div>
+  </div>
+  <div class="qcard" data-qid="7-2" data-exam="1">
+    <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">MISA &middot; why water is a molecule</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Water is classified as a molecule because it &mdash;</div>
+        <div class="mc-group" data-noshuffle>
+          <button class="mc-option" data-k="k1:NDU4fDE=">is composed of multiple atoms that are chemically bonded</button>
+          <button class="mc-option" data-k="k1:NDY1fDA=">changes phases when exposed to thermal energy</button>
+          <button class="mc-option" data-k="k1:NDcyfDA=">is composed of elements that are gases</button>
+          <button class="mc-option" data-k="k1:NDc5fDA=">has mass and takes up space</button>
+        </div>
+        <div class="mc-feedback">A molecule is two or more atoms chemically bonded together &mdash; for water, two hydrogen atoms bonded to one oxygen atom.</div>
+      </div>
+    </div>
+  </div>
+  <div class="qcard" data-qid="7-3" data-exam="1">
+    <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">MISA &middot; sugar vs. water</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">How do table sugar molecules differ from water molecules?</div>
+        <div class="mc-group" data-noshuffle>
+          <button class="mc-option" data-k="k1:NDg2fDA=">A table sugar molecule is a mixture.</button>
+          <button class="mc-option" data-k="k1:NDkzfDA=">A water molecule is a pure substance.</button>
+          <button class="mc-option" data-k="k1:NTAwfDA=">Water molecules may repeat to form extended structures.</button>
+          <button class="mc-option" data-k="k1:NTA3fDE=">Table sugar molecules may repeat to form extended structures.</button>
+        </div>
+        <div class="mc-feedback">Table sugar can link its molecular units into extended, repeating structures; water exists as separate simple molecules.</div>
+      </div>
+    </div>
+  </div>
+  <div class="qcard" data-qid="7-4" data-exam="1">
+    <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">MISA &middot; freezing and volume</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">The volume of water increases when water freezes because &mdash;</div>
+        <div class="mc-group" data-noshuffle>
+          <button class="mc-option" data-k="k1:NTE0fDA=">water molecules have a low density.</button>
+          <button class="mc-option" data-k="k1:NTIxfDA=">the components of a water molecule increase in mass.</button>
+          <button class="mc-option" data-k="k1:NTI4fDE=">the arrangement of the molecules in the water changes.</button>
+          <button class="mc-option" data-k="k1:NTM1fDA=">water molecules are composed of atoms from different elements.</button>
+        </div>
+        <div class="mc-feedback">Freezing rearranges the molecules into a more open pattern that takes up more space &mdash; the atoms and their mass do not change.</div>
+      </div>
+    </div>
+  </div>
+  <div class="qcard" data-qid="7-5" data-exam="1">
+    <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">MISA &middot; the thermometer (two-part)</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Part A &middot; In the thermometer model, the liquid expanded because the ___ of the liquid&rsquo;s molecules changes&hellip;</div>
+        <div class="mc-group" data-noshuffle>
+          <button class="mc-option" data-k="k1:NTQyfDE=">motion</button>
+          <button class="mc-option" data-k="k1:NTQ5fDA=">mass</button>
+          <button class="mc-option" data-k="k1:NTU2fDA=">number</button>
+          <button class="mc-option" data-k="k1:NTYzfDA=">color</button>
+        </div>
+        <div class="mc-feedback">Adding thermal energy speeds up particle motion, so the molecules spread apart and the liquid rises up the tube.</div>
+      </div>
+      <div class="step locked">
+        <div class="step-label">Part B &middot; &hellip;changes proportionally to the change in ___.</div>
+        <div class="mc-group" data-noshuffle>
+          <button class="mc-option" data-k="k1:NTcwfDE=">temperature</button>
+          <button class="mc-option" data-k="k1:NTc3fDA=">mass</button>
+          <button class="mc-option" data-k="k1:NTg0fDA=">volume</button>
+          <button class="mc-option" data-k="k1:NTkxfDA=">color</button>
+        </div>
+        <div class="mc-feedback">Particle motion increases in step with temperature &mdash; hotter means faster-moving particles.</div>
+      </div>
+    </div>
+  </div>
+  <div class="qcard" data-qid="7-6" data-exam="1">
+    <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">MISA &middot; constructed response</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Use evidence from the Water and Sugar investigation to explain what causes water to change phases. Be sure to include: (1) the transfer of thermal energy, and (2) what happens to the arrangement and motion of the water molecules.</div>
+        <textarea class="cr-area" placeholder="Type your explanation in full sentences..."></textarea>
+        <button class="check-btn cr-save">Save response</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="challenge">
+    <h3>Make your own</h3>
+    <p>Invent your own &ldquo;before and after&rdquo; scenario: describe a change someone could observe, then list the evidence that would tell you whether it was a <strong>physical change</strong> or a <strong>chemical reaction</strong>. Decide which it is, explain how you know, and bring your example to your next session.</p>
+  </div>
+  </section>
+
+  <footer>Matter and Its Interactions &middot; Grade 8 Science Hub &middot; NGSS MS-PS1. Real released items &copy; Maryland State Department of Education (MISA public release).</footer>
+</main>
+<script>
+  // ===== Per-module identity (Grade 8 Science - Unit 1: Matter and Its Interactions) =====
+  var G7_SYNC_HUB='grade8'; // shared-cloud namespace for this deployment
+  const G7_TOPIC_ID='sci.matter';
+  const G7_TOPIC_TITLE='Matter & Its Interactions';
+  const G7_SKILLS={
+    '1-1':'atoms','1-2':'atoms','1-3':'atoms','1-4':'atoms',
+    '2-1':'states','2-2':'states','2-3':'states',
+    '3-1':'thermal','3-2':'thermal','3-3':'thermal',
+    '4-1':'phys-chem','4-2':'reaction-evidence','4-3':'phys-chem',
+    '5-1':'conservation','5-2':'conservation','5-3':'conservation','5-4':'sci-reasoning',
+    '6-1':'synthetic','6-2':'synthetic','6-3':'synthetic','6-4':'synthetic',
+    '7-1':'atoms','7-2':'atoms','7-3':'atoms','7-4':'states','7-5':'thermal','7-6':'sci-reasoning'
+  };
+  const G7_SKILL_LABELS={
+    'atoms':'Atoms, elements, molecules & compounds',
+    'states':'States of matter & the particle model',
+    'thermal':'Thermal energy & changes of state',
+    'phys-chem':'Physical & chemical changes',
+    'reaction-evidence':'Evidence of a chemical reaction',
+    'conservation':'Conservation of mass',
+    'synthetic':'Synthetic materials & energy in reactions',
+    'sci-reasoning':'Scientific reasoning & explanation',
+    'reasoning':'Scientific reasoning & explanation'
+  };
+
+// ===== Shared [GRADE] Hub store =====
+  function g7current(){return localStorage.getItem('g7.current')||'Guest';}
+  function g7all(){try{return JSON.parse(localStorage.getItem('g7.data'))||{students:{}};}catch(e){return{students:{}};}}
+  function g7save(o){localStorage.setItem('g7.data',JSON.stringify(o));}
+  function g7topic(o){o.students=o.students||{};var s=g7current();o.students[s]=o.students[s]||{topics:{}};var T=o.students[s].topics;T[G7_TOPIC_ID]=T[G7_TOPIC_ID]||{title:G7_TOPIC_TITLE,tree:{},totalSteps:0,sectionTotals:{},lastPracticed:0,attempts:0,correct:0,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[]};return T[G7_TOPIC_ID];}
+  function g7sectionTotals(){var m={};document.querySelectorAll('.qcard[data-qid]').forEach(function(c){var sec=(c.dataset.qid||'').split('-')[0];m[sec]=(m[sec]||0)+c.querySelectorAll('.step').length;});return m;}
+  function loadData(){return g7topic(g7all()).tree;}
+  function saveData(tree){var o=g7all();var t=g7topic(o);t.tree=tree;t.totalSteps=document.querySelectorAll('.qcard .step').length;t.sectionTotals=g7sectionTotals();t.lastPracticed=Date.now();g7save(o);schedulePush();}
+  function g7sheet(event,question,detail){var url=localStorage.getItem('g7.sheetURL');if(!url)return;try{fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({hub:G7_SYNC_HUB||'default',student:g7current(),topic:G7_TOPIC_TITLE,question:question||'',event:event,detail:detail||'',ts:Date.now()})});}catch(e){}}
+  function g7log(qid,wrong,label,your,exam){var o=g7all();var t=g7topic(o);var sk=G7_SKILLS[qid]||'reasoning';t.skillStats[sk]=t.skillStats[sk]||{attempts:0,misses:0};t.skillStats[sk].attempts++;t.attempts=(t.attempts||0)+1;if(wrong){t.skillStats[sk].misses++;t.struggles.push({qid:qid,label:(label||qid).trim(),skill:sk,skillLabel:G7_SKILL_LABELS[sk],your:your||'',ts:Date.now()});if(t.struggles.length>120)t.struggles=t.struggles.slice(-120);}else{t.correct=(t.correct||0)+1;}if(exam){t.exam=t.exam||{attempts:0,correct:0};t.exam.attempts++;if(!wrong)t.exam.correct++;}t.lastPracticed=Date.now();g7save(o);g7sheet(wrong?'struggle':'step_complete',(label||qid).trim(),wrong?('typed "'+(your||'')+'"'):'');schedulePush();}
+
+  /* ===== v1.5 cloud sync (offline-first; shared multi-hub backend) ===== */
+  function syncPush(kind,name,sub,payload){var u=localStorage.getItem('g7.sheetURL');if(!u)return;try{fetch(u,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({op:'put',hub:G7_SYNC_HUB||'default',kind:kind,name:name,sub:sub||'',payload:payload,ts:Date.now()})}).catch(function(){});}catch(e){}}
+  function syncPull(cb){var u=localStorage.getItem('g7.sheetURL');if(!u){cb(null);return;}try{var nm='__modcb'+Math.floor(Math.random()*1e9);var s=document.createElement('script');
+    window[nm]=function(doc){try{cb(doc||null);}finally{try{delete window[nm];}catch(e2){}if(s.parentNode)s.parentNode.removeChild(s);}};
+    s.onerror=function(){try{delete window[nm];}catch(e2){}if(s.parentNode)s.parentNode.removeChild(s);cb(null);};
+    s.src=u+(u.indexOf('?')>=0?'&':'?')+'op=pull&hub='+encodeURIComponent(G7_SYNC_HUB||'default')+'&cb='+nm;document.head.appendChild(s);}catch(e){cb(null);}}
+  var _pushT=null;
+  function schedulePush(){if(!localStorage.getItem('g7.sheetURL'))return;clearTimeout(_pushT);_pushT=setTimeout(function(){try{var o=g7all();var s=g7current();var to=o.students&&o.students[s]&&o.students[s].topics&&o.students[s].topics[G7_TOPIC_ID];if(to)syncPush('topic',s,G7_TOPIC_ID,to);}catch(e){}},1500);}
+  function mergeCloudTopic(doc){if(!doc)return false;var s=g7current();var changed=false;
+    var o=g7all();var t=g7topic(o);
+    var c=doc.topics&&doc.topics[s]&&doc.topics[s][G7_TOPIC_ID];
+    if(c&&((c.lastPracticed||0)>(t.lastPracticed||0))){o.students[s].topics[G7_TOPIC_ID]=c;changed=true;}
+    var m=doc.reviews&&doc.reviews[s]&&doc.reviews[s][G7_TOPIC_ID];
+    if(m){var to=o.students[s].topics[G7_TOPIC_ID];((to&&to.responses)||[]).forEach(function(r){var k=String(r.ts);if(Object.prototype.hasOwnProperty.call(m,k)&&(r.reviewed||0)!==(m[k]||0)){r.reviewed=m[k]||0;changed=true;}});}
+    if(changed){g7save(o);}else if((t.lastPracticed||0)>((c&&c.lastPracticed)||0)){schedulePush();}
+    return changed;}
+  window.__modSync={mergeCloudTopic:mergeCloudTopic,schedulePush:schedulePush};
+  window.addEventListener('load',function(){syncPull(function(doc){if(mergeCloudTopic(doc))restoreProgress();});});
+
+  // ===== answer helpers =====
+  function kdec(s){try{return atob(s);}catch(e){return '';}}
+  function ansVal(inp){var a=(inp&&inp.dataset&&inp.dataset.answer)||'';return a.slice(0,3)==='k1:'?kdec(a.slice(3)):a;}
+  function optCorrect(el){if(!el||!el.dataset)return false;var k=String(el.dataset.k||'');if(k.slice(0,3)==='k1:'){var d=kdec(k.slice(3));return d.slice(d.indexOf('|')+1)==='1';}return el.dataset.correct==='true';}
+  function normalizeText(s){s=String(s).toLowerCase().trim();var neg=/^[-–—]/.test(s);s=s.replace(/[\s–—-]+/g,'-').replace(/^-|-$/g,'').replace(/\s+/g,' ');return (neg?'-':'')+s;}
+  function g7fracVal(s){s=String(s).trim().replace(/\s+/g,'');var m=s.match(/^(-?\d+)\/(-?\d+)$/);if(m){var d=parseFloat(m[2]);if(d===0)return null;return parseFloat(m[1])/d;}if(/^-?\d+(?:\.\d+)?$/.test(s))return parseFloat(s);return null;}
+  function g7isLowest(s){var m=String(s).trim().match(/^-?(\d+)\/(\d+)$/);if(!m)return true;var a=parseInt(m[1],10),b=parseInt(m[2],10);function g(x,y){x=Math.abs(x);y=Math.abs(y);while(y){var t=y;y=x%y;x=t;}return x;}return g(a,b)===1;}
+  function checkInput(input){
+    var val=input.value.trim(); if(val==='')return null;
+    var type=input.dataset.type||'numeric'; var correct=false;
+    if(type==='numeric'){var ex=parseFloat(ansVal(input)),tol=parseFloat(input.dataset.tol||'0.01'),v=parseFloat(val);correct=!isNaN(v)&&Math.abs(v-ex)<=tol;}
+    else{var raw=ansVal(input);var ans=raw.split('|');correct=ans.map(function(a){return normalizeText(a);}).indexOf(normalizeText(val))>=0;input.dataset.simplify='';
+      if(!correct){var ev=g7fracVal(ans[0]),uv=g7fracVal(val);if(ev!==null&&uv!==null&&Math.abs(ev-uv)<1e-9){correct=true;if(!g7isLowest(val))input.dataset.simplify='1';}}}
+    input.classList.remove('correct','wrong');input.classList.add(correct?'correct':'wrong');
+    var fb=input.parentElement.querySelector('.feedback');if(!fb){var row=input.closest('.input-row, td');if(row)fb=row.querySelector('.feedback');}
+    if(fb){fb.classList.remove('correct','wrong');fb.classList.add(correct?'correct':'wrong');fb.textContent=correct?(input.dataset.simplify==='1'?'✓ simplify':'✓'):'✗';}
+    return correct;
+  }
+  function setStepDisabled(step,dis){step.querySelectorAll('input,textarea,button').forEach(function(el){el.disabled=dis;});}
+  function unlockNext(step){var n=step.nextElementSibling;while(n&&!n.classList.contains('step'))n=n.nextElementSibling;if(n&&n.classList.contains('locked')){n.classList.remove('locked');setStepDisabled(n,false);}}
+  function saveStepDone(card,step){var qid=card.dataset.qid;if(!qid)return;var tr=loadData();if(!tr[qid])tr[qid]={steps:{}};var idx=Array.prototype.indexOf.call(card.querySelectorAll('.step'),step);tr[qid].steps[idx]=true;saveData(tr);refreshOverall();}
+
+  document.addEventListener('click',function(e){
+    if(e.target.matches('.check-btn')&&!e.target.classList.contains('ms-check')&&!e.target.classList.contains('cr-save')){
+      var step=e.target.closest('.step');if(!step)return;var inputs=step.querySelectorAll('.ans-input');if(inputs.length===0)return;
+      var anyVal=false;inputs.forEach(function(i){if(String(i.value).trim()!=='')anyVal=true;});if(!anyVal)return;
+      var all=true;inputs.forEach(function(i){if(checkInput(i)!==true)all=false;});
+      var card=step.closest('.qcard');var qid=card?card.dataset.qid:'';var lbl=(step.querySelector('.step-label')||{}).textContent||'';var exam=card&&card.dataset.exam==='1';
+      var fiFirst=!step.dataset.att;step.dataset.att='1';
+      if(all){step.classList.add('completed');e.target.classList.add('done');e.target.textContent='Step complete';unlockNext(step);if(card)saveStepDone(card,step);if(!step.dataset.logged){g7log(qid,false,lbl,'',exam&&fiFirst);step.dataset.logged='1';}}
+      else{var your=Array.prototype.slice.call(inputs).map(function(i){return i.value;}).filter(function(v){return v!=='';}).join(', ');g7log(qid,true,lbl,your,exam&&fiFirst);}
+    }
+    if(e.target.closest('.mc-option')){
+      var opt=e.target.closest('.mc-option');var group=opt.closest('.mc-group');if(!group||group.classList.contains('answered')||opt.classList.contains('disabled'))return;
+      var correct=optCorrect(opt);
+      var fb=group.parentElement.querySelector('.mc-feedback');if(fb&&fb.dataset.exp===undefined)fb.dataset.exp=fb.textContent||'';
+      var mcStep=group.closest('.step');var mcCard=group.closest('.qcard');var mcQid=mcCard?mcCard.dataset.qid:'';var mcLbl=mcStep?((mcStep.querySelector('.step-label')||{}).textContent||''):'';var mcExam=mcCard&&mcCard.dataset.exam==='1';
+      var mcFirst=mcStep&&!mcStep.dataset.att;if(mcStep)mcStep.dataset.att='1';
+      g7log(mcQid,!correct,mcLbl,(opt.textContent||'').trim(),mcExam&&mcFirst);
+      if(correct){
+        group.classList.add('answered');group.querySelectorAll('.mc-option').forEach(function(b){b.classList.add('disabled');});opt.classList.add('correct');
+        if(fb){fb.textContent='✓ Correct! '+(fb.dataset.exp||'');fb.classList.remove('wrong');fb.classList.add('correct');}
+        if(mcStep){mcStep.classList.add('completed');unlockNext(mcStep);if(mcCard)saveStepDone(mcCard,mcStep);}
+      }else{
+        opt.classList.add('wrong');opt.classList.add('disabled');
+        if(fb){fb.textContent='✗ Not quite — re-read the question, rule that one out, and try again.';fb.classList.remove('correct');fb.classList.add('wrong');}
+        var rest=Array.prototype.filter.call(group.querySelectorAll('.mc-option'),function(b){return !b.classList.contains('disabled');});
+        rest.forEach(function(b){b.classList.add('cooldown');});
+        setTimeout(function(){rest.forEach(function(b){b.classList.remove('cooldown');});},1600);
+      }
+    }
+    var mso=e.target.closest('.ms-option');
+    if(mso){var g=mso.closest('.ms-group');if(g&&!g.classList.contains('answered'))mso.classList.toggle('sel');return;}
+    if(e.target.matches('.ms-check')){
+      var st=e.target.closest('.step');if(!st)return;var grp=st.querySelector('.ms-group');if(!grp||grp.classList.contains('answered'))return;
+      var opts=Array.prototype.slice.call(grp.querySelectorAll('.ms-option'));if(!opts.some(function(o){return o.classList.contains('sel');}))return;
+      var ok=opts.every(function(o){return optCorrect(o)===o.classList.contains('sel');});
+      var card2=st.closest('.qcard');var qid2=card2?card2.dataset.qid:'';var lbl2=(st.querySelector('.step-label')||{}).textContent||'';var exam2=card2&&card2.dataset.exam==='1';
+      var msFirst=!st.dataset.att;st.dataset.att='1';
+      if(ok){grp.classList.add('answered');opts.forEach(function(o){o.classList.add('disabled');if(optCorrect(o))o.classList.add('correct');});st.classList.add('completed');e.target.classList.add('done');e.target.textContent='Correct';unlockNext(st);if(card2)saveStepDone(card2,st);if(!st.dataset.logged){g7log(qid2,false,lbl2,'',exam2&&msFirst);st.dataset.logged='1';}}
+      else{var your2=opts.filter(function(o){return o.classList.contains('sel');}).map(function(o){return (o.textContent||'').trim().slice(0,24);}).join('; ');opts.forEach(function(o){if(o.classList.contains('sel')&&!optCorrect(o))o.classList.add('wrong');});g7log(qid2,true,lbl2,your2,exam2&&msFirst);setTimeout(function(){opts.forEach(function(o){o.classList.remove('wrong');});},1100);}
+      return;
+    }
+    if(e.target.matches('.cr-save')){
+      var st3=e.target.closest('.step');if(!st3)return;var ta=st3.querySelector('.cr-area');if(!ta||!ta.value.trim())return;
+      var card3=st3.closest('.qcard');var qid3=card3?card3.dataset.qid:'';var lbl3=(st3.querySelector('.step-label')||{}).textContent||'';
+      var o=g7all();var t=g7topic(o);t.responses=t.responses||[];t.responses.push({qid:qid3,label:lbl3.trim(),text:ta.value.trim(),ts:Date.now()});if(t.responses.length>60)t.responses=t.responses.slice(-60);g7save(o);
+      g7sheet('constructed_response',lbl3.trim(),ta.value.trim().slice(0,180));
+      st3.classList.add('completed');e.target.classList.add('done');e.target.textContent='Saved';unlockNext(st3);if(card3)saveStepDone(card3,st3);
+      if(!st3.querySelector('.cr-saved')){var sv=document.createElement('div');sv.className='cr-saved';sv.textContent='Saved — your teacher will review this.';st3.appendChild(sv);}
+      return;
+    }
+    if(e.target.matches('.hint-btn')){var nx=e.target.nextElementSibling;if(nx&&nx.classList.contains('hint-content')){nx.classList.toggle('show');e.target.textContent=nx.classList.contains('show')?'Hide hint':'Hint';}}
+  });
+  document.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.matches('.ans-input')){e.preventDefault();var step=e.target.closest('.step');if(step){var b=step.querySelector('.check-btn');if(b&&!b.classList.contains('ms-check')&&!b.classList.contains('cr-save'))b.click();else checkInput(e.target);}else checkInput(e.target);}});
+  document.querySelectorAll('.step.locked').forEach(function(s){setStepDisabled(s,true);});
+  document.addEventListener('wheel',function(e){if(e.target&&e.target.matches&&e.target.matches('.ans-input')&&document.activeElement===e.target)e.target.blur();},{passive:true});
+  /* v1.4.2 anti-cheat: block copy/cut from question cards (typing areas exempt) */
+  ['copy','cut'].forEach(function(ev){document.addEventListener(ev,function(e){var t=e.target;if(t&&t.closest&&t.closest('.qcard')&&!(t.matches&&t.matches('input,textarea')))e.preventDefault();});});
+  /* v1.4.2 anti-cheat: shuffle MC/MS options on load (3+ options; data-noshuffle opts out — exam capstones and numeric/semantic scales keep their real order) */
+  document.querySelectorAll('.mc-group,.ms-group').forEach(function(g){if(g.hasAttribute('data-noshuffle'))return;var o=Array.prototype.slice.call(g.querySelectorAll('.mc-option,.ms-option'));if(o.length<3)return;for(var i=o.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=o[i];o[i]=o[j];o[j]=t;}o.forEach(function(b){g.appendChild(b);});});
+
+  function countAllSteps(){return document.querySelectorAll('.qcard .step').length;}
+  function refreshOverall(){var d=loadData(),done=0;document.querySelectorAll('.qcard').forEach(function(c){var q=c.dataset.qid;if(q&&d[q]&&d[q].steps)done+=Object.keys(d[q].steps).filter(function(k){return d[q].steps[k];}).length;});var tot=countAllSteps();document.getElementById('op-done').textContent=done;document.getElementById('op-total').textContent=tot;document.getElementById('op-pct').textContent=(tot?Math.round(done/tot*100):0)+'%';renderSecReport();}
+
+  /* v1.4.3: student-facing per-section report card, injected after the overall progress box */
+  function renderSecReport(){
+    var host=document.querySelector('.overall-progress');if(!host)return;
+    var box=document.getElementById('sec-report');
+    if(!box){box=document.createElement('div');box.id='sec-report';box.className='sec-report';host.parentNode.insertBefore(box,host.nextSibling);}
+    var rows='';
+    document.querySelectorAll('section.topic').forEach(function(sec){
+      var steps=sec.querySelectorAll('.qcard .step');if(!steps.length)return;
+      var done=sec.querySelectorAll('.qcard .step.completed').length;
+      var h=sec.querySelector('h2');var name=(h?h.textContent:sec.id).replace(/[<>&]/g,'').trim();
+      var pct=steps.length?Math.round(done/steps.length*100):0;
+      rows+='<div class="sec-row'+(pct>=100?' full':'')+'"><a href="#'+sec.id+'">'+name+'</a><span class="bar"><span style="width:'+pct+'%"></span></span><span class="val">'+done+'/'+steps.length+' \u00b7 '+pct+'%</span></div>';
+    });
+    if(rows)box.innerHTML='<h3>Your section scores</h3>'+rows; else box.style.display='none';
+  }
+
+  function restoreProgress(){
+    var nm=document.getElementById('g7name');if(nm)nm.textContent=g7current();
+    if(!localStorage.getItem('g7.current')&&nm&&!document.getElementById('g7guestnote')){var gw=document.createElement('a');gw.id='g7guestnote';gw.href='Grade_8_Math_Hub.html';gw.style.cssText='margin-left:.6rem;color:var(--orange);font-weight:600;text-decoration:none';gw.textContent='Not signed in — choose your name in the Hub so your work is tracked';nm.parentNode.appendChild(gw);}
+    var d=loadData();var topic=g7topic(g7all());
+    document.querySelectorAll('.qcard').forEach(function(card){
+      var qid=card.dataset.qid;if(!qid||!d[qid]||!d[qid].steps)return;
+      var steps=Array.prototype.slice.call(card.querySelectorAll('.step'));
+      steps.forEach(function(step,idx){
+        if(d[qid].steps[idx]){
+          step.classList.add('completed');step.classList.remove('locked');setStepDisabled(step,false);step.dataset.logged='1';step.dataset.att='1';
+          if(idx+1<steps.length){steps[idx+1].classList.remove('locked');setStepDisabled(steps[idx+1],false);}
+          var b=step.querySelector('.check-btn');if(b){b.classList.add('done');b.textContent=b.classList.contains('cr-save')?'Saved':'Step complete';}
+          var mc=step.querySelector('.mc-group');if(mc){mc.classList.add('answered');mc.querySelectorAll('.mc-option').forEach(function(o){o.classList.add('disabled');if(optCorrect(o))o.classList.add('correct');});var mfb=mc.parentElement.querySelector('.mc-feedback');if(mfb)mfb.classList.add('correct');}
+          var ms=step.querySelector('.ms-group');if(ms){ms.classList.add('answered');ms.querySelectorAll('.ms-option').forEach(function(o){o.classList.add('disabled');if(optCorrect(o))o.classList.add('correct');});}
+          var ta=step.querySelector('.cr-area');if(ta){var rs=(topic.responses||[]).filter(function(r){return r.qid===qid;});if(rs.length){ta.value=rs[rs.length-1].text;if(rs[rs.length-1].reviewed&&!step.querySelector('.cr-saved')){var rv=document.createElement('div');rv.className='cr-saved';rv.textContent='✓ Reviewed by your teacher';step.appendChild(rv);}}}
+          step.querySelectorAll('.ans-input').forEach(function(i){i.classList.add('correct');i.value=ansVal(i).split('|')[0];});
+        }
+      });
+    });
+    refreshOverall();
+  }
+  window.addEventListener('load',restoreProgress);
+
+  document.getElementById('btn-export').addEventListener('click',function(){
+    var d=loadData();var cards=document.querySelectorAll('.qcard');var lines=[],td=0,ts=0;
+    cards.forEach(function(c){var q=c.dataset.qid||'?';var title=(c.querySelector('.qtitle')||{}).textContent||'';var steps=c.querySelectorAll('.step');ts+=steps.length;var done=0;if(d[q]&&d[q].steps)done=Object.keys(d[q].steps).filter(function(k){return d[q].steps[k];}).length;td+=done;lines.push(q.padEnd(8)+(done+'/'+steps.length).padEnd(8)+title.trim());});
+    var date=new Date().toLocaleDateString('en-US',{day:'2-digit',month:'short',year:'numeric'});
+    var sum=G7_TOPIC_TITLE+' — Progress Report\nStudent: '+g7current()+'    Date: '+date+'\n'+'='.repeat(58)+'\nOverall: '+td+' / '+ts+' steps  ('+(ts?Math.round(td/ts*100):0)+'%)\n'+'='.repeat(58)+'\n\n'+lines.join('\n');
+    var blob=new Blob([sum],{type:'text/plain'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='progress-'+g7current().replace(/\W+/g,'_')+'-'+new Date().toISOString().slice(0,10)+'.txt';a.click();URL.revokeObjectURL(a.href);
+  });
+  document.getElementById('btn-reset-all').addEventListener('click',function(){if(!confirm('Reset your progress for this module? This cannot be undone.'))return;var o=g7all();var s=g7current();if(o.students&&o.students[s]&&o.students[s].topics){delete o.students[s].topics[G7_TOPIC_ID];g7save(o);}location.reload();});
+
+  var sections=document.querySelectorAll('section.topic'),navlinks=document.querySelectorAll('.navlink');
+  function updateActive(){var cur='';sections.forEach(function(s){if(window.scrollY+120>=s.offsetTop)cur=s.id;});navlinks.forEach(function(a){a.classList.toggle('active',a.getAttribute('href')==='#'+cur);});}
+  window.addEventListener('scroll',updateActive);window.addEventListener('load',updateActive);
+</script>
+</body>
+</html>

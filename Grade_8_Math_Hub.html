@@ -154,6 +154,17 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
 .hw-card h3{margin:0 0 .35rem;font-size:1rem;color:#6b5410}
 .hw-card .item{font-size:.88rem;color:#6b5410;margin:.15rem 0}
 .exam-line{font-size:.78rem;color:var(--muted);margin-top:.2rem}.exam-line b{color:var(--green)}
+.review-card{background:var(--green-soft);border:1px solid #CFE0D3;border-left:5px solid var(--green);border-radius:12px;padding:.9rem 1.1rem;margin:1.1rem 0 .2rem}
+.review-card h3{margin:0 0 .1rem;font-size:1rem;color:var(--green)}
+.review-card .rsub{font-size:.8rem;color:var(--muted);margin:0 0 .55rem}
+.review-list{display:flex;flex-direction:column;gap:.4rem}
+.review-item{display:flex;align-items:center;gap:.6rem;background:#fff;border:1px solid var(--line);border-radius:9px;padding:.5rem .7rem}
+.review-item .ri-ico{flex:none;width:30px;height:30px;border-radius:8px;background:var(--green-soft);color:var(--green);display:grid;place-items:center}
+.review-item .ri-main{min-width:0}
+.review-item .ri-t{font-weight:600;font-size:.9rem;color:var(--ink)}
+.review-item .ri-m{font-size:.76rem;color:var(--muted)}
+.review-item .ri-when{margin-left:auto;font-size:.74rem;font-weight:600;color:var(--muted);white-space:nowrap}
+.review-item .ri-when.over{color:#8a1c1c}
 .secbars{display:flex;gap:3px;margin:.35rem 0}.secbars .sb{flex:1;height:6px;background:#EDEBE2;border-radius:3px;overflow:hidden}.secbars .sb>span{display:block;height:100%;background:var(--gold)}
 .assign-box{display:flex;gap:.4rem;margin-top:.6rem}.assign-box input{flex:1}
 .resp-list{margin:.4rem 0 0;padding:.6rem .8rem;background:#F1F6F2;border:1px solid var(--line);border-radius:8px;font-size:.84rem}.resp-list div{padding:.2rem 0;color:#33433a}.resp-list .q{font-weight:600}
@@ -248,6 +259,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     <div id="subject-tabs" class="subject-tabs"></div>
     <div class="stats" id="stat-tiles"></div>
     <div id="hw-banner"></div>
+    <div id="due-review"></div>
     <div id="units"></div>
   </section>
 
@@ -277,7 +289,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
 </main>
 
 <footer>
-  <div class="wrap">Grade 8 Study &amp; Practice Hub · Mathematics (MCCRS &amp; MCAP-aligned) · Science (coming soon). One sign-in, one teacher dashboard across subjects.</div>
+  <div class="wrap">Grade 8 Study &amp; Practice Hub · Mathematics (MCCRS &amp; MCAP-aligned) · Science (MISA-aligned). One sign-in, one teacher dashboard across subjects.</div>
 </footer>
 
 <!-- Settings modal -->
@@ -399,6 +411,17 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     'reasoning':'Reasoning & error analysis'
   };
 
+  var SCIENCE_SKILLS={
+    'atoms':'Atoms, elements, molecules & compounds',
+    'states':'States of matter & the particle model',
+    'thermal':'Thermal energy & changes of state',
+    'phys-chem':'Physical & chemical changes',
+    'reaction-evidence':'Evidence of a chemical reaction',
+    'conservation':'Conservation of mass',
+    'synthetic':'Synthetic materials & energy in reactions',
+    'sci-reasoning':'Scientific reasoning & explanation'
+  };
+
   function svg(paths){return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+paths+'</svg>';}
   var IC={
     num:svg('<line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="10" y1="4" x2="8" y2="20"/><line x1="16" y1="4" x2="14" y2="20"/>'),
@@ -409,7 +432,9 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     life:svg('<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.52-4.48 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/>'),
     phys:svg('<circle cx="12" cy="12" r="1.4"/><ellipse cx="12" cy="12" rx="10" ry="4.4"/><ellipse cx="12" cy="12" rx="10" ry="4.4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4.4" transform="rotate(120 12 12)"/>'),
     earth:svg('<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18 14 14 0 0 1 0-18Z"/>'),
-    sci:svg('<path d="M9 3h6"/><path d="M10 3v6.6L4.9 18A1.6 1.6 0 0 0 6.4 20.4h11.2A1.6 1.6 0 0 0 19.1 18L14 9.6V3"/>')
+    sci:svg('<path d="M9 3h6"/><path d="M10 3v6.6L4.9 18A1.6 1.6 0 0 0 6.4 20.4h11.2A1.6 1.6 0 0 0 19.1 18L14 9.6V3"/>'),
+    wave:svg('<path d="M2 12c1.8-4 3.2-4 5 0s3.2 4 5 0 3.2-4 5 0"/>'),
+    bolt:svg('<path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/>')
   };
 
   /* ===== EDIT PER DEPLOYMENT: subjects -> units -> topics. =====
@@ -434,17 +459,20 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
          {id:'statistics',title:'Statistics & Probability',desc:'Scatter plots, lines of best fit, bivariate data and two-way tables.',status:'soon',icon:IC.stat}
        ]}
      ]},
-    {id:'sci', label:'Science', tagline:'Grade 8 \u00b7 coming soon', icon:IC.sci,
-     examLabel:'Exam-ready', examLabelLong:'Exam-readiness', skillLabels:{},
+    {id:'sci', label:'Science', tagline:'Grade 8 \u00b7 MISA-aligned', icon:IC.sci,
+     examLabel:'Exam-ready', examLabelLong:'Exam-readiness', skillLabels:SCIENCE_SKILLS,
      units:[
-       {unit:'Life Science',topics:[
-         {id:'sci.life',title:'Life Science',desc:'Cells & body systems, heredity & genetics, ecosystems, and the flow of energy and matter through living things.',status:'soon',icon:IC.life}
+       {unit:'Matter & Its Interactions',topics:[
+         {id:'sci.matter',title:'Matter & Its Interactions',desc:'Atoms & molecules, states of matter, thermal energy & changes of state, physical vs chemical change, conservation of mass, and synthetic materials.',file:'Matter_and_Its_Interactions.html',status:'available',icon:IC.phys}
        ]},
-       {unit:'Physical Science',topics:[
-         {id:'sci.physical',title:'Physical Science',desc:'Structure & properties of matter, chemical reactions, forces & motion, and energy and its transfer.',status:'soon',icon:IC.phys}
+       {unit:'Wave Energy & Attractive Forces',topics:[
+         {id:'sci.waves',title:'Wave Energy & Attractive Forces',desc:'Wave properties & energy, reflection/absorption/transmission, digital vs analog signals, and electric & magnetic fields.',status:'soon',icon:IC.wave}
        ]},
-       {unit:'Earth & Space Science',topics:[
-         {id:'sci.earth',title:'Earth & Space Science',desc:"Earth's systems, weather & climate, natural resources, and the solar system and universe.",status:'soon',icon:IC.earth}
+       {unit:'Energy, Forces & Motion',topics:[
+         {id:'sci.motion',title:'Energy, Forces & Motion',desc:"Newton's laws & net force, gravity, kinetic & potential energy, energy transfer, and thermal energy.",status:'soon',icon:IC.bolt}
+       ]},
+       {unit:'A Voyage Through Space',topics:[
+         {id:'sci.space',title:'A Voyage Through Space',desc:'The Earth-Sun-Moon system, lunar phases, eclipses, seasons, gravity & orbits, and the scale of the solar system.',status:'soon',icon:IC.earth}
        ]}
      ]}
   ];
@@ -544,6 +572,68 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     return new Date(ts).toLocaleDateString();
   }
 
+  // ---- spaced review (MR-1): due-for-review ladder, read-only over g7.data ----
+  // Rungs are days-until-due, indexed by a review streak. Phase 1 infers the streak
+  // from the stats already stored (accuracy, evidence, current shakiness); a real
+  // stored consecutive-success streak is the phase-2 upgrade (touches the g7. contract).
+  var REVIEW_RUNGS=[1,3,7,21,42]; // days: shaky -> solid
+  function reviewStreak(t){
+    var a=(t&&t.attempts)||0, c=(t&&t.correct)||0;
+    if(a<=0) return 0;
+    var acc=c/a;
+    var base = acc>=0.95?4 : acc>=0.85?3 : acc>=0.70?2 : acc>=0.50?1 : 0; // accuracy earns a longer rung
+    var cap  = a>=12?4 : a>=8?3 : a>=4?2 : a>=2?1 : 0;                    // but only with enough evidence
+    var s=Math.min(base,cap);
+    var st=(t&&t.skillStats)||{}, shaky=false;                            // a currently-shaky skill pulls it back one rung
+    Object.keys(st).forEach(function(k){ var m=st[k].misses||0; if(m>=2 && m/Math.max(st[k].attempts||0,1)>=0.25) shaky=true; });
+    if(shaky) s=Math.max(0,s-1);
+    return s;
+  }
+  // Returns null if the topic is not eligible (never started); else the due date and how overdue it is.
+  function reviewDue(t, now){
+    now=now||Date.now();
+    var last=(t&&t.lastPracticed)||0;
+    if(!last || ((t&&t.attempts)||0)<=0) return null;   // never list an unstarted topic
+    var rungDays=REVIEW_RUNGS[reviewStreak(t)];
+    var due=last + rungDays*86400000;
+    return { due:due, overdueMs:now-due, rungDays:rungDays, dueNow:now>=due };
+  }
+  // The due list for one student within one subject, most-overdue first. Read-only.
+  function dueReviewList(topics, ids, now){
+    var out=[];
+    (ids||Object.keys(topics||{})).forEach(function(id){
+      var to=topics&&topics[id]; if(!to) return;
+      var r=reviewDue(to, now); if(!r || !r.dueNow) return;
+      out.push({ id:id, overdueMs:r.overdueMs, last:to.lastPracticed||0, rungDays:r.rungDays });
+    });
+    return out.sort(function(a,b){return b.overdueMs-a.overdueMs;});
+  }
+  function renderDueReview(topics, subj){
+    var el=document.getElementById('due-review'); if(!el) return;
+    var list=dueReviewList(topics, subjectTopicIds(subj));
+    if(!list.length){ el.innerHTML=''; return; }
+    var rows=list.map(function(x){
+      var m=topicMeta(x.id)||{}; if(!m.file) return '';
+      var over=x.overdueMs>=86400000;
+      var when=over ? ('Due '+Math.floor(x.overdueMs/86400000)+' d ago') : 'Due now';
+      return '<div class="review-item" role="button" tabindex="0" data-id="'+esc(x.id)+'">'+
+        '<span class="ri-ico">'+(m.icon||'↺')+'</span>'+
+        '<span class="ri-main"><span class="ri-t">'+esc(m.title||x.id)+'</span><span class="ri-m">Last practiced '+relTime(x.last)+'</span></span>'+
+        '<span class="ri-when'+(over?' over':'')+'">'+when+'</span>'+
+        '<button class="btn sm ri-go">Review</button>'+
+      '</div>';
+    }).join('');
+    el.innerHTML='<div class="review-card"><h3>Due for review</h3>'+
+      '<p class="rsub">Spacing keeps mastered work from fading. A quick pass now is worth more than a re-read later.</p>'+
+      '<div class="review-list">'+rows+'</div></div>';
+    Array.prototype.forEach.call(el.querySelectorAll('.review-item'),function(it){
+      var id=it.getAttribute('data-id');
+      it.onclick=function(){openTopic(id);};
+      it.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();openTopic(id);}};
+    });
+  }
+  window.__hubReview={streak:reviewStreak,due:reviewDue,list:dueReviewList,rungs:REVIEW_RUNGS};
+
   // ---- view switching ----
   function show(id){['view-signin','view-app','view-teacher'].forEach(function(v){document.getElementById(v).classList.toggle('hidden',v!==id);});window.scrollTo(0,0);}
 
@@ -609,6 +699,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
       '<div class="stat"><div class="n">'+mastered+'</div><div class="l">Steps mastered</div></div>'+
       '<div class="stat"><div class="n">'+Object.keys(skillsToReview).length+'</div><div class="l">Skills to review</div></div>';
     renderHomeworkBanner(cur, topics, subj);
+    renderDueReview(topics, subj);
 
     var html='';
     subj.units.forEach(function(u){

@@ -95,6 +95,41 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
   rev.click();
   ok(JSON.parse(w.localStorage.getItem('g7.data')).students.Divine.topics['number-system'].responses[0].reviewed>0,'hub: reviewed flag persists');
 }
+// ===== HUB: spaced review (MR-1) — due-for-review ladder =====
+{ const DAY=86400000, now=Date.now();
+  const R=load(HUB).window.__hubReview;
+  ok(R&&typeof R.due==='function','review: hub exposes __hubReview API');
+  ok(R.rungs.join(',')==='1,3,7,21,42','review: ladder rungs are 1/3/7/21/42 days');
+  // streak inference from existing stats (phase-1 read-only)
+  ok(R.streak({attempts:20,correct:19,skillStats:{}})===4,'review: high accuracy + evidence earns the top rung');
+  ok(R.streak({attempts:20,correct:8,skillStats:{}})===0,'review: low accuracy stays on the bottom rung');
+  ok(R.streak({attempts:1,correct:1,skillStats:{}})===0,'review: one lucky correct is not a streak (evidence cap)');
+  ok(R.streak({attempts:20,correct:19,skillStats:{roots:{attempts:8,misses:4}}})===3,'review: a currently-shaky skill pulls the rung back one');
+  // due computation
+  ok(R.due({attempts:20,correct:19,skillStats:{},lastPracticed:now-50*DAY}).dueNow===true,'review: aged mastered topic is due (past its 42d rung)');
+  ok(R.due({attempts:20,correct:19,skillStats:{},lastPracticed:now-5*DAY}).dueNow===false,'review: just-practiced mastered topic is not due');
+  ok(R.due({attempts:0,correct:0,skillStats:{},lastPracticed:0})===null,'review: unstarted topic is never eligible');
+  ok(R.due({attempts:3,correct:1,skillStats:{},lastPracticed:now-2*DAY}).dueNow===true,'review: a shaky topic returns fast (1d rung)');
+  // list: only overdue, most-overdue first
+  const topics={a:{attempts:20,correct:19,skillStats:{},lastPracticed:now-50*DAY},   // rung 42d, 8d overdue
+                b:{attempts:6,correct:5,skillStats:{},lastPracticed:now-40*DAY},      // rung 7d, 33d overdue
+                c:{attempts:10,correct:9,skillStats:{},lastPracticed:now}};           // just practiced
+  const list=R.list(topics,['a','b','c'],now);
+  ok(list.length===2,'review: only overdue topics are listed (just-practiced excluded)');
+  ok(list[0].id==='b'&&list[1].id==='a','review: most-overdue first');
+}
+// ===== HUB: due-for-review renders (and stays empty when nothing is due) =====
+{ const DAY=86400000, now=Date.now();
+  const seed=lp=>({students:{Divine:{topics:{'number-system':{title:'The Number System',tree:{},totalSteps:31,sectionTotals:{},lastPracticed:lp,attempts:20,correct:19,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[]}},assignments:{}}}});
+  const store=lp=>({'g7.roster':JSON.stringify(['Divine']),'g7.pins':JSON.stringify({Divine:'1'}),'g7.current':'Divine','g7.data':JSON.stringify(seed(lp))});
+  const w=load(HUB,store(now-50*DAY)).window,d=w.document;
+  const dr=d.getElementById('due-review');
+  ok(dr&&dr.querySelectorAll('.review-item').length===1,'review: hub surfaces a due item for an aged mastered topic');
+  ok(dr.textContent.includes('The Number System'),'review: due item names the topic');
+  ok(dr.querySelector('.review-item').getAttribute('data-id')==='number-system','review: due item links into its module');
+  const w2=load(HUB,store(now)).window;
+  ok(w2.document.getElementById('due-review').innerHTML==='','review: nothing surfaced right after practice');
+}
 // ===== MODULES: source integrity =====
 { for(const f of [NS,EE]){
     const h=src(f);
@@ -238,6 +273,43 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
   q.querySelector('.ans-input').value='9';q.querySelector('.check-btn').click();
   await sleep(1700);
   ok(wm.__spy.some(b=>b.kind==='topic'&&b.sub==='number-system'&&b.hub==='grade8'&&b.payload.tree),'sync: module work pushed to cloud (debounced)');
+}
+// ===== MODULE: Matter & Its Interactions (sci.matter, MS-PS1) =====
+{ const MATTER='Matter_and_Its_Interactions.html';
+  const w=load(MATTER,{'g7.current':'Divine'}).window,d=w.document;
+  ok(!d.getElementById('g8gate'),'matter: gate removed when g8.gate=ok');
+  const mqids=[...d.querySelectorAll('.qcard[data-qid]')].map(c=>c.dataset.qid);
+  ok(mqids.length===27&&new Set(mqids).size===27,'matter: 27 unique qcards render');
+  ok(d.querySelector('[data-qid="7-1"]').dataset.exam==='1','matter: MISA item 7-1 is exam-graded');
+  ok([...d.querySelectorAll('.qcard[data-exam="1"] .hint-content')].length===0,'matter: no hints behind exam capstones (hint integrity)');
+  const mtopic=()=>JSON.parse(w.localStorage.getItem('g7.data')).students.Divine.topics['sci.matter'];
+  // fill-in: wrong then correct (qid 1-2 answer = 5)
+  const c12=d.querySelector('[data-qid="1-2"]'),i12=c12.querySelector('.ans-input');
+  i12.value='4';c12.querySelector('.check-btn').click();
+  ok(i12.classList.contains('wrong'),'matter: wrong fill-in is flagged');
+  i12.value='5';c12.querySelector('.check-btn').click();
+  ok(c12.querySelector('.step').classList.contains('completed'),'matter: correct fill-in completes the step');
+  ok(!!mtopic()&&mtopic().title==='Matter & Its Interactions','matter: work writes under topic id sci.matter');
+  // MC correct locks the group (qid 4-1)
+  const g41=d.querySelector('[data-qid="4-1"] .mc-group');
+  rightOpt(g41)[0].click();
+  ok(g41.classList.contains('answered'),'matter: correct MC answer locks the group');
+  // exam capstone keeps real MCAP order (7-1 correct = choice B, authored index 1)
+  const g71=d.querySelector('[data-qid="7-1"] .mc-group');
+  ok(g71.hasAttribute('data-noshuffle'),'matter: exam capstone 7-1 keeps real MCAP order (noshuffle)');
+  ok([...g71.querySelectorAll('.mc-option')].indexOf(rightOpt(g71)[0])===1,'matter: 7-1 correct answer stays choice B');
+  rightOpt(g71)[0].click();
+  ok(mtopic().exam.attempts>=1&&mtopic().exam.correct>=1,'matter: exam-readiness counts a first-attempt exam item');
+  // two-part 7-5: Part B locked until Part A answered
+  const steps75=d.querySelectorAll('[data-qid="7-5"] .step');
+  ok(steps75[1].classList.contains('locked'),'matter: two-part Part B starts locked');
+  rightOpt(steps75[0].querySelector('.mc-group'))[0].click();
+  ok(!steps75[1].classList.contains('locked'),'matter: correct Part A unlocks Part B');
+  // constructed response saved for teacher (qid 5-4)
+  const c54=d.querySelector('[data-qid="5-4"]');
+  c54.querySelector('.cr-area').value='In an open cup the carbon dioxide gas escaped into the air.';
+  c54.querySelector('.cr-save').click();
+  ok(mtopic().responses.some(r=>r.qid==='5-4'),'matter: constructed response saved for teacher review');
 }
 console.log('\n'+pass+' passed, '+fail+' failed');process.exit(fail?1:0);
 })();
