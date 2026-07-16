@@ -28,7 +28,7 @@ families, missing the retention layer entirely.
 | Mastery & sequencing | ● solid | no advanced concept before its prerequisite |
 | Assessment & feedback | ● solid | active check-and-feedback; hints never give the answer |
 | Motivation & UX | ◐ partial | honest mastery bars; anti-cheat; no gamification |
-| Adaptive & analytics | ◐ partial | per-topic tracking + acquisition-vs-retention readout (`AN-4` ✅) + per-skill ~85% calibration band (`AS-4` diagnostic ✅); auto difficulty-selection still needs difficulty-tagged item pools |
+| Adaptive & analytics | ● solid | per-topic tracking + acquisition-vs-retention readout (`AN-4` ✅) + automatic per-level accounting with a focus point, from the lesson's own ladder (`AS-4` ✅) + per-skill ~85% calibration band. Machine auto-serving of easier work is deliberately out of scope (house rule) |
 
 ---
 
@@ -63,17 +63,27 @@ The three build items are shared-engine work and live in
      hub/modules are behind Grade 8's engine** (no `__hubSync`/v1.5 cloud-sync layer), so the G7 module
      block omits `schedulePush`; the spaced-review layer itself is now at parity.
    - **Phase-3 (open, optional):** per-*skill* streaks and an in-module `?review=<skill>` retrieval mode.
-3. **~85% difficulty calibration — `AS-4`. ◑ diagnostic shipped (16 Jul 2026); auto-selection blocked on content.**
-   *Finding:* the modules have **no difficulty metadata and no draw-from-pool Practice** — each is a
-   fixed run of unique qcards shown top-to-bottom, ~1 Practice item per skill. So literal "bias item
-   selection within the author's difficulty range" **cannot be built without content authoring**
-   (tagging item difficulty + adding several varied-difficulty items per skill) — an author decision,
-   not something to fabricate. *Shipped instead:* a per-skill **calibration band** on the teacher
-   dashboard from stored first-attempt accuracy — **>90% "too easy → advance", <70% "too hard →
-   re-teach", else "on target (~85%)"** (min 4 attempts) — the actionable lever for the teacher to
-   raise/lower difficulty by hand. Hub-only, no engine/contract change; 4 assertions each grade.
-   **Still open (needs content):** difficulty-tagged item pools + an engine that auto-serves toward the
-   sweet spot. Raise with the author before building.
+3. **Difficulty calibration — `AS-4`. ✅ shipped as automatic level accounting (16 Jul 2026).**
+   *Correction to an earlier finding in this file:* the modules **do** carry a difficulty ladder — every
+   card is tagged `learn · guided · practice · apply · exam · stretch`, and a `stretch` tier was already
+   authored. So nothing needed difficulty tagging, and **no extra items were added on purpose**: bolting
+   2–3 variants onto each skill would spend student time on content the curriculum did not ask for.
+   **The lesson's own ladder is the difficulty gradient**, so the engine now derives the level from the
+   phase tag each card already carries — `g7level()` called inside `g7log()`, no call-site changes —
+   into an additive `levelStats{1..4}`:
+   - **1 Foundational** (`learn`/`guided`) · **2 Target** (`practice`/`apply`) · **3 Exam** — the assessed
+     MCAP bar, i.e. the expectation · **4 Stretch** — *beyond* the standard, reported separately and
+     **never counted as failure** (`exam` and `stretch` are deliberately not merged: a teacher must be able
+     to tell "missed the required bar" from "missed a bonus").
+   The teacher dashboard renders **“By level — Foundational 95% · Target 70% · Exam 40% · *Stretch
+   (beyond) 33%* → Focus: Exam”**, naming the first curriculum level where the student's strength failed —
+   the teacher's focus point; the remedy stays a human decision. The per-skill calibration band (>90% too
+   easy / <70% too hard / on target ~85%) also stays.
+   **Automatic for new modules:** any module stamped from `Module_Template.html` inherits level accounting
+   with zero setup (verified by driving both templates); untagged cards default to Target.
+   **Deliberately not built:** machine auto-serving of easier items / skipping drill — that is the one
+   direction the house rule forbids ("struggle is met with more targeted practice, never a standard
+   quietly dropped"), and the "more for strugglers" half already exists via spaced review + homework.
 4. **Durable-learning readout — `AN-4`. ✅ shipped in both grades (16 Jul 2026).** The engine buckets
    every **first-attempt** by whether the topic was **due for review when the session started**
    (`_revWasDue`, snapshotted at load): due → **retention**, not-due → **acquisition** (four additive

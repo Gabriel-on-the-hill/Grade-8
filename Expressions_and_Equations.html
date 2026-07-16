@@ -664,7 +664,19 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
   function loadData(){return g7topic(g7all()).tree;}
   function saveData(tree){var o=g7all();var t=g7topic(o);t.tree=tree;t.totalSteps=document.querySelectorAll('.qcard .step').length;t.sectionTotals=g7sectionTotals();t.lastPracticed=Date.now();g7save(o);schedulePush();}
   function g7sheet(event,question,detail){var url=localStorage.getItem('g7.sheetURL');if(!url)return;try{fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({hub:G7_SYNC_HUB||'default',student:g7current(),topic:G7_TOPIC_TITLE,question:question||'',event:event,detail:detail||'',ts:Date.now()})});}catch(e){}}
-  function g7log(qid,wrong,label,your,exam){var o=g7all();var t=g7topic(o);var sk=G7_SKILLS[qid]||'reasoning';t.skillStats[sk]=t.skillStats[sk]||{attempts:0,misses:0};t.skillStats[sk].attempts++;t.attempts=(t.attempts||0)+1;if(wrong){t.skillStats[sk].misses++;t.struggles.push({qid:qid,label:(label||qid).trim(),skill:sk,skillLabel:G7_SKILL_LABELS[sk],your:your||'',ts:Date.now()});if(t.struggles.length>120)t.struggles=t.struggles.slice(-120);}else{t.correct=(t.correct||0)+1;}if(exam){t.exam=t.exam||{attempts:0,correct:0};t.exam.attempts++;if(!wrong)t.exam.correct++;}t.lastPracticed=Date.now();g7save(o);g7sheet(wrong?'struggle':'step_complete',(label||qid).trim(),wrong?('typed "'+(your||'')+'"'):'');schedulePush();}
+  // AS-4 (automatic): the lesson's own Learn->Stretch ladder IS the difficulty gradient, so the level is
+  // read from the phase tag every stamped module already carries — no per-item tagging, no extra items,
+  // and any new module built from Module_Template gets this for free. Untagged cards default to Target.
+  function g7level(qid){
+    var c=document.querySelector('.qcard[data-qid="'+String(qid).replace(/"/g,'')+'"]');
+    if(!c)return 2;
+    var tag=c.querySelector('.qtag'),cls=(tag&&tag.className)||'';
+    if(/(^|\s)stretch(\s|$)/.test(cls))return 4;                    // 4 = beyond the standard (bonus, never a pass/fail signal)
+    if(c.dataset.exam==='1'||/(^|\s)exam(\s|$)/.test(cls))return 3; // 3 = the assessed MCAP bar (the expectation)
+    if(/(^|\s)(learn|guided)(\s|$)/.test(cls))return 1;             // 1 = foundational (supported)
+    return 2;                                                       // 2 = target (independent, grade level)
+  }
+  function g7log(qid,wrong,label,your,exam){var o=g7all();var t=g7topic(o);var sk=G7_SKILLS[qid]||'reasoning';t.skillStats[sk]=t.skillStats[sk]||{attempts:0,misses:0};t.skillStats[sk].attempts++;t.attempts=(t.attempts||0)+1;if(wrong){t.skillStats[sk].misses++;t.struggles.push({qid:qid,label:(label||qid).trim(),skill:sk,skillLabel:G7_SKILL_LABELS[sk],your:your||'',ts:Date.now()});if(t.struggles.length>120)t.struggles=t.struggles.slice(-120);}else{t.correct=(t.correct||0)+1;}if(exam){t.exam=t.exam||{attempts:0,correct:0};t.exam.attempts++;if(!wrong)t.exam.correct++;}var _lv=g7level(qid);t.levelStats=t.levelStats||{};t.levelStats[_lv]=t.levelStats[_lv]||{attempts:0,misses:0};t.levelStats[_lv].attempts++;if(wrong)t.levelStats[_lv].misses++;t.lastPracticed=Date.now();g7save(o);g7sheet(wrong?'struggle':'step_complete',(label||qid).trim(),wrong?('typed "'+(your||'')+'"'):'');schedulePush();}
 
   /* ===== spaced review (MR-1) phase-2: stored consecutive-session streak ===== */
   // A "review session" = one module visit. We count only FIRST-attempt graded items;

@@ -159,6 +159,12 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
 .hw-card .item{font-size:.88rem;color:#6b5410;margin:.15rem 0}
 .exam-line{font-size:.78rem;color:var(--muted);margin-top:.2rem}.exam-line b{color:var(--green)}
 .retain-line{font-size:.78rem;color:var(--muted);margin-top:.2rem}.retain-line b{color:var(--green)}.retain-line b.warn{color:#8a1c1c}
+.level-line{font-size:.78rem;color:var(--muted);margin-top:.2rem}
+.level-line .lv b{color:var(--green)}
+.level-line .lv.mid b{color:#8a6d1c}
+.level-line .lv.low b{color:#8a1c1c}
+.level-line .lv.beyond{opacity:.7;font-style:italic}
+.level-line .lv-focus{margin-left:.4rem;font-weight:700;color:#8a1c1c}
 .review-card{background:var(--green-soft);border:1px solid #CFE0D3;border-left:5px solid var(--green);border-radius:12px;padding:.9rem 1.1rem;margin:1.1rem 0 .2rem}
 .review-card h3{margin:0 0 .1rem;font-size:1rem;color:var(--green)}
 .review-card .rsub{font-size:.8rem;color:var(--muted);margin:0 0 .55rem}
@@ -565,6 +571,20 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
   function examReadiness(t){var e=(t&&t.exam)||{attempts:0,correct:0};return {att:e.attempts||0,cor:e.correct||0,pct:e.attempts?Math.round((e.correct||0)/e.attempts*100):0};}
   // AN-4: durable-learning readout — first-attempt accuracy split by acquisition (new) vs retention (came back due).
   function retentionStats(t){var af=(t&&t.acqFirst)||0,ac=(t&&t.acqCorrect)||0,rf=(t&&t.retFirst)||0,rc=(t&&t.retCorrect)||0;return {af:af,ac:ac,rf:rf,rc:rc,acqPct:af?Math.round(ac/af*100):null,retPct:rf?Math.round(rc/rf*100):null};}
+  // AS-4 (automatic): where did the student's strength fail as the lesson climbed? Levels come from the
+  // lesson's own ladder (1 foundational = learn/guided, 2 target = practice/apply, 3 = the assessed exam
+  // bar). Level 4 (stretch) is BEYOND the required standard and is reported separately — never as failure.
+  var LEVEL_LABELS={1:'Foundational',2:'Target',3:'Exam',4:'Stretch (beyond)'};
+  function levelBreakdown(t){
+    var ls=(t&&t.levelStats)||{};
+    return [1,2,3,4].map(function(lv){
+      var s=ls[lv]||ls[String(lv)]||{};
+      var a=s.attempts||0,m=s.misses||0;
+      return {lv:lv,a:a,ok:a-m,pct:a?Math.round((a-m)/a*100):null};
+    }).filter(function(x){return x.a>0;});
+  }
+  // The focus point: the FIRST curriculum level (lowest) where they fall below 70% — where strength failed.
+  function levelFocus(rows){for(var i=0;i<rows.length;i++){if(rows[i].lv<=3&&rows[i].pct!=null&&rows[i].pct<70)return rows[i].lv;}return null;}
   function sectionProgress(t){var totals=(t&&t.sectionTotals)||{};var tree=(t&&t.tree)||{};var by={};Object.keys(tree).forEach(function(q){var sec=q.split('-')[0];var s=tree[q].steps||{};by[sec]=(by[sec]||0)+Object.keys(s).filter(function(k){return s[k];}).length;});return Object.keys(totals).sort(function(a,b){function n(x){return parseInt(String(x).replace(/\D/g,''),10)||99;}return n(a)-n(b);}).map(function(sec){return {sec:sec,total:totals[sec],done:Math.min(by[sec]||0,totals[sec])};});}
   function suggestHomework(topics, ids, labels){var agg={};(ids||Object.keys(topics)).forEach(function(id){var to=topics[id];if(!to)return;var st=to.skillStats||{};Object.keys(st).forEach(function(k){agg[k]=agg[k]||{misses:0,attempts:0};agg[k].misses+=st[k].misses||0;agg[k].attempts+=st[k].attempts||0;});});return Object.keys(agg).filter(function(k){return agg[k].misses>=2&&agg[k].misses/Math.max(agg[k].attempts,1)>=0.25;}).sort(function(a,b){return agg[b].misses-agg[a].misses;}).slice(0,3).map(function(k){return {label:(labels&&labels[k])||SKILL_LABELS[k]||k,misses:agg[k].misses};});}
   function getAssign(stu,sid){ if(stu&&stu.assignments&&stu.assignments[sid]&&stu.assignments[sid].text)return stu.assignments[sid].text; if(sid==='math'&&stu&&stu.assignment&&stu.assignment.text)return stu.assignment.text; return ''; }
@@ -841,6 +861,19 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
             var retWarn=(rt.retPct!=null&&rt.acqPct!=null&&rt.retPct<rt.acqPct-15);
             var retTxt=rt.retPct!=null?('<b'+(retWarn?' class="warn"':'')+'>'+rt.retPct+'%</b> ('+rt.rc+'/'+rt.rf+')'):'—';
             html+='<div class="retain-line" title="First-attempt accuracy the first time a topic is learned vs. when it comes back due for review">Retrieval — first-time '+acqTxt+' · on review '+retTxt+'</div>';
+          }
+          var lvRows=levelBreakdown(to);
+          if(lvRows.length){
+            var curLv=lvRows.filter(function(x){return x.lv<=3;});
+            var beyond=lvRows.filter(function(x){return x.lv===4;})[0];
+            var focus=levelFocus(curLv);
+            var parts=curLv.map(function(x){
+              var cls=x.pct>=85?'ok':(x.pct>=70?'mid':'low');
+              return '<span class="lv '+cls+'">'+LEVEL_LABELS[x.lv]+' <b>'+x.pct+'%</b> ('+x.ok+'/'+x.a+')</span>';
+            }).join(' · ');
+            if(beyond)parts+=' · <span class="lv beyond" title="Beyond the required standard — not a pass/fail signal">'+LEVEL_LABELS[4]+' '+beyond.pct+'% ('+beyond.ok+'/'+beyond.a+')</span>';
+            if(focus)parts+='<span class="lv-focus">Focus: '+LEVEL_LABELS[focus]+'</span>';
+            html+='<div class="level-line" title="Where the student’s strength held or failed as the lesson climbed">By level — '+parts+'</div>';
           }
           var stats=to.skillStats||{};
           var keys=Object.keys(stats).filter(function(k){return stats[k].attempts>0;});

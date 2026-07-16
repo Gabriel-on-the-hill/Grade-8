@@ -197,6 +197,33 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
   ok(dash.querySelector('.cal-chip.hard')&&dash.querySelector('.cal-chip.hard').textContent==='too hard','AS-4: <70% first-attempt flagged too hard (re-teach)');
   ok(dash.querySelector('.cal-chip.sweet')&&dash.querySelector('.cal-chip.sweet').textContent==='on target','AS-4: ~85% band flagged on target');
 }
+// ===== AS-4 (automatic): the lesson's own Learn->Stretch ladder supplies the difficulty level =====
+{ const w=load(NS,{'g7.current':'Divine'}).window,d=w.document;
+  const rec=()=>JSON.parse(w.localStorage.getItem('g7.data')).students.Divine.topics['number-system'].levelStats||{};
+  const q41=d.querySelector('[data-qid="4-1"]');            // Learn  -> level 1
+  q41.querySelector('.ans-input').value='9';q41.querySelector('.check-btn').click();
+  ok(rec()['1']&&rec()['1'].attempts===1&&rec()['1'].misses===0,'AS-4: a Learn item logs to level 1 (foundational)');
+  const q42=d.querySelector('[data-qid="4-2"]');            // Practice -> level 2
+  q42.querySelector('.ans-input').value='99';q42.querySelector('.check-btn').click();
+  ok(rec()['2']&&rec()['2'].attempts===1&&rec()['2'].misses===1,'AS-4: a Practice item logs to level 2 (target)');
+  const q71=d.querySelector('[data-qid="7-1"]');            // Exam capstone -> level 3
+  q71.querySelector('.ans-input').value='0.1';q71.querySelector('.check-btn').click();
+  ok(rec()['3']&&rec()['3'].attempts===1&&rec()['3'].misses===1,'AS-4: an Exam capstone logs to level 3 (the assessed bar)');
+  ok(!rec()['4'],'AS-4: nothing lands in level 4 until a Stretch item is attempted');
+}
+// ===== AS-4: dashboard shows where strength failed; stretch stays out of pass/fail =====
+{ const data={students:{Divine:{topics:{'number-system':{title:'The Number System',tree:{},totalSteps:31,sectionTotals:{},lastPracticed:Date.now(),attempts:53,correct:38,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[],levelStats:{1:{attempts:20,misses:1},2:{attempts:20,misses:6},3:{attempts:10,misses:6},4:{attempts:3,misses:2}}}},assignments:{}}}};
+  const w=load(HUB,{'g7.roster':JSON.stringify(['Divine']),'g7.pins':JSON.stringify({Divine:'1'}),'g7.current':'Divine','g7.data':JSON.stringify(data)}).window,d=w.document;
+  d.getElementById('tb-teacher').click();d.getElementById('tm-pass').value='gabe';d.getElementById('tm-go').click();
+  const ll=d.querySelector('.level-line');
+  ok(ll&&ll.textContent.includes('Foundational 95%'),'AS-4: foundational level reported');
+  ok(ll.textContent.includes('Target 70%'),'AS-4: target level reported');
+  ok(ll.textContent.includes('Exam 40%'),'AS-4: exam (assessed bar) reported');
+  ok(d.querySelector('.lv.low')&&d.querySelector('.lv.low').textContent.includes('Exam'),'AS-4: the level where strength failed is flagged');
+  ok(d.querySelector('.lv-focus')&&d.querySelector('.lv-focus').textContent==='Focus: Exam','AS-4: focus point = first curriculum level below the bar');
+  ok(!!d.querySelector('.lv.beyond')&&ll.textContent.includes('Stretch (beyond)'),'AS-4: stretch reported separately as beyond the standard');
+  ok(!d.querySelector('.lv.beyond.low'),'AS-4: a low stretch score is never flagged as failure');
+}
 // ===== MODULES: source integrity =====
 { for(const f of [NS,EE]){
     const h=src(f);
