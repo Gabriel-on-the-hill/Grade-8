@@ -24,7 +24,7 @@ families, missing the retention layer entirely.
 | Category | Status | |
 |---|---|---|
 | Cognitive load | ● solid | Learn→Guided→Practice→Apply→Exam; strategy-only hints |
-| **Memory & retention** | ◐ **partial** | **phase-1 spaced review shipped in the Grade 8 hub ("Due for review" ladder); streak still inferred not stored; Grade 7 port pending** |
+| **Memory & retention** | ● **solid** | **spaced review shipped in both hubs — "Due for review" ladder + engine-written consecutive-session streak (phase-1 + phase-2)** |
 | Mastery & sequencing | ● solid | no advanced concept before its prerequisite |
 | Assessment & feedback | ● solid | active check-and-feedback; hints never give the answer |
 | Motivation & UX | ◐ partial | honest mastery bars; anti-cheat; no gamification |
@@ -43,19 +43,26 @@ The three build items are shared-engine work and live in
    the embedded engine via `runScripts:'dangerously'`, so it genuinely needs a DOM. Fixed by pinning
    `jsdom` as a dev-only dependency (`package.json`; `node_modules/` already gitignored) rather than by
    copying the localStorage-shim bootstrap, which does not fit a DOM-driven suite.
-2. **Spaced review — `MR-1`. Phase-1 ✅ shipped in the Grade 8 hub (15 Jul 2026); Grade 7 port pending.**
-   A mastered topic was never brought back; `lastPracticed` was recorded and unused. Now
-   `Grade_8_Math_Hub.html` renders a **"Due for review"** surface in `renderApp()`: a read-only ladder
-   `due = lastPracticed + rung(streak)`, rungs `1 → 3 → 7 → 21 → 42` days, most-overdue first, never
-   listing an unstarted topic, and separate from the mastery bar (which stays monotonic). The streak is
-   **inferred** from existing stats (accuracy earns a longer rung, capped by evidence, pulled back a
-   rung by a currently-shaky skill) — **phase-2** is a real stored consecutive-success streak written by
-   the module engine (that one touches the `g7.` contract; raise before building). Exposed for tests as
-   `window.__hubReview`; guarded by 16 new assertions in `tests/behavioral_test_suite.js`.
-   **Not yet done:** this was built in Grade 8 first (per the delegated call), so the **canonical Grade 7
-   hub still lacks it** — port the same surface there ("change both, check both"). Note the drift found
-   while porting: **Grade 7's hub is behind Grade 8's engine** (no `__hubSync`/v1.5 cloud-sync layer) and
-   its test harness has the same jsdom gap — both need handling as part of the Grade 7 port.
+2. **Spaced review — `MR-1`. ✅ shipped in full (phase-1 + phase-2) in both grades (16 Jul 2026).**
+   A mastered topic was never brought back; `lastPracticed` was recorded and unused. Now:
+   - **Phase-1 (hub surface).** `Grade_8_Math_Hub.html` renders a **"Due for review"** surface in
+     `renderApp()`: ladder `due = lastPracticed + rung(streak)`, rungs `1 → 3 → 7 → 21 → 42` days,
+     most-overdue first, never listing an unstarted topic, separate from the (monotonic) mastery bar.
+   - **Phase-2 (engine-written streak).** The module engine now records a real **consecutive-session
+     streak** on each topic record: a *review session* = one module visit; a visit with ≥3
+     first-attempt items advances the streak one rung (≥80% first-attempt) or resets it to 0, **at most
+     once per calendar day** (the day-guard stops two back-to-back sessions from skipping the ladder).
+     Two additive fields — `reviewStreak`, `reviewDay` — carried inside the topic record, so they ride
+     the existing `lastPracticed`-LWW sync with **no protocol change**; when `reviewStreak` is absent
+     the hub falls back to the phase-1 inferred proxy (zero-regression migration). Engine hook is
+     `g7review()` in every module (`__modReview` for tests); the hub prefers the stored value in
+     `reviewStreak()`.
+   - **Both grades.** Built in Grade 8 and ported to Grade 7 ("change both, check both"): 4 G8 engine
+     files + 3 G7 engine files + both hubs + both suites. Guarded by 26 review assertions in G8
+     (**131 passed**) and 26 in G7 (**95 passed**). Note the drift confirmed while porting: **Grade 7's
+     hub/modules are behind Grade 8's engine** (no `__hubSync`/v1.5 cloud-sync layer), so the G7 module
+     block omits `schedulePush`; the spaced-review layer itself is now at parity.
+   - **Phase-3 (open, optional):** per-*skill* streaks and an in-module `?review=<skill>` retrieval mode.
 3. **~85% difficulty calibration — `AS-4`.** Bias Practice selection toward the sweet spot per
    student, within the author's difficulty range.
 4. **Durable-learning readout — `AN-4`.** Retention = accuracy on due-review attempts, shown against

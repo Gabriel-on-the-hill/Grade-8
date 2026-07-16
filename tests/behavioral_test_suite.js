@@ -130,6 +130,39 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
   const w2=load(HUB,store(now)).window;
   ok(w2.document.getElementById('due-review').innerHTML==='','review: nothing surfaced right after practice');
 }
+// ===== HUB: phase-2 stored streak wins over the inferred proxy =====
+{ const DAY=86400000, now=Date.now();
+  const R=load(HUB).window.__hubReview;
+  ok(R.streak({reviewStreak:2,attempts:1,correct:1,skillStats:{}})===2,'review(p2): stored reviewStreak overrides the inferred proxy');
+  ok(R.streak({reviewStreak:0,attempts:20,correct:19,skillStats:{}})===0,'review(p2): stored 0 wins even when accuracy is high');
+  ok(R.due({reviewStreak:4,attempts:1,correct:1,skillStats:{},lastPracticed:now-50*DAY}).dueNow===true,'review(p2): stored top rung schedules 42d (due at 50d)');
+  ok(R.due({reviewStreak:4,attempts:1,correct:1,skillStats:{},lastPracticed:now-10*DAY}).dueNow===false,'review(p2): stored top rung not due at 10d');
+}
+// ===== MODULE: phase-2 engine writes the streak per spaced session =====
+{ const DAY=86400000, now=Date.now(), today=Math.floor(now/DAY);
+  const mk=(rs,rd)=>{const t={title:'The Number System',tree:{},totalSteps:31,sectionTotals:{},lastPracticed:now,attempts:0,correct:0,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[]};if(rs!==undefined)t.reviewStreak=rs;if(rd!==undefined)t.reviewDay=rd;return {students:{Divine:{topics:{'number-system':t},assignments:{}}}};};
+  const rec=w=>JSON.parse(w.localStorage.getItem('g7.data')).students.Divine.topics['number-system'];
+  // fresh topic: a clean 3-item session earns rung 1, but only after >=3 first-attempts
+  let w=load(NS,{'g7.current':'Divine','g7.data':JSON.stringify(mk())}).window;
+  w.__modReview.review(true,true);w.__modReview.review(true,true);
+  ok(rec(w).reviewStreak===undefined,'review(engine): under 3 first-attempts does not commit a session');
+  w.__modReview.review(true,true);
+  ok(rec(w).reviewStreak===1&&rec(w).reviewDay===today,'review(engine): a clean 3-item session sets streak 1 for today');
+  w.__modReview.review(true,true);
+  ok(rec(w).reviewStreak===1,'review(engine): more clean items the same visit do not double-advance');
+  // aged streak advances exactly one rung on a passing return
+  w=load(NS,{'g7.current':'Divine','g7.data':JSON.stringify(mk(2,today-1))}).window;
+  w.__modReview.review(true,true);w.__modReview.review(true,true);w.__modReview.review(true,true);
+  ok(rec(w).reviewStreak===3,'review(engine): a passing return advances the streak one rung (2->3)');
+  // a bad return (<80% first-attempt) resets to 0
+  w=load(NS,{'g7.current':'Divine','g7.data':JSON.stringify(mk(3,today-1))}).window;
+  w.__modReview.review(true,false);w.__modReview.review(true,false);w.__modReview.review(true,true);
+  ok(rec(w).reviewStreak===0,'review(engine): a failing return resets the streak to 0');
+  // day-guard: a second session the same day cannot advance again
+  w=load(NS,{'g7.current':'Divine','g7.data':JSON.stringify(mk(3,today))}).window;
+  w.__modReview.review(true,true);w.__modReview.review(true,true);w.__modReview.review(true,true);
+  ok(rec(w).reviewStreak===3,'review(engine): a second session the same day does not advance the streak');
+}
 // ===== MODULES: source integrity =====
 { for(const f of [NS,EE]){
     const h=src(f);
