@@ -780,11 +780,14 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
   window.__modReview={review:g7review,proxy:g7revProxy,init:g7reviewInit,wasDue:g7wasDue};
 
   /* ===== v1.5 cloud sync (offline-first; shared multi-hub backend) ===== */
-  function syncPush(kind,name,sub,payload){var u=localStorage.getItem('g7.sheetURL');if(!u)return;try{fetch(u,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({op:'put',hub:G7_SYNC_HUB||'default',kind:kind,name:name,sub:sub||'',payload:payload,ts:Date.now()})}).catch(function(){});}catch(e){}}
+  /* The /exec URL is public, so it grants nothing alone: a student authenticates with their
+     own PIN and can only ever read/write their OWN record. Modules never hold the teacher key. */
+  function g7pin(){try{var m=JSON.parse(localStorage.getItem('g7.pins')||'{}');var n=g7current();return (n&&m&&m[n]!==undefined)?String(m[n]):'';}catch(e){return '';}}
+  function syncPush(kind,name,sub,payload){var u=localStorage.getItem('g7.sheetURL');if(!u)return;try{fetch(u,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({op:'put',hub:G7_SYNC_HUB||'default',kind:kind,name:name,sub:sub||'',payload:payload,ts:Date.now(),pin:g7pin()})}).catch(function(){});}catch(e){}}
   function syncPull(cb){var u=localStorage.getItem('g7.sheetURL');if(!u){cb(null);return;}try{var nm='__modcb'+Math.floor(Math.random()*1e9);var s=document.createElement('script');
     window[nm]=function(doc){try{cb(doc||null);}finally{try{delete window[nm];}catch(e2){}if(s.parentNode)s.parentNode.removeChild(s);}};
     s.onerror=function(){try{delete window[nm];}catch(e2){}if(s.parentNode)s.parentNode.removeChild(s);cb(null);};
-    s.src=u+(u.indexOf('?')>=0?'&':'?')+'op=pull&hub='+encodeURIComponent(G7_SYNC_HUB||'default')+'&cb='+nm;document.head.appendChild(s);}catch(e){cb(null);}}
+    s.src=u+(u.indexOf('?')>=0?'&':'?')+'op=pull&hub='+encodeURIComponent(G7_SYNC_HUB||'default')+'&cb='+nm+'&name='+encodeURIComponent(g7current()||'')+'&pin='+encodeURIComponent(g7pin());document.head.appendChild(s);}catch(e){cb(null);}}
   var _pushT=null;
   function schedulePush(){if(!localStorage.getItem('g7.sheetURL'))return;clearTimeout(_pushT);_pushT=setTimeout(function(){try{var o=g7all();var s=g7current();var to=o.students&&o.students[s]&&o.students[s].topics&&o.students[s].topics[G7_TOPIC_ID];if(to)syncPush('topic',s,G7_TOPIC_ID,to);}catch(e){}},1500);}
   function mergeCloudTopic(doc){if(!doc)return false;var s=g7current();var changed=false;

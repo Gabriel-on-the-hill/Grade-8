@@ -315,6 +315,12 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
       <button class="btn ghost sm" id="btn-test-sheet">Send test row</button>
     </div>
     <div id="sheet-status" class="statusline muted-note"></div>
+    <label class="muted-note" style="display:block;margin-top:.8rem">Teacher sync key <span style="font-weight:400">— type it on <strong>your</strong> device only. It unlocks the full dashboard from the cloud. Students never need it; they sync their own work with their PIN. It is never stored in this page.</span></label>
+    <input id="sync-key" class="field" type="password" placeholder="the TEACHER_KEY from your Apps Script" style="margin-top:.3rem"/>
+    <div class="row">
+      <button class="btn sm" id="btn-save-key">Save key</button>
+    </div>
+    <div id="key-status" class="statusline muted-note"></div>
     <hr style="border:none;border-top:1px solid var(--line);margin:1.1rem 0">
     <label class="muted-note">Teacher passcode</label>
     <input id="pass-set" class="field" type="password" placeholder="Set or change teacher passcode" style="margin-top:.3rem"/>
@@ -502,7 +508,14 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
   var ROSTER_SEED=['Divine','Ayodeji'];
   var TEACHER_PASS_SEED=atob('R2FiZQ==');  // lightly encoded; checked case-insensitively
   var SYNC_HUB_ID='grade8';   /* namespace in the shared multi-hub cloud backend (SAT / Grade 7 / Grade 8 share one Sheet) */
-  var SHEET_URL_SEED='';      /* Apps Script web-app URL baked into the deployment -> zero-setup sync on every device (applied once per value via g7.urlv; Settings may override until the seed changes) */
+  var SHEET_URL_SEED='https://script.google.com/macros/s/AKfycbyJKH4CmbbaQ8J7_uhtVKKAO2yg7ELDoIB1jwvzBkt4bvh-G4Q2vHAbI4LGxMMCtnx5/exec';
+  /* ^ Apps Script web-app URL, baked in -> zero-setup sync on every device (applied once per value
+     via g7.urlv; Settings may override until the seed changes).
+     This page is PUBLIC, so this URL is public. That is safe only because the endpoint is scoped:
+     the URL alone returns an empty doc and every write is rejected; a student needs their own PIN
+     (and only ever reaches their own record); the full dashboard needs TEACHER_KEY, which lives in
+     the Apps Script and in the teacher's own Settings — never here. Verified live before baking.
+     If you ever remove the auth from the Apps Script, remove this seed in the same commit. */
   function applySeeds(){
     try{
       var sv=JSON.stringify(ROSTER_SEED);
@@ -515,11 +528,36 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
   }
 
   /* ===== v1.5 cloud sync (offline-first; shared multi-hub Apps Script backend — see Starter_Kit/HUB_Google_Sheet_Setup.md) ===== */
-  function syncPush(kind,name,sub,payload){if(!sheetURL())return;try{fetch(sheetURL(),{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({op:'put',hub:SYNC_HUB_ID||'default',kind:kind,name:name,sub:sub||'',payload:payload,ts:Date.now()})}).catch(function(){});}catch(e){}}
+  /* Credentials. The /exec URL is public (this page is), so it grants nothing on its own:
+     a student proves who they are with their own PIN and can only ever touch their own
+     record; the teacher's key unlocks the whole dashboard and is typed once into Settings,
+     never baked into this file. */
+  function syncKey(){return LS.getItem(K('syncKey'))||'';}
+  function pinFor(n){try{var m=jget(K('pins'),{});return (n&&m&&m[n]!==undefined)?String(m[n]):'';}catch(e){return '';}}
+  function syncPush(kind,name,sub,payload){if(!sheetURL())return;try{fetch(sheetURL(),{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({op:'put',hub:SYNC_HUB_ID||'default',kind:kind,name:name,sub:sub||'',payload:payload,ts:Date.now(),pin:pinFor(name),key:syncKey()})}).catch(function(){});}catch(e){}}
   function syncPull(cb){if(!sheetURL()){cb(null);return;}try{var nm='__hubcb'+Math.floor(Math.random()*1e9);var s=document.createElement('script');
     window[nm]=function(doc){try{cb(doc||null);}finally{try{delete window[nm];}catch(e2){}if(s.parentNode)s.parentNode.removeChild(s);}};
     s.onerror=function(){try{delete window[nm];}catch(e2){}if(s.parentNode)s.parentNode.removeChild(s);cb(null);};
-    s.src=sheetURL()+(sheetURL().indexOf('?')>=0?'&':'?')+'op=pull&hub='+encodeURIComponent(SYNC_HUB_ID||'default')+'&cb='+nm;document.head.appendChild(s);}catch(e){cb(null);}}
+    var me=current()||'';
+    s.src=sheetURL()+(sheetURL().indexOf('?')>=0?'&':'?')+'op=pull&hub='+encodeURIComponent(SYNC_HUB_ID||'default')+'&cb='+nm
+      +'&name='+encodeURIComponent(me)+'&pin='+encodeURIComponent(pinFor(me))+'&key='+encodeURIComponent(syncKey());
+    document.head.appendChild(s);}catch(e){cb(null);}}
+  /* Truthful connection test. The push path is no-cors — its response is opaque, so it can
+     never tell you anything; the old test said "sent" even against a dead URL. The JSONP ping
+     does give a real signal (callback = alive, onerror/timeout = not), and it names the Sheet. */
+  function syncPing(cb){
+    var u=sheetURL(); if(!u){cb(null);return;}
+    var done=false,nm='__hubping'+Math.floor(Math.random()*1e9),s=document.createElement('script');
+    function finish(r){if(done)return;done=true;clearTimeout(tm);try{delete window[nm];}catch(e2){}if(s.parentNode)s.parentNode.removeChild(s);cb(r);}
+    var tm=setTimeout(function(){finish(null);},8000);
+    window[nm]=function(r){finish(r||null);};
+    s.onerror=function(){finish(null);};
+    try{s.src=u+(u.indexOf('?')>=0?'&':'?')+'op=ping&cb='+nm;document.head.appendChild(s);}catch(e){finish(null);}
+  }
+  function pingStatusText(r){
+    if(!r||!r.ok)return 'No response from that URL. Check the deployment — Web app, Execute as: Me, Who has access: Anyone — and that the URL ends in /exec.';
+    return 'Connected ✓ writing to “'+r.sheet+'” — Log '+r.log+' rows, SyncStore '+r.sync+' rows.';
+  }
   function recTs(r){return Math.max((r&&r.ts)||0,(r&&r.mts)||0,(r&&r.doneTs)||0);}
   function markPinTs(n){var m=jget(K('pints'),{});m[n]=Date.now();jset(K('pints'),m);return m[n];}
   function applyCloud(doc){
@@ -548,7 +586,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
   function reviewMapFor(n,tid){var d=getData();var to=d.students&&d.students[n]&&d.students[n].topics&&d.students[n].topics[tid];var m={};((to&&to.responses)||[]).forEach(function(r){if(r.reviewed)m[String(r.ts)]=r.reviewed;});return m;}
   function runSync(after){syncPull(function(doc){var res=applyCloud(doc);var seen={};(res.pushTopics||[]).forEach(function(p){var k=p.n+'|'+p.tid;if(seen[k])return;seen[k]=1;var d=getData();var to=d.students[p.n]&&d.students[p.n].topics&&d.students[p.n].topics[p.tid];if(to)syncPush('topic',p.n,p.tid,to);});if(res.changed&&after)after();});}
   function rerenderView(){try{if(!document.getElementById('view-teacher').classList.contains('hidden')){renderTeacher();}else if(!document.getElementById('view-app').classList.contains('hidden')){renderApp();}}catch(e){}}
-  window.__hubSync={applyCloud:applyCloud,recTs:recTs,reviewMapFor:reviewMapFor};
+  window.__hubSync={applyCloud:applyCloud,recTs:recTs,reviewMapFor:reviewMapFor,pingText:pingStatusText};
 
 
   function subjectById(id){for(var i=0;i<SUBJECTS.length;i++){if(SUBJECTS[i].id===id)return SUBJECTS[i];}return null;}
@@ -952,6 +990,8 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
   function openSettings(){
     document.getElementById('sheet-url').value=sheetURL();
     document.getElementById('sheet-status').textContent='';
+    document.getElementById('sync-key').value=syncKey();
+    document.getElementById('key-status').textContent=syncKey()?'A key is saved on this device — it pulls the full dashboard.':'No key on this device — you will only sync the signed-in student’s own work.';
     document.getElementById('pass-status').textContent=teacherPass()?'A passcode is set.':'No passcode set yet.';
     document.getElementById('settingsModal').classList.remove('hidden');
   }
@@ -970,10 +1010,17 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
       if(u)LS.setItem(K('sheetURL'),u); else LS.removeItem(K('sheetURL'));
       document.getElementById('sheet-status').textContent=u?'Saved. Sheet logging is on.':'Cleared. Sheet logging is off.';
     };
+    document.getElementById('btn-save-key').onclick=function(){
+      var k=document.getElementById('sync-key').value.trim();
+      if(k)LS.setItem(K('syncKey'),k); else LS.removeItem(K('syncKey'));
+      document.getElementById('key-status').textContent=k?'Key saved on this device — it pulls the full dashboard.':'Key cleared — this device now syncs only the signed-in student’s own work.';
+    };
     document.getElementById('btn-test-sheet').onclick=function(){
-      if(!sheetURL()){document.getElementById('sheet-status').textContent='Save a URL first.';return;}
+      var st=document.getElementById('sheet-status');
+      if(!sheetURL()){st.textContent='Save a URL first.';return;}
+      st.textContent='Testing…';
       postSheet({student:current()||'(teacher test)',topic:'Hub',question:'-',event:'test',detail:'Connection test',ts:Date.now()});
-      document.getElementById('sheet-status').textContent='Test row sent. Check your Google Sheet (Log tab).';
+      syncPing(function(r){st.textContent=pingStatusText(r);});
     };
     document.getElementById('btn-save-pass').onclick=function(){
       var v=document.getElementById('pass-set').value;
