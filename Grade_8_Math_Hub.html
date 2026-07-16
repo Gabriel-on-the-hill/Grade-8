@@ -120,6 +120,10 @@ input.field:focus{outline:none;border-color:var(--green)}
 .skill-line .meter{flex:1;height:7px;background:#EDEBE2;border-radius:99px;overflow:hidden}
 .skill-line .meter > span{display:block;height:100%;border-radius:99px}
 .skill-line .v{flex:none;width:84px;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+.cal-chip{flex:none;font-size:.66rem;font-weight:700;padding:.08rem .4rem;border-radius:5px;white-space:nowrap}
+.cal-chip.easy{background:var(--green-soft);color:var(--green)}
+.cal-chip.sweet{background:#EEF2FF;color:#3b4a8a}
+.cal-chip.hard{background:#FBE3E3;color:#8a1c1c}
 .miss-ok > span{background:var(--ok)} .miss-mid > span{background:var(--gold)} .miss-hi > span{background:var(--bad)}
 .struggle-toggle{font-size:.8rem;color:var(--green);cursor:pointer;font-weight:600;margin-top:.3rem;display:inline-block}
 .struggle-list{margin:.4rem 0 0;padding:.6rem .8rem;background:#FBFAF6;border:1px solid var(--line);border-radius:8px;font-size:.82rem}
@@ -154,6 +158,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
 .hw-card h3{margin:0 0 .35rem;font-size:1rem;color:#6b5410}
 .hw-card .item{font-size:.88rem;color:#6b5410;margin:.15rem 0}
 .exam-line{font-size:.78rem;color:var(--muted);margin-top:.2rem}.exam-line b{color:var(--green)}
+.retain-line{font-size:.78rem;color:var(--muted);margin-top:.2rem}.retain-line b{color:var(--green)}.retain-line b.warn{color:#8a1c1c}
 .review-card{background:var(--green-soft);border:1px solid #CFE0D3;border-left:5px solid var(--green);border-radius:12px;padding:.9rem 1.1rem;margin:1.1rem 0 .2rem}
 .review-card h3{margin:0 0 .1rem;font-size:1rem;color:var(--green)}
 .review-card .rsub{font-size:.8rem;color:var(--muted);margin:0 0 .55rem}
@@ -558,6 +563,8 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
   }
   var MASTERY_PCT=100;
   function examReadiness(t){var e=(t&&t.exam)||{attempts:0,correct:0};return {att:e.attempts||0,cor:e.correct||0,pct:e.attempts?Math.round((e.correct||0)/e.attempts*100):0};}
+  // AN-4: durable-learning readout — first-attempt accuracy split by acquisition (new) vs retention (came back due).
+  function retentionStats(t){var af=(t&&t.acqFirst)||0,ac=(t&&t.acqCorrect)||0,rf=(t&&t.retFirst)||0,rc=(t&&t.retCorrect)||0;return {af:af,ac:ac,rf:rf,rc:rc,acqPct:af?Math.round(ac/af*100):null,retPct:rf?Math.round(rc/rf*100):null};}
   function sectionProgress(t){var totals=(t&&t.sectionTotals)||{};var tree=(t&&t.tree)||{};var by={};Object.keys(tree).forEach(function(q){var sec=q.split('-')[0];var s=tree[q].steps||{};by[sec]=(by[sec]||0)+Object.keys(s).filter(function(k){return s[k];}).length;});return Object.keys(totals).sort(function(a,b){function n(x){return parseInt(String(x).replace(/\D/g,''),10)||99;}return n(a)-n(b);}).map(function(sec){return {sec:sec,total:totals[sec],done:Math.min(by[sec]||0,totals[sec])};});}
   function suggestHomework(topics, ids, labels){var agg={};(ids||Object.keys(topics)).forEach(function(id){var to=topics[id];if(!to)return;var st=to.skillStats||{};Object.keys(st).forEach(function(k){agg[k]=agg[k]||{misses:0,attempts:0};agg[k].misses+=st[k].misses||0;agg[k].attempts+=st[k].attempts||0;});});return Object.keys(agg).filter(function(k){return agg[k].misses>=2&&agg[k].misses/Math.max(agg[k].attempts,1)>=0.25;}).sort(function(a,b){return agg[b].misses-agg[a].misses;}).slice(0,3).map(function(k){return {label:(labels&&labels[k])||SKILL_LABELS[k]||k,misses:agg[k].misses};});}
   function getAssign(stu,sid){ if(stu&&stu.assignments&&stu.assignments[sid]&&stu.assignments[sid].text)return stu.assignments[sid].text; if(sid==='math'&&stu&&stu.assignment&&stu.assignment.text)return stu.assignment.text; return ''; }
@@ -787,6 +794,17 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     closeTeacherModal();if(_tmNext==='settings')openSettings();else renderTeacher();
   }
   function missClass(ratio){ return ratio>=0.5?'miss-hi':(ratio>=0.25?'miss-mid':'miss-ok'); }
+  // AS-4: per-skill difficulty calibration around the ~85% desirable-difficulty sweet spot, from stored
+  // first-attempt accuracy. Diagnostic only (the teacher's lever to raise/lower difficulty) — automatic
+  // item-selection needs difficulty-tagged item pools, which the modules do not yet have.
+  function skillCalibration(st){
+    var a=(st&&st.attempts)||0,m=(st&&st.misses)||0;
+    if(a<4)return null;                                 // not enough evidence to calibrate
+    var acc=(a-m)/a;
+    if(acc>0.90)return{band:'easy',label:'too easy',title:'Above ~90% first-attempt — ready for harder items / advance'};
+    if(acc<0.70)return{band:'hard',label:'too hard',title:'Below ~70% first-attempt — re-teach or give an easier entry point'};
+    return{band:'sweet',label:'on target',title:'Near the ~85% success sweet spot — keep going'};
+  }
   function renderTeacher(){
     document.getElementById('roster-panel').classList.add('hidden');
     var data=getData(); var names=getRoster().slice();
@@ -817,6 +835,13 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
           html+='<div class="pbar" style="margin:.4rem 0"><span style="width:'+p.pct+'%"></span></div>';
           var secs=sectionProgress(to); if(secs.length){html+='<div class="secbars">'+secs.map(function(s){return '<span class="sb" title="Section '+String(s.sec).replace(/^\D+/,'')+': '+s.done+'/'+s.total+'"><span style="width:'+(s.total?Math.round(s.done/s.total*100):0)+'%"></span></span>';}).join('')+'</div>';}
           if(er.att){html+='<div class="exam-line">'+esc(subj.examLabelLong)+': <b>'+er.cor+'/'+er.att+'</b> ('+er.pct+'%)</div>';}
+          var rt=retentionStats(to);
+          if(rt.af||rt.rf){
+            var acqTxt=rt.acqPct!=null?('<b>'+rt.acqPct+'%</b> ('+rt.ac+'/'+rt.af+')'):'—';
+            var retWarn=(rt.retPct!=null&&rt.acqPct!=null&&rt.retPct<rt.acqPct-15);
+            var retTxt=rt.retPct!=null?('<b'+(retWarn?' class="warn"':'')+'>'+rt.retPct+'%</b> ('+rt.rc+'/'+rt.rf+')'):'—';
+            html+='<div class="retain-line" title="First-attempt accuracy the first time a topic is learned vs. when it comes back due for review">Retrieval — first-time '+acqTxt+' · on review '+retTxt+'</div>';
+          }
           var stats=to.skillStats||{};
           var keys=Object.keys(stats).filter(function(k){return stats[k].attempts>0;});
           keys.sort(function(a,b){return (stats[b].misses/stats[b].attempts)-(stats[a].misses/stats[a].attempts);});
@@ -825,7 +850,9 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
               var st=stats[k],ratio=st.attempts?st.misses/st.attempts:0,pctw=Math.round(ratio*100);
               html+='<div class="skill-line"><span class="lbl">'+esc((subj.skillLabels&&subj.skillLabels[k])||SKILL_LABELS[k]||k)+'</span>'+
                 '<span class="meter '+missClass(ratio)+'"><span style="width:'+pctw+'%"></span></span>'+
-                '<span class="v">'+st.misses+'/'+st.attempts+' missed</span></div>';
+                '<span class="v">'+st.misses+'/'+st.attempts+' missed</span>'+
+                (function(){var cal=skillCalibration(st);return cal?'<span class="cal-chip '+cal.band+'" title="'+esc(cal.title)+'">'+cal.label+'</span>':'';})()+
+                '</div>';
             });
           } else {
             html+='<div class="muted-note">No attempts logged yet.</div>';

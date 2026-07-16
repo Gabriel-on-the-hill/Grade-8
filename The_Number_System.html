@@ -741,25 +741,31 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
   // a visit with >=3 of them advances the streak one rung (>=80% first-attempt) or resets
   // it to 0, at most once per calendar day (later same-day visits don't move it). The hub
   // reads t.reviewStreak when present, else falls back to the phase-1 inferred proxy.
-  var _revFirst=0,_revCorrect=0,_revCommitted=false,_revBase=0;
+  var _revFirst=0,_revCorrect=0,_revCommitted=false,_revBase=0,_revWasDue=false;
+  var REVIEW_RUNGS=[1,3,7,21,42];
+  function g7streakOf(t){return (typeof t.reviewStreak==='number')?t.reviewStreak:g7revProxy(t);}
+  function g7wasDue(t){var last=(t&&t.lastPracticed)||0;if(!last||((t&&t.attempts)||0)<=0)return false;return Date.now()>=last+REVIEW_RUNGS[g7streakOf(t)]*86400000;}
   function g7revProxy(t){var a=(t&&t.attempts)||0,c=(t&&t.correct)||0;if(a<=0)return 0;var acc=c/a;var base=acc>=0.95?4:acc>=0.85?3:acc>=0.70?2:acc>=0.50?1:0;var cap=a>=12?4:a>=8?3:a>=4?2:a>=2?1:0;var s=Math.min(base,cap);var st=(t&&t.skillStats)||{},sh=false;Object.keys(st).forEach(function(k){var m=st[k].misses||0;if(m>=2&&m/Math.max(st[k].attempts||0,1)>=0.25)sh=true;});return sh?Math.max(0,s-1):s;}
-  // Snapshot the pre-session streak at load, so the current visit's own answers don't inflate the base.
-  function g7reviewInit(){try{if(!g7current())return;var o=g7all(),t=g7topic(o);_revBase=(typeof t.reviewStreak==='number')?t.reviewStreak:g7revProxy(t);}catch(e){}}
+  // Snapshot the pre-session streak AND whether the topic was due, at load, before this visit's answers.
+  function g7reviewInit(){try{if(!g7current())return;var o=g7all(),t=g7topic(o);_revBase=(typeof t.reviewStreak==='number')?t.reviewStreak:g7revProxy(t);_revWasDue=g7wasDue(t);}catch(e){}}
   window.addEventListener('load',g7reviewInit);
   function g7review(first,correct){
     if(!first)return;                                  // only first attempts test retrieval
     _revFirst++;if(correct)_revCorrect++;
-    if(_revFirst<3)return;                              // need enough evidence to judge a session
     var o=g7all(),t=g7topic(o);
+    // AN-4: bucket this first-attempt as retention (topic was due at session start) or acquisition
+    if(_revWasDue){t.retFirst=(t.retFirst||0)+1;if(correct)t.retCorrect=(t.retCorrect||0)+1;}
+    else{t.acqFirst=(t.acqFirst||0)+1;if(correct)t.acqCorrect=(t.acqCorrect||0)+1;}
     var today=Math.floor(Date.now()/86400000);
-    if(!_revCommitted&&t.reviewDay===today)return;     // a prior visit already logged today's session
-    _revCommitted=true;
-    var pass=(_revCorrect/_revFirst)>=0.8;
-    t.reviewStreak=pass?Math.min(4,_revBase+1):0;      // <=1 rung/day, capped at the top rung
-    t.reviewDay=today;
+    if(_revFirst>=3 && !(!_revCommitted&&t.reviewDay===today)){  // >=3 evidence; at most one rung/day
+      _revCommitted=true;
+      var pass=(_revCorrect/_revFirst)>=0.8;
+      t.reviewStreak=pass?Math.min(4,_revBase+1):0;
+      t.reviewDay=today;
+    }
     g7save(o);schedulePush();
   }
-  window.__modReview={review:g7review,proxy:g7revProxy,init:g7reviewInit};
+  window.__modReview={review:g7review,proxy:g7revProxy,init:g7reviewInit,wasDue:g7wasDue};
 
   /* ===== v1.5 cloud sync (offline-first; shared multi-hub backend) ===== */
   function syncPush(kind,name,sub,payload){var u=localStorage.getItem('g7.sheetURL');if(!u)return;try{fetch(u,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({op:'put',hub:G7_SYNC_HUB||'default',kind:kind,name:name,sub:sub||'',payload:payload,ts:Date.now()})}).catch(function(){});}catch(e){}}

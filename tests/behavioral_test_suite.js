@@ -163,6 +163,40 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
   w.__modReview.review(true,true);w.__modReview.review(true,true);w.__modReview.review(true,true);
   ok(rec(w).reviewStreak===3,'review(engine): a second session the same day does not advance the streak');
 }
+// ===== AN-4: acquisition vs retention buckets (engine) =====
+{ const DAY=86400000, now=Date.now(), today=Math.floor(now/DAY);
+  const fresh={students:{Divine:{topics:{'number-system':{title:'NS',tree:{},totalSteps:31,sectionTotals:{},lastPracticed:now,attempts:0,correct:0,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[]}},assignments:{}}}};
+  const aged={students:{Divine:{topics:{'number-system':{title:'NS',tree:{},totalSteps:31,sectionTotals:{},lastPracticed:now-50*DAY,attempts:20,correct:19,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[],reviewStreak:4,reviewDay:today-50}},assignments:{}}}};
+  const rec=w=>JSON.parse(w.localStorage.getItem('g7.data')).students.Divine.topics['number-system'];
+  let w=load(NS,{'g7.current':'Divine','g7.data':JSON.stringify(fresh)}).window;
+  ok(w.__modReview.wasDue({lastPracticed:now,attempts:0})===false,'AN-4: an unstarted/just-practiced topic is not due (acquisition)');
+  w.__modReview.review(true,true);w.__modReview.review(true,false);
+  ok(rec(w).acqFirst===2&&rec(w).acqCorrect===1&&rec(w).retFirst===undefined,'AN-4: first-attempts on a not-due topic bucket as acquisition');
+  w=load(NS,{'g7.current':'Divine','g7.data':JSON.stringify(aged)}).window;
+  ok(w.__modReview.wasDue({reviewStreak:4,lastPracticed:now-50*DAY,attempts:20})===true,'AN-4: an aged topic past its 42d rung is due (retention)');
+  w.__modReview.review(true,true);w.__modReview.review(true,true);
+  ok(rec(w).retFirst===2&&rec(w).retCorrect===2&&rec(w).acqFirst===undefined,'AN-4: first-attempts on a due topic bucket as retention');
+}
+// ===== AN-4: teacher dashboard shows acquisition vs retention =====
+{ const data={students:{Divine:{topics:{'number-system':{title:'The Number System',tree:{},totalSteps:31,sectionTotals:{},lastPracticed:Date.now(),attempts:10,correct:8,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[],acqFirst:20,acqCorrect:17,retFirst:10,retCorrect:6}},assignments:{}}}};
+  const w=load(HUB,{'g7.roster':JSON.stringify(['Divine']),'g7.pins':JSON.stringify({Divine:'1'}),'g7.current':'Divine','g7.data':JSON.stringify(data)}).window,d=w.document;
+  d.getElementById('tb-teacher').click();d.getElementById('tm-pass').value='gabe';d.getElementById('tm-go').click();
+  const dash=d.getElementById('dash');
+  ok(dash.textContent.includes('Retrieval'),'AN-4: dashboard shows the retrieval readout');
+  ok(dash.textContent.includes('first-time')&&dash.textContent.includes('85%'),'AN-4: acquisition accuracy shown (17/20 = 85%)');
+  ok(dash.textContent.includes('on review')&&dash.textContent.includes('60%'),'AN-4: retention accuracy shown (6/10 = 60%)');
+  ok(!!dash.querySelector('.retain-line b.warn'),'AN-4: retention well below acquisition is flagged for the teacher');
+}
+// ===== AS-4: per-skill difficulty calibration on the teacher dashboard =====
+{ const data={students:{Divine:{topics:{'number-system':{title:'The Number System',tree:{},totalSteps:31,sectionTotals:{},lastPracticed:Date.now(),attempts:30,correct:23,struggles:[],skillStats:{easy1:{attempts:10,misses:0},hard1:{attempts:10,misses:5},sweet1:{attempts:10,misses:2},few:{attempts:2,misses:0}},exam:{attempts:0,correct:0},responses:[]}},assignments:{}}}};
+  const w=load(HUB,{'g7.roster':JSON.stringify(['Divine']),'g7.pins':JSON.stringify({Divine:'1'}),'g7.current':'Divine','g7.data':JSON.stringify(data)}).window,d=w.document;
+  d.getElementById('tb-teacher').click();d.getElementById('tm-pass').value='gabe';d.getElementById('tm-go').click();
+  const dash=d.getElementById('dash');
+  ok(dash.querySelectorAll('.cal-chip').length===3,'AS-4: only skills with enough evidence (>=4 attempts) are calibrated');
+  ok(dash.querySelector('.cal-chip.easy')&&dash.querySelector('.cal-chip.easy').textContent==='too easy','AS-4: >90% first-attempt flagged too easy (advance)');
+  ok(dash.querySelector('.cal-chip.hard')&&dash.querySelector('.cal-chip.hard').textContent==='too hard','AS-4: <70% first-attempt flagged too hard (re-teach)');
+  ok(dash.querySelector('.cal-chip.sweet')&&dash.querySelector('.cal-chip.sweet').textContent==='on target','AS-4: ~85% band flagged on target');
+}
 // ===== MODULES: source integrity =====
 { for(const f of [NS,EE]){
     const h=src(f);

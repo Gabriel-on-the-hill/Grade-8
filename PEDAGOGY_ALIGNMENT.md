@@ -28,7 +28,7 @@ families, missing the retention layer entirely.
 | Mastery & sequencing | ● solid | no advanced concept before its prerequisite |
 | Assessment & feedback | ● solid | active check-and-feedback; hints never give the answer |
 | Motivation & UX | ◐ partial | honest mastery bars; anti-cheat; no gamification |
-| Adaptive & analytics | ◐ partial | per-topic tracking; no adaptive dose or calibration |
+| Adaptive & analytics | ◐ partial | per-topic tracking + acquisition-vs-retention readout (`AN-4` ✅) + per-skill ~85% calibration band (`AS-4` diagnostic ✅); auto difficulty-selection still needs difficulty-tagged item pools |
 
 ---
 
@@ -63,10 +63,24 @@ The three build items are shared-engine work and live in
      hub/modules are behind Grade 8's engine** (no `__hubSync`/v1.5 cloud-sync layer), so the G7 module
      block omits `schedulePush`; the spaced-review layer itself is now at parity.
    - **Phase-3 (open, optional):** per-*skill* streaks and an in-module `?review=<skill>` retrieval mode.
-3. **~85% difficulty calibration — `AS-4`.** Bias Practice selection toward the sweet spot per
-   student, within the author's difficulty range.
-4. **Durable-learning readout — `AN-4`.** Retention = accuracy on due-review attempts, shown against
-   acquisition accuracy on the teacher dashboard.
+3. **~85% difficulty calibration — `AS-4`. ◑ diagnostic shipped (16 Jul 2026); auto-selection blocked on content.**
+   *Finding:* the modules have **no difficulty metadata and no draw-from-pool Practice** — each is a
+   fixed run of unique qcards shown top-to-bottom, ~1 Practice item per skill. So literal "bias item
+   selection within the author's difficulty range" **cannot be built without content authoring**
+   (tagging item difficulty + adding several varied-difficulty items per skill) — an author decision,
+   not something to fabricate. *Shipped instead:* a per-skill **calibration band** on the teacher
+   dashboard from stored first-attempt accuracy — **>90% "too easy → advance", <70% "too hard →
+   re-teach", else "on target (~85%)"** (min 4 attempts) — the actionable lever for the teacher to
+   raise/lower difficulty by hand. Hub-only, no engine/contract change; 4 assertions each grade.
+   **Still open (needs content):** difficulty-tagged item pools + an engine that auto-serves toward the
+   sweet spot. Raise with the author before building.
+4. **Durable-learning readout — `AN-4`. ✅ shipped in both grades (16 Jul 2026).** The engine buckets
+   every **first-attempt** by whether the topic was **due for review when the session started**
+   (`_revWasDue`, snapshotted at load): due → **retention**, not-due → **acquisition** (four additive
+   fields `acqFirst/acqCorrect/retFirst/retCorrect`, ride the topic-record sync). The teacher dashboard
+   shows a **"Retrieval — first-time X% (a/b) · on review Y% (c/d)"** line per topic, with retention
+   flagged red when it falls >15 pts below acquisition — the "forgot vs never learned" signal parents'
+   reports assert. Read-only to students (teacher-gated). 8 assertions each grade (**139 / 103 pass**).
 
 **Guardrails specific to Grade 8:** the `g7.` prefix is shared back-compat — do not rename it here.
 This repo is **public and publishes markdown**, and it has **no student folder gitignored yet**
