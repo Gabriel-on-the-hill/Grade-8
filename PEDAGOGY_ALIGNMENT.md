@@ -16,15 +16,17 @@ evaluation is the "app-pedagogy-eval" artifact.
 
 ---
 
-## Where this hub stands (15 Jul 2026)
+## Where this hub stands (16 Jul 2026)
 
 Same engine, same standard, same verdict as Grade 7: the best lesson *structure* of the three
-families, missing the retention layer entirely.
+families — and, as of 16 Jul 2026, **with the retention layer it was missing**, inherited from the
+Grade 7 engine and confirmed here. Items 1–4 below are shipped. **The one remaining category is
+Motivation & UX (◐) — a real handbook gap, not a deliberate exclusion** (see the note below).
 
 | Category | Status | |
 |---|---|---|
 | Cognitive load | ● solid | Learn→Guided→Practice→Apply→Exam; strategy-only hints |
-| **Memory & retention** | ● **solid** | **spaced review shipped in both hubs — "Due for review" ladder + engine-written consecutive-session streak (phase-1 + phase-2)** |
+| **Memory & retention** | ● **solid** | **spaced review shipped in full in both hubs — "Due for review" ladder + engine-written per-topic *and* per-skill streaks + in-module `?review=<skill>` retrieval mode (phase-1 + phase-2 + phase-3)** |
 | Mastery & sequencing | ● solid | no advanced concept before its prerequisite |
 | Assessment & feedback | ● solid | active check-and-feedback; hints never give the answer |
 | Motivation & UX | ◐ partial | honest mastery bars; anti-cheat; no gamification |
@@ -43,7 +45,7 @@ The three build items are shared-engine work and live in
    the embedded engine via `runScripts:'dangerously'`, so it genuinely needs a DOM. Fixed by pinning
    `jsdom` as a dev-only dependency (`package.json`; `node_modules/` already gitignored) rather than by
    copying the localStorage-shim bootstrap, which does not fit a DOM-driven suite.
-2. **Spaced review — `MR-1`. ✅ shipped in full (phase-1 + phase-2) in both grades (16 Jul 2026).**
+2. **Spaced review — `MR-1`. ✅ shipped in full (phase-1 + phase-2 + phase-3) in both grades (16 Jul 2026).**
    A mastered topic was never brought back; `lastPracticed` was recorded and unused. Now:
    - **Phase-1 (hub surface).** `Grade_8_Math_Hub.html` renders a **"Due for review"** surface in
      `renderApp()`: ladder `due = lastPracticed + rung(streak)`, rungs `1 → 3 → 7 → 21 → 42` days,
@@ -60,9 +62,25 @@ The three build items are shared-engine work and live in
    - **Both grades.** Built in Grade 8 and ported to Grade 7 ("change both, check both"): 4 G8 engine
      files + 3 G7 engine files + both hubs + both suites. Guarded by 26 review assertions in G8
      (**131 passed**) and 26 in G7 (**95 passed**). Note the drift confirmed while porting: **Grade 7's
-     hub/modules are behind Grade 8's engine** (no `__hubSync`/v1.5 cloud-sync layer), so the G7 module
-     block omits `schedulePush`; the spaced-review layer itself is now at parity.
-   - **Phase-3 (open, optional):** per-*skill* streaks and an in-module `?review=<skill>` retrieval mode.
+     hub/modules were behind Grade 8's engine** (no `__hubSync`/v1.5 cloud-sync layer), so the G7 module
+     block omitted `schedulePush`. **That drift is now closed (16 Jul 2026):** the v1.5 layer was ported
+     back to Grade 7 — same merge rules, same LWW-on-`lastPracticed`, same auth — so the two grades are
+     one engine again. Grade 7 files its rows under `hub='grade7'` on the same shared deployment.
+   - **Phase-3 (✅ shipped, and it was load-bearing — not the optional polish this file had it filed as).**
+     `restoreProgress()` re-fills a completed item with its own correct answer and pre-marks the right MC
+     option — right for "review your work", but it meant the new **"Due for review" button opened an answer
+     key**. Verified on a real record before building: a topic finished 60 days ago re-opened with inputs
+     pre-filled and correct options marked. Phase-3 fixes it: `skillStats[k]` gains additive
+     `last`/`streak`/`day` so a **single skill** can come due inside a solid topic (same rungs, ≥2
+     first-attempt items per skill, same one-rung-per-day guard, reset on a miss; legacy records have no
+     `last`, so nothing is falsely due — zero migration). `?review=<skill>` opens up to **4 of that skill's
+     already-authored Target/Exam cards** — *no new content* — **cleared for a genuine attempt**, with the
+     rest of the lesson hidden. Cards are **moved, not removed** (step totals stay honest), the tree is
+     **never written** (mastery bar stays monotonic), and the re-attempt lands in the `AN-4` **retention**
+     bucket. Unknown skill → normal lesson. The hub's due row now names the faded skill and links to
+     `<module>?review=<skill>`. Built in Grade 7 and ported here by extracting the canonical blocks from
+     `Module_Template.html`, so the stamped copies cannot drift. **G8 187 assertions pass (+27), G7 162
+     (+39)**, mutation-checked. Guarded invariant: **a due revisit must never show its own answers.**
 3. **Difficulty calibration — `AS-4`. ✅ shipped as automatic level accounting (16 Jul 2026).**
    *Correction to an earlier finding in this file:* the modules **do** carry a difficulty ladder — every
    card is tagged `learn · guided · practice · apply · exam · stretch`, and a `stretch` tier was already
@@ -111,8 +129,26 @@ Identical to Grade 7 — every new unit or feature must clear it:
 - [ ] **Student data gitignored before commit**, tutor-facing `LEDGER.md` only (root rule 6).
 - [ ] **A test guards it** — keep the suite green.
 
-## Definition of 100% aligned
+## Definition of 100% aligned — ✅ met (16 Jul 2026)
 
-The Grade 7 engine items shipped and **verified as inherited here** (spaced review surfacing Grade 8
-topics; tests green), calibration and the retention readout landed. At that point Memory & retention
-moves ○ → ● for both hubs together.
+The Grade 7 engine items shipped and **verified as inherited here** — spaced review in all three phases
+surfacing Grade 8 topics, per-skill ladder and `?review=<skill>` retrieval mode confirmed against
+`The_Number_System.html`, calibration and the retention readout landed, **187 assertions green**. Memory
+& retention has moved ○ → ● for both hubs together.
+
+**Motivation & UX (◐) is the last category short of ● — and it is an open gap, not a choice.**
+*Correction to an earlier reading of this file:* "no gamification" was previously read as a virtue. It
+isn't. Nothing in the house rules forbids it, and the handbook calls for it — `MO-2` (gamify, aligned and
+hack-resistant), `MO-1`, `MO-3` (XP ≈ productive minutes), `MO-4`, `MO-6` (habit). Two constraints hold
+in both grades: `MO-7` (*progress ≠ points*) is **already honored** and must stay — the mastery bar is
+monotonic share-of-topics, so any XP must be a **separate effort currency**; and `MO-5` (close loopholes)
+matters here because vanity metrics unmoored from learning **corrupt `M1`**. The retrieval-earned
+`reviewStreak` is the natural `MO-5`-safe foundation. It is a design decision — **raise it before
+building it.** The full item lives in [`../Grade 7/PEDAGOGY_ALIGNMENT.md`](../Grade%207/PEDAGOGY_ALIGNMENT.md) item 4.
+
+**What is deliberately not built** (the only such item): machine auto-serving of easier work / skipping
+drill — forbidden by the house rule (see item 3). Don't add to this list without a house rule to cite.
+
+**Still open here, and it is not an engine item:** this repo is public, publishes markdown, and has **no
+student folder gitignored yet** (Grade 7 ignores `Fareedah/`). The moment a student folder or `LEDGER.md`
+lands, it must be gitignored *before* the first commit (root rule 6).

@@ -12,8 +12,8 @@ const DIR=(process.argv[2]||'.').replace(/\/?$/,'/');
 let pass=0,fail=0;const ok=(c,m)=>{c?pass++:(fail++,console.log('  FAIL:',m));};
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const src=f=>fs.readFileSync(path.join(DIR,f),'utf8');
-function load(file,seed,rnd){
-  const dom=new JSDOM(src(file),{runScripts:'dangerously',url:'https://x.test/'+file,
+function load(file,seed,rnd,qs){   // qs: query string, e.g. '?review=roots' (MR-1 phase-3)
+  const dom=new JSDOM(src(file),{runScripts:'dangerously',url:'https://x.test/'+file+(qs||''),
     beforeParse(w){const store=Object.assign({'g8.gate':'ok'},seed||{});
       w.localStorage.clear();Object.keys(store).forEach(k=>w.localStorage.setItem(k,store[k]));
       if(rnd)w.Math.random=rnd;
@@ -415,6 +415,76 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
   c54.querySelector('.cr-area').value='In an open cup the carbon dioxide gas escaped into the air.';
   c54.querySelector('.cr-save').click();
   ok(mtopic().responses.some(r=>r.qid==='5-4'),'matter: constructed response saved for teacher review');
+}
+// ===== MR-1 phase-3: per-skill ladder + in-module retrieval mode (?review=<skill>) =====
+// Inherited from Grade 7 (the parent engine). Confirmed here per AGENTS.md: "change both, check both."
+{
+  const DAY=86400000, now=Date.now();
+  const R=load(HUB).window.__hubReview;
+  ok(typeof R.skillStreak==='function'&&typeof R.dueSkills==='function','p3: hub inherits the per-skill ladder');
+  ok(R.skillStreak({streak:3})===3,'p3: engine-written skill streak wins over the proxy');
+  ok(R.skillStreak({attempts:8,misses:1})===3,'p3: legacy skill falls back to the inferred proxy');
+  ok(R.skillDue({attempts:5,misses:0})===null,'p3: a skill with no timestamp is never due (legacy-safe)');
+  ok(R.skillDue({attempts:5,misses:1,streak:2,last:now-8*DAY},now).dueNow===true,'p3: skill past its 7d rung is due');
+  ok(R.skillDue({attempts:5,misses:1,streak:2,last:now-3*DAY},now).dueNow===false,'p3: skill inside its rung is not due');
+  const topic={lastPracticed:now-40*DAY,attempts:20,correct:19,reviewStreak:1,skillStats:{
+    roots:{attempts:6,misses:0,streak:0,last:now-30*DAY},
+    irrational:{attempts:6,misses:0,streak:4,last:now-45*DAY},
+    estimate:{attempts:6,misses:0,streak:2,last:now-1*DAY}}};
+  const ds=R.dueSkills(topic,now);
+  ok(ds.length===2&&ds[0].skill==='roots','p3: due skills are most-overdue first');
+  ok(!ds.some(x=>x.skill==='estimate'),'p3: a skill inside its rung is not listed');
+  const legacy={lastPracticed:now-60*DAY,attempts:20,correct:19,skillStats:{roots:{attempts:6,misses:0}}};
+  ok(R.list({t:legacy},['t'],now)[0].skill==='','p3: legacy topic still lists, with no skill -> opens the full lesson');
+  ok(R.list({t:topic},['t'],now)[0].skill==='roots','p3: due row carries its sharpest-faded skill');
+
+  const ago=now-60*DAY;
+  const S={'g7.current':'Divine','g7.data':JSON.stringify({students:{Divine:{topics:{
+    'number-system':{title:'T',tree:{'4-1':{steps:{0:true}},'1-1':{steps:{0:true}}},totalSteps:31,sectionTotals:{},
+      lastPracticed:ago,attempts:20,correct:19,struggles:[],
+      skillStats:{roots:{attempts:6,misses:0,last:ago},'rational-decimal':{attempts:8,misses:1,last:ago}},
+      exam:{attempts:0,correct:0},responses:[]}}}}})};
+  const norm=load('The_Number_System.html',S).window.document;
+  const dom=load('The_Number_System.html',S,null,'?review=roots');
+  const d=dom.window.document, panel=d.getElementById('g7-review-panel');
+  ok(d.body.classList.contains('g7-review-mode'),'p3: ?review=<skill> enters review mode');
+  ok(!!panel,'p3: review panel is rendered');
+  const cards=[...panel.querySelectorAll('.qcard[data-qid]')];
+  ok(cards.length>0&&cards.length<=4,'p3: review draws a short set (<=4) from the authored pool');
+  ok(cards.every(c=>['4-1','4-2','4-3','4-4','7-3'].includes(c.dataset.qid)),'p3: review set is only the due skill');
+  ok([...panel.querySelectorAll('.ans-input')].filter(i=>i.value.trim()!=='').length===0,
+     'p3: review mode never pre-fills an answer');
+  ok(panel.querySelectorAll('.step.completed').length===0,'p3: review items are cleared for a real attempt');
+  ok(panel.querySelectorAll('.mc-option.correct').length===0,'p3: review mode never marks the correct MC option up front');
+  ok(d.querySelectorAll('.qcard .step').length===norm.querySelectorAll('.qcard .step').length,
+     'p3: cards are moved, never removed — step totals stay honest');
+  ok(panel.querySelector('.rev-done a').getAttribute('href')==='Grade_8_Math_Hub.html','p3: review panel links back to the G8 hub');
+  ok(!load('The_Number_System.html',S,null,'?review=nonsense').window.document.body.classList.contains('g7-review-mode'),
+     'p3: an unknown skill falls back to the normal lesson');
+  ok(!load('The_Number_System.html',S).window.document.body.classList.contains('g7-review-mode'),
+     'p3: no ?review param leaves the lesson untouched');
+  const rec=()=>JSON.parse(dom.window.localStorage.getItem('g7.data')).students.Divine.topics['number-system'];
+  const t0=rec();
+  dom.window.__modReview.review(true,true,'4-1');
+  dom.window.__modReview.review(true,true,'4-2');
+  const t1=rec();
+  ok(t1.retFirst===2&&t1.retCorrect===2,'p3: a review attempt lands in the AN-4 retention bucket');
+  ok(!t1.acqFirst,'p3: a review attempt is not counted as new acquisition');
+  ok(Object.keys(t1.tree).length===Object.keys(t0.tree).length,'p3: review never rewinds the stored mastery tree');
+  ok(t1.skillStats.roots.streak===3,'p3: two clean first attempts advance the skill one rung (proxy base 2 -> 3)');
+  const dm=load('The_Number_System.html',S,null,'?review=roots');
+  dm.window.__modReview.review(true,true,'4-1');dm.window.__modReview.review(true,false,'4-2');
+  ok(JSON.parse(dm.window.localStorage.getItem('g7.data')).students.Divine.topics['number-system']
+     .skillStats.roots.streak===0,'p3: a missed review resets the skill to the bottom rung');
+  const today=Math.floor(now/DAY);
+  const Sd={'g7.current':'Divine','g7.data':JSON.stringify({students:{Divine:{topics:{
+    'number-system':{title:'T',tree:{},totalSteps:31,sectionTotals:{},lastPracticed:ago,attempts:20,correct:19,
+      struggles:[],skillStats:{roots:{attempts:6,misses:0,last:ago,streak:1,day:today}},
+      exam:{attempts:0,correct:0},responses:[]}}}}})};
+  const dd=load('The_Number_System.html',Sd,null,'?review=roots');
+  dd.window.__modReview.review(true,true,'4-1');dd.window.__modReview.review(true,true,'4-2');
+  ok(JSON.parse(dd.window.localStorage.getItem('g7.data')).students.Divine.topics['number-system']
+     .skillStats.roots.streak===1,'p3: a skill climbs at most one rung per calendar day');
 }
 console.log('\n'+pass+' passed, '+fail+' failed');process.exit(fail?1:0);
 })();

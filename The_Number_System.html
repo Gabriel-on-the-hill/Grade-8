@@ -108,6 +108,16 @@ table.gtable th{background:var(--pitch-green);color:#fff;font-weight:600} table.
 .sec-row.full .bar>span{background:var(--ok)}
 footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;border-top:1px solid var(--border);margin-top:3rem}
 @media(max-width:640px){main{padding:1rem .75rem 3rem}.qcard,.tcard,.challenge,.guide{padding:.85rem}.qtitle{margin-left:0;width:100%;font-size:.93rem}header.mod h1{font-size:1.25rem}}
+/* MR-1 phase-3: retrieval-practice review mode (?review=<skill>) — the due skill's own
+   authored items, cleared for a fresh attempt. Everything else is hidden so the session is
+   a retrieval, not a re-read; nothing is removed from the DOM, so the step totals stay honest. */
+.g7-review-mode section.topic,.g7-review-mode .overall-progress,.g7-review-mode #sec-report,.g7-review-mode .toc{display:none}
+.rev-panel{background:#fff;border:1px solid var(--border);border-left:4px solid var(--gold);border-radius:10px;padding:1rem 1.1rem;margin-bottom:1.2rem}
+.rev-panel h2{margin:0 0 .35rem;font-size:1.15rem;color:var(--pitch-green)}
+.rev-sub{margin:0 0 1rem;font-size:.88rem;color:var(--muted);line-height:1.5}
+.rev-done{margin-top:1rem;display:flex;gap:.6rem;flex-wrap:wrap}
+.rev-done .btn{display:inline-block;background:var(--pitch-green);color:#fff;border:none;border-radius:8px;padding:.55rem 1rem;font-size:.88rem;font-weight:600;text-decoration:none;cursor:pointer}
+.rev-done .btn.ghost{background:transparent;color:var(--navy);border:1px solid var(--border)}
 </style>
 </head>
 <body>
@@ -746,7 +756,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     if(/(^|\s)(learn|guided)(\s|$)/.test(cls))return 1;             // 1 = foundational (supported)
     return 2;                                                       // 2 = target (independent, grade level)
   }
-  function g7log(qid,wrong,label,your,exam){var o=g7all();var t=g7topic(o);var sk=G7_SKILLS[qid]||'reasoning';t.skillStats[sk]=t.skillStats[sk]||{attempts:0,misses:0};t.skillStats[sk].attempts++;t.attempts=(t.attempts||0)+1;if(wrong){t.skillStats[sk].misses++;t.struggles.push({qid:qid,label:(label||qid).trim(),skill:sk,skillLabel:G7_SKILL_LABELS[sk],your:your||'',ts:Date.now()});if(t.struggles.length>120)t.struggles=t.struggles.slice(-120);}else{t.correct=(t.correct||0)+1;}if(exam){t.exam=t.exam||{attempts:0,correct:0};t.exam.attempts++;if(!wrong)t.exam.correct++;}var _lv=g7level(qid);t.levelStats=t.levelStats||{};t.levelStats[_lv]=t.levelStats[_lv]||{attempts:0,misses:0};t.levelStats[_lv].attempts++;if(wrong)t.levelStats[_lv].misses++;t.lastPracticed=Date.now();g7save(o);g7sheet(wrong?'struggle':'step_complete',(label||qid).trim(),wrong?('typed "'+(your||'')+'"'):'');schedulePush();}
+  function g7log(qid,wrong,label,your,exam){var o=g7all();var t=g7topic(o);var sk=G7_SKILLS[qid]||'reasoning';t.skillStats[sk]=t.skillStats[sk]||{attempts:0,misses:0};t.skillStats[sk].attempts++;t.skillStats[sk].last=Date.now();t.attempts=(t.attempts||0)+1;if(wrong){t.skillStats[sk].misses++;t.struggles.push({qid:qid,label:(label||qid).trim(),skill:sk,skillLabel:G7_SKILL_LABELS[sk],your:your||'',ts:Date.now()});if(t.struggles.length>120)t.struggles=t.struggles.slice(-120);}else{t.correct=(t.correct||0)+1;}if(exam){t.exam=t.exam||{attempts:0,correct:0};t.exam.attempts++;if(!wrong)t.exam.correct++;}var _lv=g7level(qid);t.levelStats=t.levelStats||{};t.levelStats[_lv]=t.levelStats[_lv]||{attempts:0,misses:0};t.levelStats[_lv].attempts++;if(wrong)t.levelStats[_lv].misses++;t.lastPracticed=Date.now();g7save(o);g7sheet(wrong?'struggle':'step_complete',(label||qid).trim(),wrong?('typed "'+(your||'')+'"'):'');schedulePush();}
 
   /* ===== spaced review (MR-1) phase-2: stored consecutive-session streak ===== */
   // A "review session" = one module visit. We count only FIRST-attempt graded items;
@@ -754,6 +764,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
   // it to 0, at most once per calendar day (later same-day visits don't move it). The hub
   // reads t.reviewStreak when present, else falls back to the phase-1 inferred proxy.
   var _revFirst=0,_revCorrect=0,_revCommitted=false,_revBase=0,_revWasDue=false;
+  var _revSkill={};   // phase-3: per-skill session tally, keyed by skill
   var REVIEW_RUNGS=[1,3,7,21,42];
   function g7streakOf(t){return (typeof t.reviewStreak==='number')?t.reviewStreak:g7revProxy(t);}
   function g7wasDue(t){var last=(t&&t.lastPracticed)||0;if(!last||((t&&t.attempts)||0)<=0)return false;return Date.now()>=last+REVIEW_RUNGS[g7streakOf(t)]*86400000;}
@@ -761,7 +772,19 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
   // Snapshot the pre-session streak AND whether the topic was due, at load, before this visit's answers.
   function g7reviewInit(){try{if(!g7current())return;var o=g7all(),t=g7topic(o);_revBase=(typeof t.reviewStreak==='number')?t.reviewStreak:g7revProxy(t);_revWasDue=g7wasDue(t);}catch(e){}}
   window.addEventListener('load',g7reviewInit);
-  function g7review(first,correct){
+  // phase-3: the same ladder, one level down — per *skill*, so a topic that is solid overall can
+  // still bring back the one skill inside it that is fading. Same shape as the topic proxy, read
+  // off skillStats; a skill needs only >=2 first-attempt items in a session (a module authors far
+  // fewer items per skill than per topic), still at most one rung per calendar day.
+  function g7skillProxy(t,sk){
+    var s=(t&&t.skillStats&&t.skillStats[sk])||null,a=(s&&s.attempts)||0;
+    if(a<=0)return 0;
+    var acc=(a-((s&&s.misses)||0))/a;
+    var base=acc>=0.95?4:acc>=0.85?3:acc>=0.70?2:acc>=0.50?1:0;
+    var cap=a>=12?4:a>=8?3:a>=4?2:a>=2?1:0;
+    return Math.min(base,cap);
+  }
+  function g7review(first,correct,qid){
     if(!first)return;                                  // only first attempts test retrieval
     _revFirst++;if(correct)_revCorrect++;
     var o=g7all(),t=g7topic(o);
@@ -775,9 +798,26 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
       t.reviewStreak=pass?Math.min(4,_revBase+1):0;
       t.reviewDay=today;
     }
-    g7save(o);schedulePush();
+    if(qid){
+      var sk=G7_SKILLS[qid]||'reasoning';
+      var ss=t.skillStats[sk]=t.skillStats[sk]||{attempts:0,misses:0};
+      // base is snapshotted the first time this skill is seen this session — before any write below
+      var S=_revSkill[sk]=_revSkill[sk]||{first:0,correct:0,committed:false,
+        base:(typeof ss.streak==='number')?ss.streak:g7skillProxy(t,sk)};
+      S.first++;if(correct)S.correct++;
+      if(S.first>=2 && !(!S.committed && ss.day===today)){
+        S.committed=true;
+        ss.streak=(S.correct/S.first)>=0.8?Math.min(4,S.base+1):0;
+        ss.day=today;
+      }
+    }
+    g7save(o);
+    // v1.5: the streak and the acquisition/retention buckets are part of the topic record, so they
+    // must reach the cloud like any other write. Guarded because not every stamped copy carries the
+    // sync layer (the Starter_Kit template does not) — there it is simply a no-op.
+    if(typeof schedulePush==='function')schedulePush();
   }
-  window.__modReview={review:g7review,proxy:g7revProxy,init:g7reviewInit,wasDue:g7wasDue};
+  window.__modReview={review:g7review,proxy:g7revProxy,init:g7reviewInit,wasDue:g7wasDue,skillProxy:g7skillProxy};
 
   /* ===== v1.5 cloud sync (offline-first; shared multi-hub backend) ===== */
   /* The /exec URL is public, so it grants nothing alone: a student authenticates with their
@@ -832,7 +872,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
       var fiFirst=!step.dataset.att;step.dataset.att='1';
       if(all){step.classList.add('completed');e.target.classList.add('done');e.target.textContent='Step complete';unlockNext(step);if(card)saveStepDone(card,step);if(!step.dataset.logged){g7log(qid,false,lbl,'',exam&&fiFirst);step.dataset.logged='1';}}
       else{var your=Array.prototype.slice.call(inputs).map(function(i){return i.value;}).filter(function(v){return v!=='';}).join(', ');g7log(qid,true,lbl,your,exam&&fiFirst);}
-      g7review(fiFirst,all);
+      g7review(fiFirst,all,qid);
     }
     if(e.target.closest('.mc-option')){
       var opt=e.target.closest('.mc-option');var group=opt.closest('.mc-group');if(!group||group.classList.contains('answered')||opt.classList.contains('disabled'))return;
@@ -840,7 +880,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
       var fb=group.parentElement.querySelector('.mc-feedback');if(fb&&fb.dataset.exp===undefined)fb.dataset.exp=fb.textContent||'';
       var mcStep=group.closest('.step');var mcCard=group.closest('.qcard');var mcQid=mcCard?mcCard.dataset.qid:'';var mcLbl=mcStep?((mcStep.querySelector('.step-label')||{}).textContent||''):'';var mcExam=mcCard&&mcCard.dataset.exam==='1';
       var mcFirst=mcStep&&!mcStep.dataset.att;if(mcStep)mcStep.dataset.att='1';
-      g7log(mcQid,!correct,mcLbl,(opt.textContent||'').trim(),mcExam&&mcFirst);g7review(mcFirst,correct);
+      g7log(mcQid,!correct,mcLbl,(opt.textContent||'').trim(),mcExam&&mcFirst);g7review(mcFirst,correct,mcQid);
       if(correct){
         group.classList.add('answered');group.querySelectorAll('.mc-option').forEach(function(b){b.classList.add('disabled');});opt.classList.add('correct');
         if(fb){fb.textContent='✓ Correct! '+(fb.dataset.exp||'');fb.classList.remove('wrong');fb.classList.add('correct');}
@@ -863,7 +903,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
       var msFirst=!st.dataset.att;st.dataset.att='1';
       if(ok){grp.classList.add('answered');opts.forEach(function(o){o.classList.add('disabled');if(optCorrect(o))o.classList.add('correct');});st.classList.add('completed');e.target.classList.add('done');e.target.textContent='Correct';unlockNext(st);if(card2)saveStepDone(card2,st);if(!st.dataset.logged){g7log(qid2,false,lbl2,'',exam2&&msFirst);st.dataset.logged='1';}}
       else{var your2=opts.filter(function(o){return o.classList.contains('sel');}).map(function(o){return (o.textContent||'').trim().slice(0,24);}).join('; ');opts.forEach(function(o){if(o.classList.contains('sel')&&!optCorrect(o))o.classList.add('wrong');});g7log(qid2,true,lbl2,your2,exam2&&msFirst);setTimeout(function(){opts.forEach(function(o){o.classList.remove('wrong');});},1100);}
-      g7review(msFirst,ok);
+      g7review(msFirst,ok,qid2);
       return;
     }
     if(e.target.matches('.cr-save')){
@@ -926,6 +966,86 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     refreshOverall();
   }
   window.addEventListener('load',restoreProgress);
+
+  /* ===== spaced review (MR-1) phase-3: in-module retrieval mode, ?review=<skill> ===== */
+  // Why this exists: restoreProgress() re-fills a completed item with its own correct answer, so a
+  // student sent back by the hub's "Due for review" would have re-read an answer key — the opposite
+  // of retrieval. Review mode takes the due skill's ALREADY-AUTHORED items (no new content), clears
+  // them for a real attempt, and hides the rest of the lesson. The stored tree is never touched, so
+  // the mastery bar stays monotonic; the re-attempt logs normally and lands in the AN-4 retention
+  // bucket because the topic was due when the session started.
+  var _oCap=false;
+  function g7capture(){                                   // originals, snapshotted before any restore
+    if(_oCap)return;_oCap=true;
+    Array.prototype.forEach.call(document.querySelectorAll('.qcard .step'),function(s){
+      s.dataset.olock=s.classList.contains('locked')?'1':'0';
+      var b=s.querySelector('.check-btn');if(b&&b.dataset.olbl===undefined)b.dataset.olbl=b.textContent;
+      var f=s.querySelector('.mc-feedback');if(f&&f.dataset.exp===undefined)f.dataset.exp=f.textContent||'';
+    });
+  }
+  g7capture();
+  function g7hubHref(){var a=document.querySelector('a[href$="Hub.html"]');return (a&&a.getAttribute('href'))||'index.html';}
+  function g7revParam(){try{return (new URLSearchParams(location.search)).get('review')||'';}catch(e){return '';}}
+  // The retrieval core for a skill: its Target/Exam items. Learn/Guided are scaffolded re-reads and
+  // Stretch is beyond the standard, so neither belongs in a review set — but if a skill authored
+  // nothing else, fall back to what exists rather than showing an empty panel.
+  function g7revSet(sk){
+    var core=[],any=[];
+    Array.prototype.forEach.call(document.querySelectorAll('.qcard[data-qid]'),function(c){
+      var q=c.dataset.qid;if((G7_SKILLS[q]||'reasoning')!==sk)return;
+      any.push(c);var lv=g7level(q);if(lv===2||lv===3)core.push(c);
+    });
+    return (core.length?core:any).slice(0,4);           // a short set — review is a pass, not a re-run
+  }
+  function g7revReset(card){
+    Array.prototype.forEach.call(card.querySelectorAll('.step'),function(s){
+      s.classList.remove('completed');
+      delete s.dataset.att;delete s.dataset.logged;
+      var lock=s.dataset.olock==='1';
+      s.classList.toggle('locked',lock);setStepDisabled(s,lock);
+      var b=s.querySelector('.check-btn');
+      if(b){b.classList.remove('done');if(b.dataset.olbl!==undefined)b.textContent=b.dataset.olbl;b.disabled=lock;}
+      Array.prototype.forEach.call(s.querySelectorAll('.ans-input'),function(i){
+        i.value='';i.classList.remove('correct','wrong');i.dataset.simplify='';});
+      Array.prototype.forEach.call(s.querySelectorAll('.feedback'),function(f){
+        f.textContent='';f.classList.remove('correct','wrong');});
+      var mc=s.querySelector('.mc-group');
+      if(mc){mc.classList.remove('answered');Array.prototype.forEach.call(mc.querySelectorAll('.mc-option'),function(o){
+        o.classList.remove('disabled','correct','wrong','sel','cooldown');});}
+      var mfb=s.querySelector('.mc-feedback');
+      if(mfb){mfb.classList.remove('correct','wrong');if(mfb.dataset.exp!==undefined)mfb.textContent=mfb.dataset.exp;}
+      var ms=s.querySelector('.ms-group');
+      if(ms){ms.classList.remove('answered');Array.prototype.forEach.call(ms.querySelectorAll('.ms-option'),function(o){
+        o.classList.remove('disabled','correct','wrong','sel');});}
+      var ta=s.querySelector('.cr-area');if(ta)ta.value='';
+      var sv=s.querySelector('.cr-saved');if(sv&&sv.parentNode)sv.parentNode.removeChild(sv);
+      var hc=s.querySelector('.hint-content');if(hc)hc.classList.remove('show');
+      var hb=s.querySelector('.hint-btn');if(hb)hb.textContent='Hint';
+    });
+  }
+  function g7reviewMode(){
+    var sk=g7revParam();if(!sk)return;
+    var set=g7revSet(sk);if(!set.length)return;          // unknown/unauthored skill -> the normal lesson
+    var panel=document.createElement('div');panel.className='rev-panel';panel.id='g7-review-panel';
+    var h=document.createElement('h2');h.textContent='Review — '+(G7_SKILL_LABELS[sk]||sk);
+    var p=document.createElement('p');p.className='rev-sub';
+    p.textContent=set.length+' item'+(set.length===1?'':'s')+' you have worked before, cleared for a fresh '+
+      'attempt. Answer from memory — pulling it back is what makes it stick. Nothing here can move your '+
+      'mastery bar down.';
+    panel.appendChild(h);panel.appendChild(p);
+    set.forEach(function(c){g7revReset(c);panel.appendChild(c);});   // moved, never removed: totals stay honest
+    var done=document.createElement('div');done.className='rev-done';
+    var a1=document.createElement('a');a1.className='btn';a1.href=g7hubHref();a1.textContent='Done — back to the Hub';
+    var a2=document.createElement('a');a2.className='btn ghost';
+    a2.href=(location.pathname.split('/').pop()||'');a2.textContent='Open the full lesson';
+    done.appendChild(a1);done.appendChild(a2);panel.appendChild(done);
+    var first=document.querySelector('section.topic');
+    if(first&&first.parentNode)first.parentNode.insertBefore(panel,first);
+    else (document.querySelector('.container')||document.body).appendChild(panel);
+    document.body.classList.add('g7-review-mode');
+  }
+  window.addEventListener('load',g7reviewMode);          // after restoreProgress: undoes its pre-fill
+  window.__modReviewMode={set:g7revSet,reset:g7revReset,mode:g7reviewMode,param:g7revParam};
 
   document.getElementById('btn-export').addEventListener('click',function(){
     var d=loadData();var cards=document.querySelectorAll('.qcard');var lines=[],td=0,ts=0;

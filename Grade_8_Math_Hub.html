@@ -664,13 +664,44 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     var due=last + rungDays*86400000;
     return { due:due, overdueMs:now-due, rungDays:rungDays, dueNow:now>=due };
   }
+  // ---- phase-3: the same ladder one level down, per skill ----
+  // A topic can be solid overall while one skill inside it fades. The engine stamps skillStats[k].last
+  // and .streak; legacy records have neither, so these return null/0 and the row simply falls back to
+  // opening the whole lesson — no migration needed.
+  function skillStreak(ss){
+    if(ss&&typeof ss.streak==='number') return ss.streak;   // engine-written streak wins
+    var a=(ss&&ss.attempts)||0; if(a<=0) return 0;
+    var acc=(a-((ss&&ss.misses)||0))/a;
+    var base = acc>=0.95?4 : acc>=0.85?3 : acc>=0.70?2 : acc>=0.50?1 : 0;
+    var cap  = a>=12?4 : a>=8?3 : a>=4?2 : a>=2?1 : 0;
+    return Math.min(base,cap);
+  }
+  function skillDue(ss, now){
+    now=now||Date.now();
+    var last=(ss&&ss.last)||0;
+    if(!last || ((ss&&ss.attempts)||0)<=0) return null;      // never surface a skill never practised
+    var rungDays=REVIEW_RUNGS[skillStreak(ss)];
+    var due=last + rungDays*86400000;
+    return { due:due, overdueMs:now-due, rungDays:rungDays, dueNow:now>=due };
+  }
+  // The due skills inside one topic, most-overdue first.
+  function dueSkills(t, now){
+    var st=(t&&t.skillStats)||{}, out=[];
+    Object.keys(st).forEach(function(k){
+      var r=skillDue(st[k], now); if(!r||!r.dueNow) return;
+      out.push({ skill:k, overdueMs:r.overdueMs, rungDays:r.rungDays });
+    });
+    return out.sort(function(a,b){return b.overdueMs-a.overdueMs;});
+  }
   // The due list for one student within one subject, most-overdue first. Read-only.
   function dueReviewList(topics, ids, now){
     var out=[];
     (ids||Object.keys(topics||{})).forEach(function(id){
       var to=topics&&topics[id]; if(!to) return;
       var r=reviewDue(to, now); if(!r || !r.dueNow) return;
-      out.push({ id:id, overdueMs:r.overdueMs, last:to.lastPracticed||0, rungDays:r.rungDays });
+      var ds=dueSkills(to, now);   // the sharpest-faded skill drives the retrieval set
+      out.push({ id:id, overdueMs:r.overdueMs, last:to.lastPracticed||0, rungDays:r.rungDays,
+                 skill:ds.length?ds[0].skill:'' });
     });
     return out.sort(function(a,b){return b.overdueMs-a.overdueMs;});
   }
@@ -682,9 +713,13 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
       var m=topicMeta(x.id)||{}; if(!m.file) return '';
       var over=x.overdueMs>=86400000;
       var when=over ? ('Due '+Math.floor(x.overdueMs/86400000)+' d ago') : 'Due now';
-      return '<div class="review-item" role="button" tabindex="0" data-id="'+esc(x.id)+'">'+
+      // Name the faded skill when we know it — the row then opens that skill's retrieval set
+      // rather than the whole lesson (whose completed items would show their own answers).
+      var sl=x.skill ? ((subj.skillLabels&&subj.skillLabels[x.skill])||SKILL_LABELS[x.skill]||'') : '';
+      var sub=sl ? ('Retrieve: '+esc(sl)) : ('Last practiced '+relTime(x.last));
+      return '<div class="review-item" role="button" tabindex="0" data-id="'+esc(x.id)+'" data-skill="'+esc(x.skill||'')+'">'+
         '<span class="ri-ico">'+(m.icon||'↺')+'</span>'+
-        '<span class="ri-main"><span class="ri-t">'+esc(m.title||x.id)+'</span><span class="ri-m">Last practiced '+relTime(x.last)+'</span></span>'+
+        '<span class="ri-main"><span class="ri-t">'+esc(m.title||x.id)+'</span><span class="ri-m">'+sub+'</span></span>'+
         '<span class="ri-when'+(over?' over':'')+'">'+when+'</span>'+
         '<button class="btn sm ri-go">Review</button>'+
       '</div>';
@@ -693,12 +728,13 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
       '<p class="rsub">Spacing keeps mastered work from fading. A quick pass now is worth more than a re-read later.</p>'+
       '<div class="review-list">'+rows+'</div></div>';
     Array.prototype.forEach.call(el.querySelectorAll('.review-item'),function(it){
-      var id=it.getAttribute('data-id');
-      it.onclick=function(){openTopic(id);};
-      it.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();openTopic(id);}};
+      var id=it.getAttribute('data-id'), sk=it.getAttribute('data-skill')||'';
+      it.onclick=function(){openTopic(id,sk);};
+      it.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();openTopic(id,sk);}};
     });
   }
-  window.__hubReview={streak:reviewStreak,due:reviewDue,list:dueReviewList,rungs:REVIEW_RUNGS};
+  window.__hubReview={streak:reviewStreak,due:reviewDue,list:dueReviewList,rungs:REVIEW_RUNGS,
+    skillStreak:skillStreak,skillDue:skillDue,dueSkills:dueSkills};
 
   // ---- view switching ----
   function show(id){['view-signin','view-app','view-teacher'].forEach(function(v){document.getElementById(v).classList.toggle('hidden',v!==id);});window.scrollTo(0,0);}
@@ -804,10 +840,11 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     });
     show('view-app');
   }
-  function openTopic(id){
+  // skill (optional) opens the module straight into its retrieval-practice set for that skill.
+  function openTopic(id,skill){
     var t=topicMeta(id); if(!t||!t.file)return;
-    postSheet({student:current(),topic:t.title,question:'',event:'topic_opened',detail:'',ts:Date.now()});
-    location.href=t.file;
+    postSheet({student:current(),topic:t.title,question:'',event:skill?'review_opened':'topic_opened',detail:skill||'',ts:Date.now()});
+    location.href=t.file+(skill?('?review='+encodeURIComponent(skill)):'');
   }
   function renderHomeworkBanner(cur, topics, subj){
     var el=document.getElementById('hw-banner'); if(!el)return;
