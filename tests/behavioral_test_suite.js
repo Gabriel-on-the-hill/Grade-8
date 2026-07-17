@@ -26,37 +26,48 @@ const rightOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
 const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{try{return atob((o.dataset.k||'').slice(3)).endsWith('|0');}catch(e){return false;}});
 
 (async function(){
-// ===== HUB: cold boot, seeds, PIN, binding =====
+// ===== HUB: cold boot, no gate, no roster list, typed-name sign-in, case-insensitive =====
 { const w=load(HUB).window,d=w.document;
-  ok(!d.getElementById('g8gate'),'hub: gate removed when g8.gate=ok');
+  ok(!d.getElementById('g8gate'),'hub: no access gate (removed)');
   ok(!d.getElementById('view-signin').classList.contains('hidden'),'hub: sign-in visible on cold boot');
-  const names=[...d.querySelectorAll('.name-tile .nm')].map(e=>e.textContent);
-  ok(names.join(',')==='Divine,Ayodeji','hub: seeded roster (Divine, Ayodeji) with zero setup');
+  ok(d.querySelectorAll('.name-tile').length===0,'hub: NO roster list is ever shown');
+  ok(!!d.getElementById('signin-name'),'hub: typed-name input present');
   ok(w.localStorage.getItem('g7.teacherPass')==='Gabe','hub: teacher passcode seeded');
-  const tile=d.querySelector('.name-tile');
-  ok(tile.getAttribute('tabindex')==='0'&&tile.getAttribute('role')==='button','hub: tiles keyboard-accessible');
-  tile.click();
-  ok(!d.getElementById('pinModal').classList.contains('hidden'),'hub: PIN modal opens');
+  ok(JSON.parse(w.localStorage.getItem('g7.roster')).join(',')==='Divine,Ayodeji','hub: roster locked to Divine,Ayodeji');
+  // an unknown name is rejected, and never opens the PIN modal
+  d.getElementById('signin-name').value='Somebody';d.getElementById('signin-go').click();
+  ok(/couldn.t find/i.test(d.getElementById('signin-err').textContent),'hub: unknown name rejected');
+  ok(d.getElementById('pinModal').classList.contains('hidden'),'hub: no PIN modal for an unknown name');
+  // a real name in ANY case resolves to the canonical spelling
+  d.getElementById('signin-name').value='  DIVINE  ';d.getElementById('signin-go').click();
+  ok(!d.getElementById('pinModal').classList.contains('hidden'),'hub: PIN modal opens for a real name (any case)');
+  ok(d.getElementById('pin-title').textContent==='Divine','hub: typed name resolves to canonical spelling');
   ok(d.getElementById('pin-sub').textContent.includes('Create'),'hub: create-PIN mode first time');
-  d.getElementById('pin1').value='11';d.getElementById('pin2').value='12';d.getElementById('pin-go').click();
-  ok(d.getElementById('pin-err').textContent.includes('do not match'),'hub: mismatched PINs rejected');
-  d.getElementById('pin2').value='11';d.getElementById('pin-go').click();
-  ok(!d.getElementById('view-app').classList.contains('hidden'),'hub: app opens after PIN set');
-  ok(JSON.parse(w.localStorage.getItem('g7.pins')).Divine==='11','hub: PIN persisted');
+  d.getElementById('pin1').value='1a';d.getElementById('pin2').value='1b';d.getElementById('pin-go').click();
+  ok(d.getElementById('pin-err').textContent.includes('do not match'),'hub: genuinely different PINs rejected');
+  // case-differing confirm is accepted (PINs are case-insensitive)
+  d.getElementById('pin1').value='Ab';d.getElementById('pin2').value='aB';d.getElementById('pin-go').click();
+  ok(!d.getElementById('view-app').classList.contains('hidden'),'hub: app opens after PIN set (case-insensitive confirm)');
+  ok(JSON.parse(w.localStorage.getItem('g7.pins')).Divine==='Ab','hub: PIN persisted');
   ok(w.localStorage.getItem('g7.device')==='Divine','hub: device bound to Divine');
   ok(d.querySelectorAll('.subject-tab').length===2,'hub: two subject tabs');
-  d.getElementById('tb-switch').click();
-  ok([...d.querySelectorAll('.name-tile .nm')].map(e=>e.textContent).join(',')==='Divine','hub: bound device shows only its student');
-  const sa=d.getElementById('show-all-names');ok(!!sa,'hub: "Someone else?" link present');
-  sa.click();
-  ok(d.querySelectorAll('.name-tile').length===2,'hub: link reveals full roster');
 }
-// ===== HUB: wrong PIN =====
-{ const w=load(HUB,{'g7.pins':JSON.stringify({Divine:'11'})}).window,d=w.document;
-  d.querySelector('.name-tile').click();
+// ===== HUB: bound device never lists students; wrong then case-insensitive PIN =====
+{ const w=load(HUB,{'g7.device':'Divine','g7.pins':JSON.stringify({Divine:'Ab'})}).window,d=w.document;
+  ok(d.querySelectorAll('.name-tile').length===0,'hub: bound device shows no list');
+  ok(d.getElementById('signin-host').textContent.includes('Divine'),'hub: bound device shows only its own student');
+  ok(!d.getElementById('signin-host').textContent.includes('Ayodeji'),'hub: bound device never shows the other student');
+  d.getElementById('signin-open').click();
   ok(d.getElementById('pin-sub').textContent.includes('Enter'),'hub: enter-PIN mode for returning student');
   d.getElementById('pin1').value='99';d.getElementById('pin-go').click();
   ok(d.getElementById('pin-err').textContent.includes('Incorrect'),'hub: wrong PIN rejected');
+  d.getElementById('pin1').value='AB';d.getElementById('pin-go').click();   // stored 'Ab', typed 'AB'
+  ok(!d.getElementById('view-app').classList.contains('hidden'),'hub: case-insensitive PIN entry signs in');
+}
+// ===== HUB: roster is authoritative — a stray name and its PIN are pruned on boot =====
+{ const w=load(HUB,{'g7.roster':JSON.stringify(['Divine','Ayodeji','Intruder']),'g7.pins':JSON.stringify({Divine:'1',Intruder:'9'})}).window;
+  ok(JSON.parse(w.localStorage.getItem('g7.roster')).indexOf('Intruder')<0,'hub: stray roster name pruned');
+  ok(!('Intruder' in JSON.parse(w.localStorage.getItem('g7.pins'))),'hub: stray PIN pruned');
 }
 // ===== HUB: teacher modal, gated settings, Escape, takeover =====
 { const w=load(HUB,{'g7.teacherPass':'studentmade'}).window,d=w.document;
@@ -366,7 +377,7 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
 // ===== SYNC v1.5: student pushes + module merge =====
 { const w=load(HUB,{'g7.sheetURL':'https://sheet.test/exec'}).window,d=w.document;
   w.__spy=[];
-  d.querySelector('.name-tile').click();d.getElementById('pin1').value='7';d.getElementById('pin2').value='7';d.getElementById('pin-go').click();
+  d.getElementById('signin-name').value='divine';d.getElementById('signin-go').click();d.getElementById('pin1').value='7';d.getElementById('pin2').value='7';d.getElementById('pin-go').click();
   ok(w.__spy.some(b=>b.kind==='pin'&&b.payload.v==='7'&&b.hub==='grade8'),'sync: PIN creation pushed');
   const wm=load(NS,{'g7.current':'Divine','g7.sheetURL':'https://sheet.test/exec'}).window;
   ok(!!wm.__modSync,'sync: module exposes sync API');

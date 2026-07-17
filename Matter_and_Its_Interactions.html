@@ -121,33 +121,6 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
 </style>
 </head>
 <body>
-<!-- Access gate (light client-side deterrent; password is case-insensitive) -->
-<div id="g8gate" style="position:fixed;inset:0;z-index:99999;background:#14532D;display:grid;place-items:center;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif">
-  <div style="background:#fff;border-radius:16px;padding:1.8rem 1.6rem;max-width:340px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center">
-    <div style="width:54px;height:54px;margin:0 auto .8rem;border-radius:14px;background:#FAC415;display:grid;place-items:center">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#14532D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
-    </div>
-    <h2 style="margin:.2rem 0 .3rem;font-size:1.15rem;color:#16241C">Grade 8 Study Hub</h2>
-    <p style="margin:0 0 1rem;color:#6B7280;font-size:.88rem">Enter the access password to continue.</p>
-    <input id="g8pw" type="password" placeholder="Password" autocomplete="off" style="width:100%;box-sizing:border-box;border:1.5px solid #E4E1D6;border-radius:9px;padding:.6rem .7rem;font-size:.95rem"/>
-    <div id="g8err" style="color:#C2410C;font-size:.8rem;min-height:1rem;margin:.35rem 0 .2rem"></div>
-    <button id="g8go" style="width:100%;background:#14532D;color:#fff;border:none;border-radius:9px;padding:.6rem;font-size:.95rem;font-weight:600;cursor:pointer">Enter</button>
-  </div>
-</div>
-<script>
-(function(){
-  var PW="divine", KEY="g8.gate";
-  var g=document.getElementById("g8gate");
-  function unlock(){ try{localStorage.setItem(KEY,"ok");}catch(e){} document.body.style.overflow=""; if(g&&g.parentNode)g.parentNode.removeChild(g); }
-  try{ if(localStorage.getItem(KEY)==="ok"){ unlock(); return; } }catch(e){}
-  document.body.style.overflow="hidden";
-  var inp=document.getElementById("g8pw"), err=document.getElementById("g8err");
-  function tryit(){ if(String(inp.value||"").trim().toLowerCase()===PW){ unlock(); } else { err.textContent="Incorrect password."; inp.value=""; inp.focus(); } }
-  document.getElementById("g8go").onclick=tryit;
-  inp.addEventListener("keydown",function(e){ if(e.key==="Enter")tryit(); });
-  inp.focus();
-})();
-</script>
 
 <header class="mod">
   <h1>Matter and Its Interactions</h1>
