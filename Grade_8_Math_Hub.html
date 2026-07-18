@@ -234,6 +234,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
       </div>
     </div>
     <div id="sync-warning" style="display:none;background:#FEF3C7;border:1px solid #FAC415;border-left:5px solid #DC2626;border-radius:12px;padding:.7rem 1rem;margin-bottom:1rem;font-size:.9rem;color:#7C1D1D;font-weight:600"></div>
+    <div id="teacher-as" style="display:none;background:#E7F0EA;border:1px solid #C5D8CB;border-left:5px solid #14532D;border-radius:12px;padding:.7rem 1rem;margin-bottom:1rem;font-size:.9rem;color:#14532D"></div>
     <div id="subject-tabs" class="subject-tabs"></div>
     <div class="stats" id="stat-tiles"></div>
     <div id="hw-banner"></div>
@@ -378,10 +379,10 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
       // PINs are case-insensitive: the confirm matches regardless of case, and enter (below) compares
       // case-insensitively too, so "abc" and "ABC" are the same PIN.
       if(v1.toLowerCase()!==v2.toLowerCase()){err.textContent='The PINs do not match.';return;}
-      setPin(n,v1); syncPush('pin',n,'',{v:v1,ts:markPinTs(n)}); closePinModal(); setCurrent(n); LS.setItem(K('device'),n); boot(); return;
+      setPin(n,v1); syncPush('pin',n,'',{v:v1,ts:markPinTs(n)}); closePinModal(); setTeacherAs(''); setCurrent(n); LS.setItem(K('device'),n); boot(); return;
     }
     if(v1.toLowerCase()!==String(getPin(n)||'').toLowerCase()){err.textContent='Incorrect PIN. If you forgot it, ask your teacher to reset it.';document.getElementById('pin1').focus();document.getElementById('pin1').select();return;}
-    closePinModal(); setCurrent(n); LS.setItem(K('device'),n); boot();
+    closePinModal(); setTeacherAs(''); setCurrent(n); LS.setItem(K('device'),n); boot();
   }
   function getData(){return jget(K('data'),{students:{}});}
   function current(){return LS.getItem(K('current'))||'';}
@@ -822,6 +823,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
       '<div class="stat"><div class="n">'+Object.keys(skillsToReview).length+'</div><div class="l">Skills to review</div></div>';
     renderHomeworkBanner(cur, topics, subj);
     renderSyncWarning(cur, started>0);
+    renderTeacherAs(cur);
     renderHomeworkSets(cur, subj, topics);
     renderDueReview(topics, subj);
 
@@ -883,6 +885,23 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     s+='</div>'; el.innerHTML=s;
     var hb=document.getElementById('hw-done');
     if(hb)hb.onclick=function(){var d=getData();d.students=d.students||{};d.students[cur]=d.students[cur]||{topics:{}};d.students[cur].assignments=d.students[cur].assignments||{};var cu=d.students[cur].assignments[subj.id]||{text:ao.text,ts:ao.ts||Date.now()};cu.doneTs=cu.doneTs?0:Date.now();cu.mts=Date.now();d.students[cur].assignments[subj.id]=cu;jset(K('data'),d);syncPush('assign',cur,subj.id,cu);renderApp();};
+  }
+
+  /* ===== teacher view ("open as <student>") =====
+   * Students stay bound to their own device; only the teacher, past the passcode, can act as any
+   * student. The banner keeps that state visible so nothing is recorded under the wrong name. */
+  function teacherAs(){return LS.getItem(K('teacherAs'))||'';}
+  function setTeacherAs(n){ if(n){LS.setItem(K('teacherAs'),n);} else {LS.removeItem(K('teacherAs'));} }
+  function renderTeacherAs(cur){
+    var el=document.getElementById('teacher-as'); if(!el)return;
+    var as=teacherAs();
+    if(as && cur && as===cur){
+      el.innerHTML='Teacher view — you are working as <strong>'+esc(cur)+'</strong>. Anything answered here is saved to their record.'+
+        '<button class="btn ghost sm" id="ta-exit" style="margin-left:.6rem">Leave teacher view</button>';
+      el.style.display='block';
+      var b=document.getElementById('ta-exit');
+      if(b)b.onclick=function(){ setTeacherAs(''); setCurrent(''); location.reload(); };
+    } else { el.style.display='none'; el.innerHTML=''; }
   }
 
   // Warn a student, on their own device, when their work is NOT reaching the cloud — the silent
@@ -1132,7 +1151,9 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
       var lastAll=0; Object.keys(topics).forEach(function(id){var p=topicProgress(topics[id]); if(p.last>lastAll)lastAll=p.last;});
       html+='<div class="student-block"><div class="sb-top"><span class="av">'+esc(initials(name))+'</span><span class="nm">'+esc(name)+'</span>'+
         '<span class="grade-tag" style="margin-left:.45rem;font-size:.72rem;font-weight:700;letter-spacing:.03em;background:var(--green-light,#E7F0EA);color:var(--pitch-green,#14532D);border-radius:999px;padding:.1rem .5rem">'+esc(GRADE_LABEL)+'</span>'+
-        '<span class="meta">Last active: '+relTime(lastAll)+'</span></div><div class="sb-body">';
+        '<span class="meta">Last active: '+relTime(lastAll)+'</span>'+
+        '<button class="btn ghost sm open-as" data-n="'+esc(name)+'" style="margin-left:auto">Open as '+esc(name)+'</button>'+
+        '</div><div class="sb-body">';
       var stuA=(data.students&&data.students[name])||{};
       var anyStudent=false;
       SUBJECTS.forEach(function(subj){
@@ -1213,7 +1234,17 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
       if(!anyStudent) html+='<p class="muted-note">No activity yet.</p>';
       html+='</div></div>';
     });
-    dash.innerHTML=html;
+    dash.innerHTML=foreignNote+html;
+    Array.prototype.forEach.call(dash.querySelectorAll('.open-as'),function(b){
+      b.onclick=function(){
+        /* Teacher-only student switch, reachable only from behind the teacher passcode, so it can
+         * never leak into a student's sign-in. It deliberately does NOT touch g7.device: the device
+         * binding belongs to whoever owns that device and must not follow the teacher around. While
+         * it is active a banner is shown, because work filed silently under the wrong student is
+         * exactly how one student's science attempt ended up under another's name. */
+        setTeacherAs(b.getAttribute('data-n')); setCurrent(b.getAttribute('data-n')); boot();
+      };
+    });
     Array.prototype.forEach.call(dash.querySelectorAll('.assign-save'),function(b){b.onclick=function(){var inp=b.parentNode.querySelector('.assign-inp');var n=b.getAttribute('data-n');var sid=b.getAttribute('data-s');var d=getData();d.students=d.students||{};d.students[n]=d.students[n]||{topics:{}};d.students[n].assignments=d.students[n].assignments||{};d.students[n].assignments[sid]={text:inp.value.trim(),ts:Date.now(),mts:Date.now()};jset(K('data'),d);syncPush('assign',n,sid,d.students[n].assignments[sid]);b.textContent='Saved';setTimeout(function(){b.textContent='Save';},1200);};});
     Array.prototype.forEach.call(dash.querySelectorAll('.cr-rev'),function(b){b.onclick=function(){var d=getData();var n=b.getAttribute('data-n'),ti=b.getAttribute('data-t'),i=parseInt(b.getAttribute('data-i'),10);var to=d.students&&d.students[n]&&d.students[n].topics&&d.students[n].topics[ti];if(!to||!to.responses||!to.responses[i])return;to.responses[i].reviewed=to.responses[i].reviewed?0:Date.now();jset(K('data'),d);syncPush('review',n,ti,reviewMapFor(n,ti));b.textContent=to.responses[i].reviewed?'Reviewed \u2713':'Mark reviewed';};});
     Array.prototype.forEach.call(dash.querySelectorAll('.struggle-toggle'),function(tg){
