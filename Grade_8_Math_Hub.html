@@ -945,8 +945,8 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     var u=sheetURL();if(!u)return;
     try{fetch(u,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},
       body:JSON.stringify({op:'hw',hub:SYNC_HUB_ID||'default',name:cur,pin:pinFor(cur),key:syncKey(),
-        subject:sid,set:set.id,correct:prog.done,total:prog.total,ts:Date.now(),
-        payload:{label:set.label||set.id,items:set.items||[]}})}).catch(function(){});}catch(e){}
+        subject:sid,set:set.id,item:'(set complete)',outcome:prog.done+' / '+prog.total,ts:Date.now(),
+        payload:{label:set.label||set.id,correct:prog.done,total:prog.total,items:set.items||[]}})}).catch(function(){});}catch(e){}
   }
   function hwRecordDone(cur,sid,set,prog){
     var d=getData();d.students=d.students||{};d.students[cur]=d.students[cur]||{topics:{}};
@@ -977,7 +977,10 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
         var links=hwLinks(set).map(function(g){
           if(g.kind!=='module')return '';
           var t=topicMeta(g.topic);if(!t||!t.file)return '';
-          return '<a class="btn sm" href="'+esc(t.file)+'?q='+encodeURIComponent(g.qids.join(','))+'">'+esc(t.title)+' →</a>';
+          /* hw/subj travel with the link so the module knows these attempts are homework and can
+           * record them as such — otherwise they are indistinguishable from ordinary practice. */
+          return '<a class="btn sm" href="'+esc(t.file)+'?q='+encodeURIComponent(g.qids.join(','))+
+                 '&hw='+encodeURIComponent(set.id)+'&subj='+encodeURIComponent(subj.id)+'">'+esc(t.title)+' →</a>';
         }).filter(Boolean).join(' ');
         rows+='<div class="item">'+label+' — '+prog.done+'/'+prog.total+' done'+
               '<div style="margin-top:.35rem">'+links+'</div></div>';

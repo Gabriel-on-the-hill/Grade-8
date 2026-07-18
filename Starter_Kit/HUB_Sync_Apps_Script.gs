@@ -17,7 +17,7 @@ var SHEET_LOG = 'Log', SHEET_SYNC = 'SyncStore', SHEET_HW = 'Homework';
 /* Homework tab header. `raw` is load-bearing: it carries the whole posted JSON, so new fields can be
  * read later WITHOUT redeploying this script. Keep the order — a test parses this header, because a
  * column-map drift has already silently blanked a dashboard once and looks identical to "no data". */
-var HW_HEADER = ['when', 'hub', 'student', 'subject', 'set', 'correct', 'total', 'seconds', 'raw'];
+var HW_HEADER = ['when', 'hub', 'student', 'subject', 'set', 'item', 'outcome', 'raw'];
 
 /* ===================== PUT YOUR SHEET ID ON THE LINE BELOW =====================
  * Run `setup` once (Run ▸ setup) and it prints the exact id for you.
@@ -181,11 +181,14 @@ function doPost(e) {
     if (d.op === 'hw') {
       var whoHw = _who(hub, d.name, d.pin, d.key);
       if (whoHw !== 'teacher' && whoHw !== 'student') return ContentService.createTextOutput('err: auth');
+      /* One row per homework EVENT. Two kinds arrive here:
+       *   - an attempt on a homework item: item = the question id, outcome = correct | incorrect
+       *   - a finished set:                item = "(set complete)", outcome = "4 / 5"
+       * Every row in this tab is homework by definition, so homework can never be confused with
+       * ordinary module practice — which is exactly what the Log tab could not distinguish. */
       var hw = _sheet(SHEET_HW, HW_HEADER);
       hw.appendRow([new Date(), hub, d.name || '', d.subject || '', d.set || '',
-                    (d.correct == null ? '' : d.correct),
-                    (d.total   == null ? '' : d.total),
-                    (d.seconds == null ? '' : d.seconds),
+                    d.item || '', d.outcome || '',
                     JSON.stringify(d.payload || {})]);
       return ContentService.createTextOutput('ok');
     }

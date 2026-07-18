@@ -78,13 +78,22 @@ global.__setKey('TKEY');
 t('teacher publishes hwplan for A -> ok', post({ op:'put', hub:HUB, kind:'hwplan', name:'A', sub:'math', key:'TKEY', payload:{sets:[{id:'s1'}]}, ts:4 }), 'ok');
 t('teacher publishes hwplan for B -> ok', post({ op:'put', hub:HUB, kind:'hwplan', name:'B', sub:'sci',  key:'TKEY', payload:{sets:[{id:'s9'}]}, ts:4 }), 'ok');
 
-// ---- completion history ----
-t('student records own completion -> ok', post({ op:'hw', hub:HUB, name:'A', pin:'1111', subject:'math', set:'s1', correct:4, total:5, seconds:300, payload:{items:[]} }), 'ok');
-t('anonymous completion rejected', post({ op:'hw', hub:HUB, name:'A', subject:'math', set:'s1', correct:5, total:5 }), 'err: auth');
-const hwRow = sheets['Homework']._rows[1];
-t('completion row lands in header order (student/subject/set/correct/total)',
-  [hwRow[2], hwRow[3], hwRow[4], hwRow[5], hwRow[6]], ['A', 'math', 's1', 4, 5]);
-t('only ONE completion row was written', sheets['Homework']._rows.length, 2);
+// ---- homework history ----
+// Two kinds of row land here, and every row in this tab is homework by definition — that is what
+// makes homework distinguishable from ordinary module practice, which the Log tab cannot do.
+t('student records a homework ATTEMPT -> ok',
+  post({ op:'hw', hub:HUB, name:'A', pin:'1111', subject:'math', set:'s1', item:'2-5', outcome:'correct' }), 'ok');
+t('student records a SET COMPLETION -> ok',
+  post({ op:'hw', hub:HUB, name:'A', pin:'1111', subject:'math', set:'s1', item:'(set complete)', outcome:'4 / 5' }), 'ok');
+t('anonymous homework row rejected',
+  post({ op:'hw', hub:HUB, name:'A', subject:'math', set:'s1', item:'2-5', outcome:'correct' }), 'err: auth');
+
+const rows = sheets['Homework']._rows;
+t('attempt row lands in header order (student/subject/set/item/outcome)',
+  [rows[1][2], rows[1][3], rows[1][4], rows[1][5], rows[1][6]], ['A', 'math', 's1', '2-5', 'correct']);
+t('completion row is distinguishable from an attempt',
+  [rows[2][5], rows[2][6]], ['(set complete)', '4 / 5']);
+t('exactly two homework rows written (the anonymous one was refused)', rows.length, 3);
 
 // ---- the isolation property ----
 const asA = pull({ hub: HUB, name: 'A', pin: '1111' });
