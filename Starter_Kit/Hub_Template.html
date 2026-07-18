@@ -197,6 +197,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
         <p id="greeting-sub"></p>
       </div>
     </div>
+    <div id="sync-warning" style="display:none;background:#FEF3C7;border:1px solid #FAC415;border-left:5px solid #DC2626;border-radius:12px;padding:.7rem 1rem;margin-bottom:1rem;font-size:.9rem;color:#7C1D1D;font-weight:600"></div>
     <div id="subject-tabs" class="subject-tabs"></div>
     <div class="stats" id="stat-tiles"></div>
     <div id="hw-banner"></div>
@@ -374,7 +375,9 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     s.src=sheetURL()+(sheetURL().indexOf('?')>=0?'&':'?')+'op=pull&hub='+encodeURIComponent(SYNC_HUB_ID||'default')+'&cb='+nm;document.head.appendChild(s);}catch(e){cb(null);}}
   function recTs(r){return Math.max((r&&r.ts)||0,(r&&r.mts)||0,(r&&r.doneTs)||0);}
   function markPinTs(n){var m=jget(K('pints'),{});m[n]=Date.now();jset(K('pints'),m);return m[n];}
+  var _lastCloud=null;  /* the most recent pulled cloud doc — used to detect work that isn't reaching the cloud */
   function applyCloud(doc){
+    _lastCloud=doc;
     if(!doc)return {changed:false,pushTopics:[]};
     var changed=false,pushTopics=[];
     var d=getData();d.students=d.students||{};
@@ -398,7 +401,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     return {changed:changed,pushTopics:pushTopics};
   }
   function reviewMapFor(n,tid){var d=getData();var to=d.students&&d.students[n]&&d.students[n].topics&&d.students[n].topics[tid];var m={};((to&&to.responses)||[]).forEach(function(r){if(r.reviewed)m[String(r.ts)]=r.reviewed;});return m;}
-  function runSync(after){syncPull(function(doc){var res=applyCloud(doc);var seen={};(res.pushTopics||[]).forEach(function(p){var k=p.n+'|'+p.tid;if(seen[k])return;seen[k]=1;var d=getData();var to=d.students[p.n]&&d.students[p.n].topics&&d.students[p.n].topics[p.tid];if(to)syncPush('topic',p.n,p.tid,to);});if(res.changed&&after)after();});}
+  function runSync(after){syncPull(function(doc){var res=applyCloud(doc);var seen={};(res.pushTopics||[]).forEach(function(p){var k=p.n+'|'+p.tid;if(seen[k])return;seen[k]=1;if(!topicMeta(p.tid))return;/* never re-push a topic this hub doesn't own — stops cross-grade bleed via shared localStorage */var d=getData();var to=d.students[p.n]&&d.students[p.n].topics&&d.students[p.n].topics[p.tid];if(to)syncPush('topic',p.n,p.tid,to);});if(res.changed&&after)after();});}
   function rerenderView(){try{if(!document.getElementById('view-teacher').classList.contains('hidden')){renderTeacher();}else if(!document.getElementById('view-app').classList.contains('hidden')){renderApp();}}catch(e){}}
   window.__hubSync={applyCloud:applyCloud,recTs:recTs,reviewMapFor:reviewMapFor};
 
@@ -500,6 +503,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
       '<div class="stat"><div class="n">'+mastered+'</div><div class="l">Steps mastered</div></div>'+
       '<div class="stat"><div class="n">'+Object.keys(skillsToReview).length+'</div><div class="l">Skills to review</div></div>';
     renderHomeworkBanner(cur, topics, subj);
+    renderSyncWarning(cur, started>0);
 
     var html='';
     subj.units.forEach(function(u){
@@ -558,6 +562,23 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     s+='</div>'; el.innerHTML=s;
     var hb=document.getElementById('hw-done');
     if(hb)hb.onclick=function(){var d=getData();d.students=d.students||{};d.students[cur]=d.students[cur]||{topics:{}};d.students[cur].assignments=d.students[cur].assignments||{};var cu=d.students[cur].assignments[subj.id]||{text:ao.text,ts:ao.ts||Date.now()};cu.doneTs=cu.doneTs?0:Date.now();cu.mts=Date.now();d.students[cur].assignments[subj.id]=cu;jset(K('data'),d);syncPush('assign',cur,subj.id,cu);renderApp();};
+  }
+
+  // Warn a student, on their own device, when their work is NOT reaching the cloud — the silent
+  // failure that hides lost work. Conservative: only fires when they have local practice AND a
+  // completed pull returned no record of them (no cloud PIN / URL). Never blocks practice.
+  function renderSyncWarning(cur, hasWork){
+    var el=document.getElementById('sync-warning'); if(!el)return;
+    var msg='';
+    if(hasWork && cur){
+      if(!sheetURL()){
+        msg='Your work is saving on this device only — cloud sync is off. Tell your teacher.';
+      } else if(_lastCloud && !((_lastCloud.pins&&_lastCloud.pins[cur])||(_lastCloud.topics&&_lastCloud.topics[cur]))){
+        msg='Your work isn’t reaching the cloud yet. Check you signed in with your name and PIN — and tell your teacher if this keeps showing.';
+      }
+    }
+    if(msg){el.textContent='⚠ '+msg;el.style.display='block';}
+    else{el.style.display='none';el.textContent='';}
   }
 
   // ---- teacher ----
