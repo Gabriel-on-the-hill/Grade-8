@@ -18,6 +18,6 @@ The short version:
   what review mode exists to prevent, and it is the one regression to watch for. Engine work happens in
   Grade 7 and is inherited here.
 - **Public repo, publishes `.md`.** Any per-student data must be gitignored before commit (see how
-  Grade 7 handles `Fareedah/`).
+  Grade 7 handles `<student>/`).
 
 House pedagogy is in the root [AGENTS.md](../AGENTS.md).

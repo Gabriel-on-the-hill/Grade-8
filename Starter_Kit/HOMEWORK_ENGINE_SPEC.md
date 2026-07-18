@@ -182,7 +182,30 @@ reach a student, or silently loses their answers, recreates the exact bug this s
    record per student, authenticated with the teacher key.
 4. Validation runs before publishing. A plan that fails §6 is rejected, not published.
 
-## 9. Never
+## 9. Where bank items come from
+
+The project standard's rule, applied to homework — **use the best from the sources, and author new
+only when it is genuinely better for this student.** In order of preference:
+
+1. **The textbooks in the project folder.** Copy their strongest exercises. Textbook-grade questions
+   are what prepare a student for textbook-grade assessment, so using them is *preferred*, not a
+   fallback. The `.gitignore` keeps the source **PDFs** unpublished — that restricts the files, not
+   their content.
+2. **Publicly released state items** (`MCAP MATHS/`, `MCAP SCIENCE/` — MSDE public release) for
+   exam-grade capstones.
+3. **Newly authored items — only where genuinely better.** This is a narrow case, and it is the
+   bank's real reason to exist: items that exist nowhere else because they are built from one
+   student's error profile — a combination probe that makes two specific gaps fail *together*, or a
+   clean anchor that isolates one suspected gap so a miss is decodable.
+
+The standards and MCAP blueprint in `Curriculum/` decide **coverage and weighting**, not the items.
+
+**Do not build a second general question pool.** The modules already carry general practice, and a
+parallel pool breaches "one structure, no duplicates". Anything that already exists as a module
+question is referenced with `{ref:'module'}`, never copied into the bank — which also keeps it
+feeding the per-concept tracking.
+
+## 10. Never
 
 - Never put a student's name, or anything *about* a student, into the repo or into anything the
   student can read. Assignment text renders on their screen; tutor notes belong elsewhere.

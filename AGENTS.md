@@ -56,5 +56,5 @@ engine behaviour, change both and check both.
 The `.gitignore` blocks PDFs, textbooks, and `Curriculum/` — but it **publishes markdown**. So the
 moment a per-student folder or note is added here, it must be gitignored *before* it is committed, or
 it goes to the public internet attached to a named minor (root rule 6). Grade 7 already does this for
-`Fareedah/`. Follow that pattern: private student data is ignored, and a `LEDGER.md` (tutor-facing,
+`<student>/`. Follow that pattern: private student data is ignored, and a `LEDGER.md` (tutor-facing,
 never student-readable) is where per-student state lives. Ask the `pedagogy` skill to set one up.

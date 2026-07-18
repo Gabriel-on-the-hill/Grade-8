@@ -112,7 +112,7 @@ The three build items are shared-engine work and live in
 
 **Guardrails specific to Grade 8:** the `g7.` prefix is shared back-compat — do not rename it here.
 This repo is **public and publishes markdown**, and it has **no student folder gitignored yet**
-(Grade 7 ignores `Fareedah/`); the moment a student folder or `LEDGER.md` is added, it must be
+(Grade 7 ignores `<student>/`); the moment a student folder or `LEDGER.md` is added, it must be
 gitignored *before* the first commit (root rule 6).
 
 ---
@@ -150,5 +150,5 @@ building it.** The full item lives in [`../Grade 7/PEDAGOGY_ALIGNMENT.md`](../Gr
 drill — forbidden by the house rule (see item 3). Don't add to this list without a house rule to cite.
 
 **Still open here, and it is not an engine item:** this repo is public, publishes markdown, and has **no
-student folder gitignored yet** (Grade 7 ignores `Fareedah/`). The moment a student folder or `LEDGER.md`
+student folder gitignored yet** (Grade 7 ignores `<student>/`). The moment a student folder or `LEDGER.md`
 lands, it must be gitignored *before* the first commit (root rule 6).
