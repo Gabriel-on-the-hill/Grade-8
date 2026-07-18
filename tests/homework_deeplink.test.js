@@ -12,11 +12,13 @@
 const fs = require('fs');
 const path = require('path');
 
-const MODULES = [
-  'Expressions_and_Equations.html',
-  'The_Number_System.html',
-  'Matter_and_Its_Interactions.html'
-];
+// Auto-detect every module in this repo that carries the deep-link, so the suite covers Grade 7,
+// Grade 8 and any module added later without anyone remembering to edit this list.
+const DIR = path.join(__dirname, '..');
+const MODULES = fs.readdirSync(DIR)
+  .filter(f => /\.html$/.test(f) && !/_Math_Hub\.html$/.test(f))
+  .filter(f => /function g7hwSet\(/.test(fs.readFileSync(path.join(DIR, f), 'utf8')));
+if (!MODULES.length) { console.log('FAIL no module carries the homework deep-link'); process.exit(1); }
 
 let pass = 0, fail = 0;
 const t = (label, got, want) => {

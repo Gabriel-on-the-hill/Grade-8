@@ -10,7 +10,12 @@
  */
 const fs = require('fs');
 const path = require('path');
-const html = fs.readFileSync(path.join(__dirname, '..', 'Grade_8_Math_Hub.html'), 'utf8');
+// Auto-detect this repo's hub, so the same suite guards Grade 7, Grade 8 and any future hub.
+const DIR = path.join(__dirname, '..');
+const HUB = fs.readdirSync(DIR).find(f => /_Math_Hub\.html$/.test(f));
+if (!HUB) { console.log('FAIL no *_Math_Hub.html found'); process.exit(1); }
+const html = fs.readFileSync(path.join(DIR, HUB), 'utf8');
+console.log('hub: ' + HUB);
 
 const fnSrc = (html.match(/function hwValidatePlans\(list\)\{[\s\S]*?\n  \}/) || [])[0];
 if (!fnSrc) { console.log('FAIL could not extract hwValidatePlans'); process.exit(1); }
