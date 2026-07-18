@@ -237,6 +237,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     <div id="subject-tabs" class="subject-tabs"></div>
     <div class="stats" id="stat-tiles"></div>
     <div id="hw-banner"></div>
+    <div id="hw-sets"></div>
     <div id="due-review"></div>
     <div id="units"></div>
   </section>
@@ -288,6 +289,14 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
       <button class="btn sm" id="btn-save-key">Save key</button>
     </div>
     <div id="key-status" class="statusline muted-note"></div>
+    <hr style="border:none;border-top:1px solid var(--line);margin:1.1rem 0">
+    <label class="muted-note">Homework — publish plans <span style="font-weight:400">— choose your plans <code>.json</code>. It is validated first, then sent to each student privately. The file never touches this site or the repo, so no student name is ever published.</span></label>
+    <div class="row">
+      <button class="btn sm" id="btn-pick-hw">Choose plans file</button>
+      <button class="btn ghost sm" id="btn-publish-hw" disabled>Publish</button>
+      <input type="file" id="hw-file" accept="application/json" style="display:none">
+    </div>
+    <div id="hw-status" class="statusline muted-note"></div>
     <hr style="border:none;border-top:1px solid var(--line);margin:1.1rem 0">
     <label class="muted-note">Teacher passcode</label>
     <input id="pass-set" class="field" type="password" placeholder="Set or change teacher passcode" style="margin-top:.3rem"/>
@@ -553,6 +562,14 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
         if(((c&&c.lastPracticed)||0)>((l&&l.lastPracticed)||0)){d.students[n].topics[tid]=c;changed=true;}
         else if(l&&((l.lastPracticed||0)>((c&&c.lastPracticed)||0))){pushTopics.push({n:n,tid:tid});}});});
     Object.keys(d.students).forEach(function(n){var tps=(d.students[n]&&d.students[n].topics)||{};Object.keys(tps).forEach(function(tid){if(!(ct[n]&&ct[n][tid])&&((tps[tid]&&tps[tid].lastPracticed)||0)>0)pushTopics.push({n:n,tid:tid});});});
+    /* Homework: the plan is published by the teacher, the state is written by the student. Both
+     * arrive already scoped by the backend — a student's pull can only ever contain their own. */
+    var chp=doc.hwplan||{};
+    Object.keys(chp).forEach(function(n){var subs=chp[n]||{};d.students[n]=d.students[n]||{topics:{}};d.students[n].hwplan=d.students[n].hwplan||{};
+      Object.keys(subs).forEach(function(sid){var c=subs[sid];var l=d.students[n].hwplan[sid];if(recTs(c)>recTs(l)){d.students[n].hwplan[sid]=c;changed=true;}});});
+    var chs=doc.hwstate||{};
+    Object.keys(chs).forEach(function(n){var subs=chs[n]||{};d.students[n]=d.students[n]||{topics:{}};d.students[n].hwstate=d.students[n].hwstate||{};
+      Object.keys(subs).forEach(function(sid){var c=subs[sid];var l=d.students[n].hwstate[sid];if(recTs(c)>recTs(l)){d.students[n].hwstate[sid]=c;changed=true;}});});
     var cr=doc.reviews||{};
     Object.keys(cr).forEach(function(n){var tmap=cr[n]||{};var st=d.students[n];if(!st||!st.topics)return;
       Object.keys(tmap).forEach(function(tid){var m=tmap[tid]||{};var to=st.topics[tid];if(!to||!to.responses)return;
@@ -798,6 +815,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
       '<div class="stat"><div class="n">'+Object.keys(skillsToReview).length+'</div><div class="l">Skills to review</div></div>';
     renderHomeworkBanner(cur, topics, subj);
     renderSyncWarning(cur, started>0);
+    renderHomeworkSets(cur, subj, topics);
     renderDueReview(topics, subj);
 
     var html='';
@@ -876,6 +894,171 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     if(msg){el.textContent='⚠ '+msg;el.style.display='block';}
     else{el.style.display='none';el.textContent='';}
   }
+
+  /* ===== homework engine =====
+   * A plan is published per student per subject by the teacher and pulled scoped, so a student can
+   * only ever receive their own. Sets release by date; a released set NEVER locks again, because the
+   * students this exists for are the ones catching up. Module-referenced items are marked done by
+   * reading what the module already recorded — one source of truth, no double counting. */
+  function hwToday(){var d=new Date();function p(n){return (n<10?'0':'')+n;}return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());}
+  function hwPlanFor(cur,sid){var d=getData();var s=d.students&&d.students[cur];var p=s&&s.hwplan&&s.hwplan[sid];return (p&&p.sets)?p:null;}
+  function hwStateFor(cur,sid){var d=getData();var s=d.students&&d.students[cur];return (s&&s.hwstate&&s.hwstate[sid]&&s.hwstate[sid].sets)||{};}
+  // ISO dates compare correctly as plain strings, so no date parsing is needed.
+  function hwSetStatus(set,state,today){
+    var st=state&&state[set.id];
+    if(st&&st.completedTs)return 'done';
+    if(set.releaseOn&&String(set.releaseOn)>today)return 'locked';
+    return 'open';                                        // released stays open forever — no catch-up lockout
+  }
+  /* A module item counts as done once the module has recorded a step against that qid. Per-qid step
+   * totals are not stored anywhere, so "attempted and recorded" is the strongest signal available. */
+  function hwItemDone(item,topics){
+    if(!item||item.ref!=='module')return false;
+    var to=topics&&topics[item.topic];var tr=to&&to.tree&&to.tree[item.qid];
+    if(!tr||!tr.steps)return false;
+    return Object.keys(tr.steps).some(function(k){return !!tr.steps[k];});
+  }
+  // Only items this engine can evaluate count toward progress (bank items arrive with the bank).
+  function hwSetProgress(set,topics){
+    var done=0,total=0;
+    (set.items||[]).forEach(function(it){if(it&&it.ref==='module'){total++;if(hwItemDone(it,topics))done++;}});
+    return {done:done,total:total};
+  }
+  // Consecutive module items in the same topic collapse into ONE link (?q=a,b) — one trip, not three.
+  function hwLinks(set){
+    var out=[],cur=null;
+    (set.items||[]).forEach(function(it){
+      if(!it||it.ref!=='module'){cur=null;out.push({kind:'other',item:it});return;}
+      if(cur&&cur.topic===it.topic){cur.qids.push(it.qid);return;}
+      cur={kind:'module',topic:it.topic,qids:[it.qid]};out.push(cur);
+    });
+    return out;
+  }
+  function postHomework(cur,sid,set,prog){
+    var u=sheetURL();if(!u)return;
+    try{fetch(u,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({op:'hw',hub:SYNC_HUB_ID||'default',name:cur,pin:pinFor(cur),key:syncKey(),
+        subject:sid,set:set.id,correct:prog.done,total:prog.total,ts:Date.now(),
+        payload:{label:set.label||set.id,items:set.items||[]}})}).catch(function(){});}catch(e){}
+  }
+  function hwRecordDone(cur,sid,set,prog){
+    var d=getData();d.students=d.students||{};d.students[cur]=d.students[cur]||{topics:{}};
+    var hs=d.students[cur].hwstate=d.students[cur].hwstate||{};
+    var rec=hs[sid]=hs[sid]||{sets:{},ts:0};rec.sets=rec.sets||{};
+    if(rec.sets[set.id]&&rec.sets[set.id].completedTs)return false;   // record a completion once, never twice
+    rec.sets[set.id]={completedTs:Date.now(),correct:prog.done,total:prog.total};
+    rec.ts=Date.now();jset(K('data'),d);
+    syncPush('hwstate',cur,sid,rec);postHomework(cur,sid,set,prog);
+    return true;
+  }
+  function renderHomeworkSets(cur,subj,topics){
+    var el=document.getElementById('hw-sets');if(!el)return;
+    var plan=hwPlanFor(cur,subj.id);
+    if(!plan){el.innerHTML='';return;}
+    var state=hwStateFor(cur,subj.id),today=hwToday(),rows='';
+    (plan.sets||[]).forEach(function(set){
+      // ownership guard: never render a set that references a topic this hub does not own
+      if((set.items||[]).some(function(it){return it&&it.ref==='module'&&!topicMeta(it.topic);}))return;
+      var status=hwSetStatus(set,state,today),prog=hwSetProgress(set,topics);
+      if(status==='open'&&prog.total>0&&prog.done>=prog.total){if(hwRecordDone(cur,subj.id,set,prog))status='done';}
+      var label=esc(set.label||set.id);
+      if(status==='locked'){
+        rows+='<div class="item">'+label+' — <span class="muted-note">opens '+esc(set.releaseOn)+'</span></div>';
+      }else if(status==='done'){
+        rows+='<div class="item">'+label+' — <strong>done ✓</strong></div>';
+      }else{
+        var links=hwLinks(set).map(function(g){
+          if(g.kind!=='module')return '';
+          var t=topicMeta(g.topic);if(!t||!t.file)return '';
+          return '<a class="btn sm" href="'+esc(t.file)+'?q='+encodeURIComponent(g.qids.join(','))+'">'+esc(t.title)+' →</a>';
+        }).filter(Boolean).join(' ');
+        rows+='<div class="item">'+label+' — '+prog.done+'/'+prog.total+' done'+
+              '<div style="margin-top:.35rem">'+links+'</div></div>';
+      }
+    });
+    el.innerHTML=rows?('<div class="hw-card"><h3>Your '+esc(subj.label)+' homework</h3>'+rows+'</div>'):'';
+  }
+
+  /* ---- publishing plans (teacher) ----
+   * Plans are authored tutor-side and picked as a FILE, so they never enter the public repo and no
+   * student name is ever committed. Validation fails closed: one bad plan publishes nothing, because
+   * a half-published week is worse than an unpublished one. Publishing is then CONFIRMED by reading
+   * back as teacher — a no-cors write can never report failure, and "looks published but isn't" is
+   * the exact failure mode this system has already been bitten by. */
+  var _hwPending=null;
+  function hwValidatePlans(list){
+    var errs=[],ok=[];
+    (list||[]).forEach(function(p,i){
+      var where='plan '+(i+1);
+      var name=resolveName((p&&p.student)||'');
+      if(!name){errs.push(where+': student "'+((p&&p.student)||'')+'" is not on this hub’s roster');return;}
+      var subj=subjectById((p&&p.subject)||'');
+      if(!subj){errs.push(where+' ('+name+'): unknown subject "'+((p&&p.subject)||'')+'"');return;}
+      var sets=(p.sets||[]);
+      if(!sets.length){errs.push(where+' ('+name+'): no sets');return;}
+      var seen={};
+      sets.forEach(function(s,j){
+        var w=where+' ('+name+'/'+subj.id+') set '+(j+1);
+        if(!s||!s.id){errs.push(w+': missing id');return;}
+        if(seen[s.id]){errs.push(w+': duplicate set id "'+s.id+'"');return;}
+        seen[s.id]=1;
+        if(s.releaseOn&&!/^\d{4}-\d{2}-\d{2}$/.test(String(s.releaseOn)))errs.push(w+': releaseOn must be YYYY-MM-DD');
+        var items=(s.items||[]);
+        if(!items.length){errs.push(w+': no items');return;}
+        items.forEach(function(it,k){
+          var wi=w+' item '+(k+1);
+          if(!it||(it.ref!=='module'&&it.ref!=='bank')){errs.push(wi+': ref must be "module" or "bank"');return;}
+          if(it.ref==='module'){
+            if(!it.topic||!it.qid){errs.push(wi+': module item needs topic and qid');return;}
+            if(!topicMeta(it.topic))errs.push(wi+': this hub does not own topic "'+it.topic+'"');
+          }else if(!it.id){errs.push(wi+': bank item needs an id');}
+        });
+      });
+      ok.push({student:name,subject:subj.id,plan:{hub:SYNC_HUB_ID||'default',student:name,subject:subj.id,sets:sets,ts:Date.now()}});
+    });
+    return {errors:errs,plans:errs.length?[]:ok};
+  }
+  function hwWireSettings(){
+    var pick=document.getElementById('btn-pick-hw'),file=document.getElementById('hw-file'),
+        pub=document.getElementById('btn-publish-hw'),st=document.getElementById('hw-status');
+    if(!pick||!file||!pub||!st)return;
+    pick.onclick=function(){file.click();};
+    file.onchange=function(e){
+      var f=e.target.files[0];if(!f)return;
+      var r=new FileReader();
+      r.onload=function(){
+        var raw;try{raw=JSON.parse(r.result);}catch(err){st.textContent='That file is not valid JSON.';pub.disabled=true;_hwPending=null;return;}
+        var list=Array.isArray(raw)?raw:((raw&&raw.plans)||[]);
+        var res=hwValidatePlans(list);
+        if(res.errors.length){
+          _hwPending=null;pub.disabled=true;
+          st.innerHTML='<strong>Not published — '+res.errors.length+' problem'+(res.errors.length===1?'':'s')+':</strong><br>'+
+                       res.errors.slice(0,8).map(esc).join('<br>');
+          return;
+        }
+        _hwPending=res.plans;pub.disabled=false;
+        var sets=0;res.plans.forEach(function(p){sets+=(p.plan.sets||[]).length;});
+        st.textContent='Ready: '+res.plans.length+' plan'+(res.plans.length===1?'':'s')+', '+sets+' set'+(sets===1?'':'s')+'. Press Publish.';
+      };
+      r.readAsText(f);e.target.value='';
+    };
+    pub.onclick=function(){
+      if(!_hwPending||!_hwPending.length)return;
+      if(!sheetURL()){st.textContent='No Sheet URL saved — cannot publish.';return;}
+      if(!syncKey()){st.textContent='No teacher sync key saved — the cloud would reject this. Set it above first.';return;}
+      var plans=_hwPending;
+      plans.forEach(function(p){syncPush('hwplan',p.student,p.subject,p.plan);});
+      st.textContent='Sent — confirming…';
+      setTimeout(function(){
+        syncPull(function(doc){
+          var got=0;plans.forEach(function(p){if(doc&&doc.hwplan&&doc.hwplan[p.student]&&doc.hwplan[p.student][p.subject])got++;});
+          if(got===plans.length){st.textContent='Published and confirmed: '+got+' plan'+(got===1?'':'s')+' now in the cloud.';_hwPending=null;pub.disabled=true;}
+          else st.textContent='WARNING: only '+got+' of '+plans.length+' confirmed. Check the teacher sync key, then Publish again.';
+        });
+      },1800);
+    };
+  }
+  hwWireSettings();
 
   // ---- teacher ----
   var _tmMode='',_tmNext='dash';

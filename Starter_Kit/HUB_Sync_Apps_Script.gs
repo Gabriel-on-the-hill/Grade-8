@@ -12,7 +12,12 @@
  * spreadsheet this deployment writes to, and the row counts. If you ever end up
  * with several copies of this Sheet, that is how you tell which one is live.
  */
-var SHEET_LOG = 'Log', SHEET_SYNC = 'SyncStore';
+var SHEET_LOG = 'Log', SHEET_SYNC = 'SyncStore', SHEET_HW = 'Homework';
+
+/* Homework tab header. `raw` is load-bearing: it carries the whole posted JSON, so new fields can be
+ * read later WITHOUT redeploying this script. Keep the order — a test parses this header, because a
+ * column-map drift has already silently blanked a dashboard once and looks identical to "no data". */
+var HW_HEADER = ['when', 'hub', 'student', 'subject', 'set', 'correct', 'total', 'seconds', 'raw'];
 
 /* ===================== PUT YOUR SHEET ID ON THE LINE BELOW =====================
  * Run `setup` once (Run ▸ setup) and it prints the exact id for you.
@@ -83,6 +88,7 @@ function setup() {
   var ss = _ss();
   _sheet(SHEET_SYNC, ['key', 'hub', 'kind', 'name', 'sub', 'ts', 'json']);
   _sheet(SHEET_LOG, ['when', 'hub', 'student', 'topic', 'question', 'event', 'detail']);
+  _sheet(SHEET_HW, HW_HEADER);
   var msg = 'Tabs ready in "' + ss.getName() + '".\n\n' +
             'EDIT THE LINE THAT IS ALREADY NEAR THE TOP OF THIS SCRIPT.\n' +
             "Find:   var SHEET_ID = '';   and put the id between its quotes, so it reads:\n\n" +
@@ -145,8 +151,9 @@ function doPost(e) {
         if (d.kind === 'pin') {
           // first claim is open; changing an existing PIN needs the owner or the teacher
           if (_pinOf(hub, d.name) !== null && who !== 'student') return ContentService.createTextOutput('err: auth');
-        } else if (d.kind === 'review') {
-          return ContentService.createTextOutput('err: auth'); // teacher-only
+        } else if (d.kind === 'review' || d.kind === 'hwplan') {
+          // teacher-only. A student must never be able to rewrite their own homework plan.
+          return ContentService.createTextOutput('err: auth');
         } else if (who !== 'student') {
           return ContentService.createTextOutput('err: auth');
         }
@@ -167,6 +174,22 @@ function doPost(e) {
       sh.appendRow([key, hub, d.kind, d.name, d.sub || '', ts, JSON.stringify(d.payload)]);
       return ContentService.createTextOutput('ok');
     }
+
+    /* Homework completion — append-only history in its own tab, so homework reads AS homework
+     * instead of being dug out of the activity Log. A student may record their own; the teacher
+     * may record any. Same auth as a topic write: the URL alone still grants nothing. */
+    if (d.op === 'hw') {
+      var whoHw = _who(hub, d.name, d.pin, d.key);
+      if (whoHw !== 'teacher' && whoHw !== 'student') return ContentService.createTextOutput('err: auth');
+      var hw = _sheet(SHEET_HW, HW_HEADER);
+      hw.appendRow([new Date(), hub, d.name || '', d.subject || '', d.set || '',
+                    (d.correct == null ? '' : d.correct),
+                    (d.total   == null ? '' : d.total),
+                    (d.seconds == null ? '' : d.seconds),
+                    JSON.stringify(d.payload || {})]);
+      return ContentService.createTextOutput('ok');
+    }
+
     var lg = _sheet(SHEET_LOG, ['when', 'hub', 'student', 'topic', 'question', 'event', 'detail']);
     lg.appendRow([new Date(), hub, d.student || '', d.topic || '', d.question || '', d.event || '', d.detail || '']);
     return ContentService.createTextOutput('ok');
@@ -187,19 +210,21 @@ function doGet(e) {
      * names the Sheet it writes to, so "is it working, and which Sheet?" is one click. */
     if (op === 'ping') {
       var pss = _ss();
-      var psy = pss.getSheetByName(SHEET_SYNC), plg = pss.getSheetByName(SHEET_LOG);
+      var psy = pss.getSheetByName(SHEET_SYNC), plg = pss.getSheetByName(SHEET_LOG),
+          phw = pss.getSheetByName(SHEET_HW);
       return _jsonp(cb, {
         ok: true,
         sheet: pss.getName(),
         id: pss.getId(),
         sync: psy ? Math.max(0, psy.getLastRow() - 1) : 0,
         log: plg ? Math.max(0, plg.getLastRow() - 1) : 0,
+        hw:  phw ? Math.max(0, phw.getLastRow() - 1) : 0,
         serverTs: Date.now()
       });
     }
     if (op !== 'pull') return _jsonp(cb, null);
     var hub = String(e.parameter.hub || 'default');
-    var doc = { pins: {}, assign: {}, reviews: {}, topics: {}, serverTs: Date.now() };
+    var doc = { pins: {}, assign: {}, reviews: {}, topics: {}, hwplan: {}, hwstate: {}, serverTs: Date.now() };
 
     /* Scope the read. The URL is public, so on its own it returns an empty doc —
      * the same shape the client already handles when there is no cloud data.
@@ -222,6 +247,11 @@ function doGet(e) {
         else if (kind === 'assign') { (doc.assign[name] = doc.assign[name] || {})[sub] = p; }
         else if (kind === 'review') { (doc.reviews[name] = doc.reviews[name] || {})[sub] = p; }
         else if (kind === 'topic') { (doc.topics[name] = doc.topics[name] || {})[sub] = p; }
+        /* Homework is scoped by exactly the same rule as everything else above: teacher key -> all
+         * students, name + PIN -> self only, neither -> nothing. That is what makes one student
+         * unable to see another's homework, and it is enforced here, not in the app. */
+        else if (kind === 'hwplan')  { (doc.hwplan[name]  = doc.hwplan[name]  || {})[sub] = p; }
+        else if (kind === 'hwstate') { (doc.hwstate[name] = doc.hwstate[name] || {})[sub] = p; }
       }
     }
     return _jsonp(cb, doc);

@@ -1,0 +1,40 @@
+[
+  {
+    "_comment": "EXAMPLE ONLY. Copy this, fill in real names, and keep your copy OFF this repo (see .gitignore). Publish it via Teacher > Settings > Homework > Choose plans file.",
+    "student": "<student name exactly as it appears on the roster>",
+    "subject": "math",
+    "sets": [
+      {
+        "id": "sn-1",
+        "label": "Set 1 — scientific notation",
+        "_releaseOn_note": "Omit releaseOn for a single set available immediately. Add it for a dated release.",
+        "items": [
+          { "ref": "module", "topic": "expressions-equations", "qid": "2-3" },
+          { "ref": "module", "topic": "expressions-equations", "qid": "2-4" }
+        ]
+      },
+      {
+        "id": "sn-2",
+        "label": "Set 2 — number system review",
+        "releaseOn": "2026-07-22",
+        "items": [
+          { "ref": "module", "topic": "number-system", "qid": "1-2" }
+        ]
+      }
+    ]
+  },
+  {
+    "_comment": "A second subject for the same student is simply a second plan — they render as separate cards.",
+    "student": "<same or another roster name>",
+    "subject": "sci",
+    "sets": [
+      {
+        "id": "matter-1",
+        "label": "Set 1 — matter",
+        "items": [
+          { "ref": "module", "topic": "sci.matter", "qid": "7-1" }
+        ]
+      }
+    ]
+  }
+]

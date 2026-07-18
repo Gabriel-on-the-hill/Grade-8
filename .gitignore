@@ -5,6 +5,11 @@ MCAP MATHS/
 MCAP SCIENCE/
 Textbooks/
 
+# tutor-side homework plans — NEVER commit. They name students, and this repo is public.
+# Author them anywhere on your machine and pick the file in Teacher > Settings > Publish plans.
+homework-plans/
+*.plans.json
+
 # scratch / junk
 _synctest.txt
 outputs/

@@ -1017,8 +1017,46 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     else (document.querySelector('.container')||document.body).appendChild(panel);
     document.body.classList.add('g7-review-mode');
   }
-  window.addEventListener('load',g7reviewMode);          // after restoreProgress: undoes its pre-fill
+  /* ===== homework deep-link: ?q=<qid>[,<qid>...] =====
+   * A homework set can reference exact questions in this module. Sending the student straight to
+   * them — several at once, in the order the set names them — beats a round-trip per question.
+   * Reuses the review reset so she makes a REAL attempt: restoreProgress() would otherwise re-fill a
+   * completed item with its own answer key, which is the opposite of retrieval. The stored tree is
+   * never touched, so the hub reads completion straight back out of it. */
+  function g7hwParam(){try{return (new URLSearchParams(location.search)).get('q')||'';}catch(e){return '';}}
+  function g7hwSet(csv){
+    var want=String(csv||'').split(',').map(function(s){return s.trim();}).filter(Boolean);
+    var byId={};
+    Array.prototype.forEach.call(document.querySelectorAll('.qcard[data-qid]'),function(c){byId[c.dataset.qid]=c;});
+    var out=[];
+    want.forEach(function(q){var c=byId[q];if(c&&out.indexOf(c)<0)out.push(c);});
+    return out;                                           // order follows the homework set, not the page
+  }
+  function g7homeworkMode(){
+    var csv=g7hwParam();if(!csv)return false;
+    var set=g7hwSet(csv);if(!set.length)return false;     // unknown qid -> fall through to the normal lesson
+    var panel=document.createElement('div');panel.className='rev-panel';panel.id='g7-homework-panel';
+    var h=document.createElement('h2');h.textContent='Homework';
+    var p=document.createElement('p');p.className='rev-sub';
+    p.textContent=set.length+' question'+(set.length===1?'':'s')+' set for you, cleared for a fresh '+
+      'attempt. Work each one out before you answer.';
+    panel.appendChild(h);panel.appendChild(p);
+    set.forEach(function(c){g7revReset(c);panel.appendChild(c);});   // moved, never removed: totals stay honest
+    var done=document.createElement('div');done.className='rev-done';
+    var a1=document.createElement('a');a1.className='btn';a1.href=g7hubHref();a1.textContent='Done — back to the Hub';
+    var a2=document.createElement('a');a2.className='btn ghost';
+    a2.href=(location.pathname.split('/').pop()||'');a2.textContent='Open the full lesson';
+    done.appendChild(a1);done.appendChild(a2);panel.appendChild(done);
+    var first=document.querySelector('section.topic');
+    if(first&&first.parentNode)first.parentNode.insertBefore(panel,first);
+    else (document.querySelector('.container')||document.body).appendChild(panel);
+    document.body.classList.add('g7-review-mode');
+    return true;
+  }
+  // Homework wins over review: it is an explicit instruction, not a suggestion.
+  window.addEventListener('load',function(){if(!g7homeworkMode())g7reviewMode();});
   window.__modReviewMode={set:g7revSet,reset:g7revReset,mode:g7reviewMode,param:g7revParam};
+  window.__modHomeworkMode={set:g7hwSet,mode:g7homeworkMode,param:g7hwParam};
 
   document.getElementById('btn-export').addEventListener('click',function(){
     var d=loadData();var cards=document.querySelectorAll('.qcard');var lines=[],td=0,ts=0;
