@@ -28,14 +28,13 @@ function grab(re, label) {
 const src = [
   grab(/function hwToday\(\)\{[^\n]*/, 'hwToday'),
   grab(/function hwSetStatus\(set,state,today\)\{[\s\S]*?\n  \}/, 'hwSetStatus'),
-  grab(/function hwItemDone\(item,topics\)\{[\s\S]*?\n  \}/, 'hwItemDone'),
-  grab(/function hwSetProgress\(set,topics\)\{[\s\S]*?\n  \}/, 'hwSetProgress'),
+  grab(/function hwSetProgress\(set,doneMap\)\{[\s\S]*?\n  \}/, 'hwSetProgress'),
   grab(/function hwLinks\(set\)\{[\s\S]*?\n  \}/, 'hwLinks')
 ].join('\n');
 
-eval(src + '\nglobal.__today=hwToday;global.__status=hwSetStatus;global.__done=hwItemDone;' +
+eval(src + '\nglobal.__today=hwToday;global.__status=hwSetStatus;' +
            'global.__prog=hwSetProgress;global.__links=hwLinks;');
-const today = global.__today, status = global.__status, itemDone = global.__done,
+const today = global.__today, status = global.__status,
       progress = global.__prog, links = global.__links;
 
 let pass = 0, fail = 0;
@@ -59,25 +58,29 @@ t('a MISSED past set stays open (no catch-up lockout)',
 t('completed -> done',               status({ id: 's' }, { s: { completedTs: 1 } }, TODAY), 'done');
 t('completed beats a future release', status({ id: 's', releaseOn: '2099-01-01' }, { s: { completedTs: 1 } }, TODAY), 'done');
 
-// ---- module completion reading ----
-const topics = {
-  'expressions-equations': { tree: { '2-3': { steps: { '0': true } }, '2-4': { steps: { '0': false } }, '2-9': {} } }
-};
-t('recorded step -> done',        itemDone({ ref: 'module', topic: 'expressions-equations', qid: '2-3' }, topics), true);
-t('all-false steps -> not done',  itemDone({ ref: 'module', topic: 'expressions-equations', qid: '2-4' }, topics), false);
-t('empty tree entry -> not done', itemDone({ ref: 'module', topic: 'expressions-equations', qid: '2-9' }, topics), false);
-t('unknown qid -> not done',      itemDone({ ref: 'module', topic: 'expressions-equations', qid: 'zz' }, topics), false);
-t('unknown topic -> not done',    itemDone({ ref: 'module', topic: 'nope', qid: '2-3' }, topics), false);
-t('bank item -> not counted yet', itemDone({ ref: 'bank', id: 'x' }, topics), false);
+// ---- set progress, from HOMEWORK markers only ----
+// The load-bearing rule: progress counts work done AS HOMEWORK. It must never be inferred from the
+// module's topic tree, or a question answered weeks ago in ordinary practice would count — and a set
+// whose items had all been practised before would auto-complete and post a score for homework the
+// student never did.
+const set5 = { items: [
+  { ref: 'module', topic: 'expressions-equations', qid: '2-2' },
+  { ref: 'module', topic: 'expressions-equations', qid: '2-5' },
+  { ref: 'module', topic: 'number-system',         qid: '2-5' },   // same qid, different module
+  { ref: 'bank', id: 'b1' }
+] };
 
-// ---- set progress ----
-t('progress counts module items only',
-  progress({ items: [
-    { ref: 'module', topic: 'expressions-equations', qid: '2-3' },
-    { ref: 'module', topic: 'expressions-equations', qid: '2-4' },
-    { ref: 'bank', id: 'b1' }
-  ] }, topics), { done: 1, total: 2 });
-t('empty set -> 0/0', progress({ items: [] }, topics), { done: 0, total: 0 });
+t('nothing done yet -> 0 of 3', progress(set5, {}), { done: 0, total: 3 });
+t('one homework marker -> 1 of 3',
+  progress(set5, { 'expressions-equations|2-2': { ts: 1 } }), { done: 1, total: 3 });
+t('markers are keyed topic|qid, so the same qid in two modules is NOT double-counted',
+  progress(set5, { 'expressions-equations|2-5': { ts: 1 } }), { done: 1, total: 3 });
+t('both same-qid items counted only when each is marked',
+  progress(set5, { 'expressions-equations|2-5': { ts: 1 }, 'number-system|2-5': { ts: 1 } }), { done: 2, total: 3 });
+t('a bare qid key does NOT count (must be topic-qualified)',
+  progress(set5, { '2-2': { ts: 1 } }), { done: 0, total: 3 });
+t('bank items are excluded from the denominator', progress(set5, {}).total, 3);
+t('empty set -> 0/0', progress({ items: [] }, {}), { done: 0, total: 0 });
 
 // ---- link grouping ----
 const g = s => links(s).filter(x => x.kind === 'module').map(x => x.topic + ':' + x.qids.join(','));

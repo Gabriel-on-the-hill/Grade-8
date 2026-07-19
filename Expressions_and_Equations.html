@@ -723,6 +723,24 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
    * either way, and the Homework tab only ever saw a row once a whole set was finished. */
   function g7hwCtx(){try{var p=new URLSearchParams(location.search);var s=p.get('hw');
     return s?{set:s,subj:p.get('subj')||''}:null;}catch(e){return null;}}
+  /* Mark this item done AS HOMEWORK, locally and in the cloud. Completion must not be inferred from
+   * the module tree: that records any past practice, so a set could show progress — or even auto-
+   * complete and post a score — for work never done as homework. Keyed by topic|qid because the
+   * same qid exists in more than one module. */
+  function g7hwMark(qid,wrong){
+    var c=g7hwCtx();if(!c)return;
+    try{
+      var o=g7all(),s=g7current();
+      o.students=o.students||{};o.students[s]=o.students[s]||{topics:{}};
+      var hs=o.students[s].hwstate=o.students[s].hwstate||{};
+      var rec=hs[c.subj]=hs[c.subj]||{sets:{},items:{},ts:0};
+      rec.items=rec.items||{};
+      var m=rec.items[c.set]=rec.items[c.set]||{};
+      m[G7_TOPIC_ID+'|'+qid]={ts:Date.now(),wrong:!!wrong};
+      rec.ts=Date.now();g7save(o);
+      syncPush('hwstate',s,c.subj,rec);
+    }catch(e){}
+  }
   function g7hwPost(qid,wrong){
     var c=g7hwCtx();if(!c)return;
     var url=localStorage.getItem('g7.sheetURL');if(!url)return;
@@ -731,7 +749,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
         subject:c.subj,set:c.set,item:qid,outcome:wrong?'incorrect':'correct',ts:Date.now(),
         payload:{topic:G7_TOPIC_ID,title:G7_TOPIC_TITLE}})}).catch(function(){});}catch(e){}
   }
-  function g7log(qid,wrong,label,your,exam){var o=g7all();var t=g7topic(o);var sk=G7_SKILLS[qid]||'reasoning';t.skillStats[sk]=t.skillStats[sk]||{attempts:0,misses:0};t.skillStats[sk].attempts++;t.skillStats[sk].last=Date.now();t.attempts=(t.attempts||0)+1;if(wrong){t.skillStats[sk].misses++;t.struggles.push({qid:qid,label:(label||qid).trim(),skill:sk,skillLabel:G7_SKILL_LABELS[sk],your:your||'',ts:Date.now()});if(t.struggles.length>120)t.struggles=t.struggles.slice(-120);}else{t.correct=(t.correct||0)+1;}if(exam){t.exam=t.exam||{attempts:0,correct:0};t.exam.attempts++;if(!wrong)t.exam.correct++;}var _lv=g7level(qid);t.levelStats=t.levelStats||{};t.levelStats[_lv]=t.levelStats[_lv]||{attempts:0,misses:0};t.levelStats[_lv].attempts++;if(wrong)t.levelStats[_lv].misses++;t.lastPracticed=Date.now();g7save(o);g7sheet(wrong?'struggle':'step_complete',(label||qid).trim(),wrong?('typed "'+(your||'')+'"'):'');g7hwPost(qid,wrong);schedulePush();}
+  function g7log(qid,wrong,label,your,exam){var o=g7all();var t=g7topic(o);var sk=G7_SKILLS[qid]||'reasoning';t.skillStats[sk]=t.skillStats[sk]||{attempts:0,misses:0};t.skillStats[sk].attempts++;t.skillStats[sk].last=Date.now();t.attempts=(t.attempts||0)+1;if(wrong){t.skillStats[sk].misses++;t.struggles.push({qid:qid,label:(label||qid).trim(),skill:sk,skillLabel:G7_SKILL_LABELS[sk],your:your||'',ts:Date.now()});if(t.struggles.length>120)t.struggles=t.struggles.slice(-120);}else{t.correct=(t.correct||0)+1;}if(exam){t.exam=t.exam||{attempts:0,correct:0};t.exam.attempts++;if(!wrong)t.exam.correct++;}var _lv=g7level(qid);t.levelStats=t.levelStats||{};t.levelStats[_lv]=t.levelStats[_lv]||{attempts:0,misses:0};t.levelStats[_lv].attempts++;if(wrong)t.levelStats[_lv].misses++;t.lastPracticed=Date.now();g7save(o);g7sheet(wrong?'struggle':'step_complete',(label||qid).trim(),wrong?('typed "'+(your||'')+'"'):'');g7hwPost(qid,wrong);g7hwMark(qid,wrong);schedulePush();}
 
   /* ===== spaced review (MR-1) phase-2: stored consecutive-session streak ===== */
   // A "review session" = one module visit. We count only FIRST-attempt graded items;

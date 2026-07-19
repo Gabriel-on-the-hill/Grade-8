@@ -876,7 +876,10 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     var ao=getAssignObj(stu, subj.id);
     var sugg=suggestHomework(topics, subjectTopicIds(subj), subj.skillLabels);
     if(!ao && !sugg.length){ el.innerHTML=''; return; }
-    var s='<div class="hw-card"><h3>Your '+esc(subj.label)+' homework</h3>';
+    /* Distinct from the assigned-homework card below it, which owns the phrase "Your ... homework".
+     * This card is a teacher note and/or an automatic suggestion from her weakest concepts — a
+     * signal, not a task, so it must not read as the homework itself. */
+    var s='<div class="hw-card"><h3>'+(ao?'A note from your teacher':'Suggested extra practice')+'</h3>';
     if(ao){
       s+='<div class="item">From your teacher: '+esc(ao.text)+(ao.doneTs?' <strong>— done \u2713</strong>':'')+'</div>';
       s+='<div style="margin-top:.4rem"><button class="btn sm'+(ao.doneTs?' ghost':'')+'" id="hw-done">'+(ao.doneTs?'Mark as not done':'Mark done')+'</button></div>';
@@ -936,18 +939,21 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     if(set.releaseOn&&String(set.releaseOn)>today)return 'locked';
     return 'open';                                        // released stays open forever — no catch-up lockout
   }
-  /* A module item counts as done once the module has recorded a step against that qid. Per-qid step
-   * totals are not stored anywhere, so "attempted and recorded" is the strongest signal available. */
-  function hwItemDone(item,topics){
-    if(!item||item.ref!=='module')return false;
-    var to=topics&&topics[item.topic];var tr=to&&to.tree&&to.tree[item.qid];
-    if(!tr||!tr.steps)return false;
-    return Object.keys(tr.steps).some(function(k){return !!tr.steps[k];});
+  /* Which items of this set were done AS HOMEWORK. Deliberately NOT read from the module's topic
+   * tree: that records any past practice, so a set would show progress for work done weeks earlier
+   * and — if every item happened to have been practised before — would auto-complete and post a
+   * score for homework the student never did. The module writes these markers only when it is
+   * opened through a homework link. Keyed topic|qid, because the same qid exists in more than one
+   * module (2-5 is a real item in both Expressions & Equations and The Number System). */
+  function hwDoneMap(cur,sid,setId){
+    var d=getData();var s=d.students&&d.students[cur];
+    var it=s&&s.hwstate&&s.hwstate[sid]&&s.hwstate[sid].items;
+    return (it&&it[setId])||{};
   }
   // Only items this engine can evaluate count toward progress (bank items arrive with the bank).
-  function hwSetProgress(set,topics){
+  function hwSetProgress(set,doneMap){
     var done=0,total=0;
-    (set.items||[]).forEach(function(it){if(it&&it.ref==='module'){total++;if(hwItemDone(it,topics))done++;}});
+    (set.items||[]).forEach(function(it){if(it&&it.ref==='module'){total++;if(doneMap[it.topic+'|'+it.qid])done++;}});
     return {done:done,total:total};
   }
   // Consecutive module items in the same topic collapse into ONE link (?q=a,b) — one trip, not three.
@@ -985,7 +991,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     (plan.sets||[]).forEach(function(set){
       // ownership guard: never render a set that references a topic this hub does not own
       if((set.items||[]).some(function(it){return it&&it.ref==='module'&&!topicMeta(it.topic);}))return;
-      var status=hwSetStatus(set,state,today),prog=hwSetProgress(set,topics);
+      var status=hwSetStatus(set,state,today),prog=hwSetProgress(set,hwDoneMap(cur,subj.id,set.id));
       if(status==='open'&&prog.total>0&&prog.done>=prog.total){if(hwRecordDone(cur,subj.id,set,prog))status='done';}
       var label=esc(set.label||set.id);
       if(status==='locked'){
