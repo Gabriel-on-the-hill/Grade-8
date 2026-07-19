@@ -179,9 +179,12 @@ Engine v1.2 (v1.1 + the multi-subject hub layer: flat `UNITS` replaced by `SUBJE
 > across sessions; this does not. If you change the hub or a module, **add a line here in the same
 > commit as the change**.
 
-- [ ] **2026-07-19 — `ref:"task"` homework item kind** (hub only: validator + `renderHomeworkSets` + one CSS rule + `__hubHw` test hook). **Blocks a publish:** `ayodeji.plans.json` (set `wk-2026-07-20`, released 19 Jul) contains a `task` item, and **an un-pushed live hub will reject the whole plan** — publishing fails closed, so the week publishes as nothing. **Push before publishing that plan.**
-- [ ] **2026-07-19 — per-student subject visibility (`STUDENT_SUBJECTS`)** (hub only). Ayodeji is gated to Mathematics; Divine keeps both. **Also blocks a publish:** the validator now rejects a plan whose subject the student cannot see, so an old live hub and a new plan file disagree in both directions.
-- [ ] *Unverified from earlier sessions* — the 2026-07-15 (Science unit) and 2026-07-19 (`g8.` namespace split) build-log entries both end "Live site is stale until pushed" and nothing records whether they went out. **Check the live site against local before assuming these are done.**
+- [x] **2026-07-19 — `ref:"task"` homework item kind** — pushed in `b8a7bf1`; **verified live** (the served hub returns `ref must be "module", "bank" or "task"`).
+- [x] **2026-07-19 — per-student subject visibility (`STUDENT_SUBJECTS`)** — pushed in `b8a7bf1`; **verified live** (`STUDENT_SUBJECTS` present in the served hub).
+- [x] **2026-07-19 — `g8.` storage-namespace split** — was already on `origin/main` at `b92c15e`; **verified live** (served hub carries `STORE_PREFIX='g8.'`).
+- [x] **2026-07-15 — Science unit (Matter & Its Interactions)** — **verified live** (`Matter_and_Its_Interactions.html` returns HTTP 200).
+
+*Nothing outstanding as of 19 Jul 2026. Verified by fetching the deployed site, not by assuming a push shipped — a green `git push` only proves the remote updated, and Pages rebuilds a minute or two later.*
 
 - Repo: **https://github.com/Gabriel-on-the-hill/Grade-8** → GitHub Pages at **https://gabriel-on-the-hill.github.io/Grade-8/** (branch `main`, root). `index.html` redirects to `Grade_8_Math_Hub.html`.
 - **Publish only** the original web app + docs: `index.html`, the hub, the module HTML files, `README.md`, this standard, `Starter_Kit/`.
