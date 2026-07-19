@@ -32,6 +32,14 @@ function subjectById(id) { return SUBJECTS_BY_ID[id] || null; }
 const OWNED = { 'expressions-equations': { id: 'expressions-equations' }, 'sci.matter': { id: 'sci.matter' } };
 function topicMeta(id) { return OWNED[id] || null; }
 var SYNC_HUB_ID = 'grade8';
+// Per-student subject visibility. A plan for a subject the student cannot see would publish
+// successfully and then never appear on their screen — indistinguishable from homework that was
+// never set — so the validator rejects it up front. B is enrolled in math only.
+const STUDENT_SUBJECTS = { B: ['math'] };
+function subjectAllowed(name, sid) {
+  const a = STUDENT_SUBJECTS[name];
+  return !a || a.indexOf(sid) >= 0;
+}
 
 eval(fnSrc + '\nglobal.__validate = hwValidatePlans;');
 const validate = global.__validate;
@@ -72,6 +80,10 @@ t('module item without qid rejected', bad({ student: 'A', subject: 'math', sets:
 t('module item on an UNOWNED topic rejected',
   bad({ student: 'A', subject: 'math', sets: [{ id: 's', items: [{ ref: 'module', topic: 'not-ours', qid: '1-1' }] }] }), true);
 t('bank item without id rejected',   bad({ student: 'A', subject: 'math', sets: [{ id: 's', items: [{ ref: 'bank' }] }] }), true);
+t('plan for a subject the student cannot see rejected',
+  bad({ student: 'B', subject: 'sci', sets: [{ id: 's', items: [{ ref: 'module', topic: 'sci.matter', qid: '1-1' }] }] }), true);
+t('...but the same subject is fine for a student who can see it',
+  bad({ student: 'A', subject: 'sci', sets: [{ id: 's', items: [{ ref: 'module', topic: 'sci.matter', qid: '1-1' }] }] }), false);
 
 // ---- the load-bearing rule ----
 r = validate([goodPlan('A'), { student: 'Nobody', subject: 'math', sets: [{ id: 's', items: [goodItem] }] }]);

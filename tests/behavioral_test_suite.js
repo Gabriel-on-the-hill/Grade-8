@@ -53,7 +53,37 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
   ok(!d.getElementById('view-app').classList.contains('hidden'),'hub: app opens after PIN set (case-insensitive confirm)');
   ok(JSON.parse(w.localStorage.getItem(P+'pins')).Divine==='Ab','hub: PIN persisted');
   ok(w.localStorage.getItem(P+'device')==='Divine','hub: device bound to Divine');
-  ok(d.querySelectorAll('.subject-tab').length===2,'hub: two subject tabs');
+  ok(d.querySelectorAll('.subject-tab').length===4,'hub: four subject tabs (math, sci, hist, ela)');
+}
+// ===== HUB: World History + ELA are scaffolded, visible, and inert =====
+{ const w=load(HUB,{[P+'device']:'Divine',[P+'pins']:JSON.stringify({Divine:'Ab'})}).window,d=w.document;
+  d.getElementById('signin-open').click();
+  d.getElementById('pin1').value='Ab';d.getElementById('pin-go').click();
+  const tabs=[...d.querySelectorAll('.subject-tab')];
+  const labelOf=t=>t.querySelector('span').textContent;
+  ok(tabs.map(labelOf).join(',')==='Mathematics,Science,World History,ELA','hub: all four subjects tabbed for Divine');
+  const hist=tabs.find(t=>t.getAttribute('data-s')==='hist');
+  const ela =tabs.find(t=>t.getAttribute('data-s')==='ela');
+  ok(!!hist.querySelector('.cs')&&!!ela.querySelector('.cs'),'hub: History and ELA both flagged soon');
+  ok(!tabs.find(t=>t.getAttribute('data-s')==='math').querySelector('.cs'),'hub: Mathematics is NOT flagged soon');
+  ok(d.querySelector('.subject-tab.active').getAttribute('data-s')==='math','hub: a soon-only subject never becomes the default tab');
+  // History: the two units actually taught in class, and nothing openable
+  hist.click();
+  const titles=[...d.querySelectorAll('.section-title')].map(e=>e.textContent);
+  ok(titles.join('|')==='Ancient Civilizations|Civilizations of the Americas','hub: History shows its two real units');
+  ok(d.querySelectorAll('.tcard.avail').length===0,'hub: no History topic is openable yet');
+  // ELA: one honest placeholder, no invented unit list
+  ela.click();
+  ok(d.querySelectorAll('.tcard').length===1,'hub: ELA shows a single placeholder card');
+  ok(d.querySelectorAll('.tcard.avail').length===0,'hub: the ELA placeholder is not openable');
+  ok(/coming soon/i.test(d.querySelector('.tcard').textContent),'hub: the ELA card says coming soon');
+}
+// ===== HUB: a student not enrolled in the new subjects never sees them =====
+{ const w=load(HUB,{[P+'device']:'Ayodeji',[P+'pins']:JSON.stringify({Ayodeji:'Cd'})}).window,d=w.document;
+  d.getElementById('signin-open').click();
+  d.getElementById('pin1').value='Cd';d.getElementById('pin-go').click();
+  const ids=[...d.querySelectorAll('.subject-tab')].map(t=>t.getAttribute('data-s'));
+  ok(ids.indexOf('hist')<0&&ids.indexOf('ela')<0,'hub: STUDENT_SUBJECTS still hides History and ELA from Ayodeji');
 }
 // ===== HUB: bound device never lists students; wrong then case-insensitive PIN =====
 { const w=load(HUB,{[P+'device']:'Divine',[P+'pins']:JSON.stringify({Divine:'Ab'})}).window,d=w.document;

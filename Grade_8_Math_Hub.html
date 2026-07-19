@@ -436,7 +436,9 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     earth:svg('<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18 14 14 0 0 1 0-18Z"/>'),
     sci:svg('<path d="M9 3h6"/><path d="M10 3v6.6L4.9 18A1.6 1.6 0 0 0 6.4 20.4h11.2A1.6 1.6 0 0 0 19.1 18L14 9.6V3"/>'),
     wave:svg('<path d="M2 12c1.8-4 3.2-4 5 0s3.2 4 5 0 3.2-4 5 0"/>'),
-    bolt:svg('<path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/>')
+    bolt:svg('<path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/>'),
+    hist:svg('<path d="M3 9 12 4l9 5"/><line x1="5" y1="9" x2="5" y2="18"/><line x1="10" y1="9" x2="10" y2="18"/><line x1="14" y1="9" x2="14" y2="18"/><line x1="19" y1="9" x2="19" y2="18"/><line x1="3" y1="20" x2="21" y2="20"/>'),
+    book:svg('<path d="M4 4h4.5A3.5 3.5 0 0 1 12 7.5V20a3 3 0 0 0-3-2.5H4Z"/><path d="M20 4h-4.5A3.5 3.5 0 0 0 12 7.5V20a3 3 0 0 1 3-2.5H20Z"/>')
   };
 
   /* ===== EDIT PER DEPLOYMENT: subjects -> units -> topics. =====
@@ -475,6 +477,35 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
        ]},
        {unit:'A Voyage Through Space',topics:[
          {id:'sci.space',title:'A Voyage Through Space',desc:'The Earth-Sun-Moon system, lunar phases, eclipses, seasons, gravity & orbits, and the scale of the solar system.',status:'soon',icon:IC.earth}
+       ]}
+     ]},
+    /* World History. SCAFFOLD ONLY -- no module is built, so every topic is 'soon' and the tab
+       carries a "soon" chip. The two units are NOT invented: they are the units actually taught and
+       assessed in class, named by the papers on file (the World History final for Ancient
+       Civilizations, and "Unit 4: Civilizations of the Americas" for the Maya & Inca, tested
+       21 May 2026). Units 1-3 exist in her course but are not named in anything here, so they are
+       deliberately absent rather than guessed at. */
+    {id:'hist', label:'World History', tagline:'Grade 8 \u00b7 taught in class', icon:IC.hist,
+     examLabel:'Exam-ready', examLabelLong:'Exam-readiness', skillLabels:{},
+     units:[
+       {unit:'Ancient Civilizations',topics:[
+         {id:'hist.ancient',title:'Ancient Civilizations',desc:"River-valley civilisations: Mesopotamia and Egypt, the Fertile Crescent, cuneiform, Hammurabi's law code, pharaohs, religion and daily life.",status:'soon',icon:IC.hist}
+       ]},
+       {unit:'Civilizations of the Americas',topics:[
+         {id:'hist.americas',title:'The Maya & the Inca',desc:'City-states versus empire, achievements in writing, calendar, mathematics and engineering, religion, farming and society, and the Classic Maya collapse.',status:'soon',icon:IC.earth}
+       ]}
+     ]},
+    /* ELA. SCAFFOLD ONLY, and deliberately UNSCOPED -- one honest placeholder rather than a unit
+       list. The only ELA material on file is GRADE 7 practice papers (LEAP, MAP, SC READY, MDE,
+       Forward), gathered for the April 2026 baseline when Grade 7 was her actual grade. Building a
+       unit structure from those would pitch the whole subject a year low -- the same error as
+       treating her 15/23 Grade-7 baseline as a current target. Get Grade 8 ELA standards first,
+       THEN name the units. Renaming 'ela.soon' later is free: a 'soon' topic holds no data. */
+    {id:'ela', label:'ELA', tagline:'Grade 8 \u00b7 being set up', icon:IC.book,
+     examLabel:'Exam-ready', examLabelLong:'Exam-readiness', skillLabels:{},
+     units:[
+       {unit:'Reading & Writing',topics:[
+         {id:'ela.soon',title:'Coming soon',desc:'Your ELA units will show up here once they are ready. Nothing to do yet.',status:'soon',icon:IC.book}
        ]}
      ]}
   ];
