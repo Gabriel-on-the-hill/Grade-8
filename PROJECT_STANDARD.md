@@ -185,7 +185,9 @@ Engine v1.2 (v1.1 + the multi-subject hub layer: flat `UNITS` replaced by `SUBJE
 - [x] **2026-07-19 — `g8.` storage-namespace split** — was already on `origin/main` at `b92c15e`; **verified live** (served hub carries `STORE_PREFIX='g8.'`).
 - [x] **2026-07-15 — Science unit (Matter & Its Interactions)** — **verified live** (`Matter_and_Its_Interactions.html` returns HTTP 200).
 
-*Nothing outstanding as of 19 Jul 2026. Verified by fetching the deployed site, not by assuming a push shipped — a green `git push` only proves the remote updated, and Pages rebuilds a minute or two later.*
+- [x] **2026-07-19 — dashboard labels non-enrolment** — pushed in `4feb7ee`; **verified live** (served hub carries the `hidden from <name>` chip).
+
+*Nothing outstanding as of 19 Jul 2026, through `4feb7ee`. Verified by fetching the deployed site, not by assuming a push shipped — a green `git push` only proves the remote updated, and Pages rebuilds a minute or two later.*
 
 - Repo: **https://github.com/Gabriel-on-the-hill/Grade-8** → GitHub Pages at **https://gabriel-on-the-hill.github.io/Grade-8/** (branch `main`, root). `index.html` redirects to `Grade_8_Math_Hub.html`.
 - **Publish only** the original web app + docs: `index.html`, the hub, the module HTML files, `README.md`, this standard, `Starter_Kit/`.
