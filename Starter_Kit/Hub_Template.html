@@ -280,7 +280,9 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
 (function(){
   "use strict";
   var LS=localStorage;
-  /* Storage namespace. Keep 'g7.' for back-compat with existing data; change to isolate a deployment. */
+  /* Storage namespace. EDIT PER DEPLOYMENT: every hub MUST own its own prefix, and the modules'
+     G7_STORE must match it exactly. Two hubs left sharing one prefix put both grades' rosters,
+     PINs and progress in one set of keys -- see Grade 8, 19 Jul 2026. */
   var STORE_PREFIX='g7.';
   function K(s){return STORE_PREFIX+s;}
   function jget(k,f){try{var v=JSON.parse(LS.getItem(k));return (v===null||v===undefined)?f:v;}catch(e){return f;}}

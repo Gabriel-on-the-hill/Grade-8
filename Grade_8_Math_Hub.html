@@ -333,8 +333,12 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
 (function(){
   "use strict";
   var LS=localStorage;
-  /* Storage namespace. Keep 'g7.' for back-compat with existing data; change to isolate a deployment. */
-  var STORE_PREFIX='g7.';
+  /* Storage namespace. Every hub MUST own its own prefix -- Grade 7 is 'g7.', Grade 8 is 'g8.'.
+     Both declared 'g7.' until 19 Jul 2026, so on any device that opened both (the tutor's, always)
+     roster/data/pins/current/teacherPass/syncKey were ONE shared set of keys. That was the root
+     cause behind three symptoms: a deleted record reappearing, a Grade 7 student listed on the
+     Grade 8 dashboard, and removing a student from the roster changing nothing. See migrateStore(). */
+  var STORE_PREFIX='g8.';
   function K(s){return STORE_PREFIX+s;}
   function jget(k,f){try{var v=JSON.parse(LS.getItem(k));return (v===null||v===undefined)?f:v;}catch(e){return f;}}
   function jset(k,v){LS.setItem(k,JSON.stringify(v));}
@@ -513,6 +517,53 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     }catch(e){}
   }
 
+  /* ===== one-time migration off the shared 'g7.' namespace (19 Jul 2026) =====
+     Every device that has used this hub already holds its student's PINs, progress and device
+     binding under 'g7.'. Shipping the rename alone would strand all of it and make a returning
+     student look brand new, so the keys this hub owns are copied across once.
+
+     COPY, never move: Grade 7 still runs on 'g7.' and its data must stay exactly where it is.
+
+     Only students on THIS hub's roster come across. That filter is the point of the whole fix --
+     it is what stops the cross-grade bleed the shared namespace caused, rather than faithfully
+     reproducing it under a new name. Never overwrite a key the new namespace already has. */
+  function migrateStore(){
+    try{
+      if(STORE_PREFIX==='g7.')return;            // a hub still on the old prefix has nothing to do
+      if(LS.getItem(K('migv'))==='1')return;     // already migrated on this device
+      var own={}; ROSTER_SEED.forEach(function(n){own[n]=true;});
+      var fresh=function(k){return LS.getItem(K(k))===null;};
+      var carryOwned=function(k){                // name-keyed maps: keep only our own students
+        if(!fresh(k))return;
+        var o=jget('g7.'+k,null); if(!o)return;
+        var n={}; Object.keys(o).forEach(function(name){if(own[name])n[name]=o[name];});
+        jset(K(k),n);
+      };
+      if(fresh('data')){
+        var od=jget('g7.data',null);
+        if(od&&od.students){
+          var nd={students:{}};
+          Object.keys(od.students).forEach(function(name){if(own[name])nd.students[name]=od.students[name];});
+          jset(K('data'),nd);                    // hwplan/hwstate ride along inside each student record
+        }
+      }
+      carryOwned('pins');
+      carryOwned('pints');
+      /* Device-level settings belong to the device, not to a grade. */
+      ['sheetURL','syncKey','teacherPass'].forEach(function(k){
+        if(!fresh(k))return; var v=LS.getItem('g7.'+k); if(v!==null)LS.setItem(K(k),v);
+      });
+      /* Identity carries over only if the signed-in/bound name is one of ours; otherwise this
+         device was last used by another grade's student and should sign in fresh here. */
+      ['current','device'].forEach(function(k){
+        if(!fresh(k))return; var v=LS.getItem('g7.'+k); if(v!==null&&own[v])LS.setItem(K(k),v);
+      });
+      /* seedv/passv/urlv are deliberately NOT copied -- leaving them unset lets applySeeds()
+         re-apply this deployment's seeds cleanly under the new prefix. */
+      LS.setItem(K('migv'),'1');
+    }catch(e){}
+  }
+
   /* ===== v1.5 cloud sync (offline-first; shared multi-hub Apps Script backend — see Starter_Kit/HUB_Google_Sheet_Setup.md) ===== */
   /* Credentials. The /exec URL is public (this page is), so it grants nothing on its own:
      a student proves who they are with their own PIN and can only ever touch their own
@@ -581,11 +632,11 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
   }
   function reviewMapFor(n,tid){var d=getData();var to=d.students&&d.students[n]&&d.students[n].topics&&d.students[n].topics[tid];var m={};((to&&to.responses)||[]).forEach(function(r){if(r.reviewed)m[String(r.ts)]=r.reviewed;});return m;}
   function runSync(after){syncPull(function(doc){var res=applyCloud(doc);var seen={};(res.pushTopics||[]).forEach(function(p){var k=p.n+'|'+p.tid;if(seen[k])return;seen[k]=1;if(!topicMeta(p.tid))return;/* never re-push a topic this hub doesn't own */
-    /* ...and never re-push a student this hub does not have on its roster. localStorage is shared
-     * across every hub on one device (STORE_PREFIX 'g7.'), so a tutor's browser holds every grade's
-     * students in one g7.data. Without this, the Grade 8 hub republishes a Grade 7 student's record
-     * under grade8 — which is why deleting such a row from the Sheet only makes it come straight
-     * back on the next sync. */
+    /* ...and never re-push a student this hub does not have on its roster. Kept as defence in
+     * depth: the hubs no longer share a storage namespace (Grade 8 owns 'g8.'), so g8.data should
+     * hold only this hub's students — but a cloud pull, a backup import or a hand-edited store can
+     * still put a foreign name here, and republishing one under grade8 is what made a deleted row
+     * come straight back on the next sync. Cheap check, expensive symptom. */
     if(!resolveName(p.n))return;var d=getData();var to=d.students[p.n]&&d.students[p.n].topics&&d.students[p.n].topics[p.tid];if(to)syncPush('topic',p.n,p.tid,to);});if(res.changed&&after)after();});}
   function rerenderView(){try{if(!document.getElementById('view-teacher').classList.contains('hidden')){renderTeacher();}else if(!document.getElementById('view-app').classList.contains('hidden')){renderApp();}}catch(e){}}
   window.__hubSync={applyCloud:applyCloud,recTs:recTs,reviewMapFor:reviewMapFor,pingText:pingStatusText};
@@ -1135,10 +1186,11 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
   function renderTeacher(){
     document.getElementById('roster-panel').classList.add('hidden');
     var data=getData();
-    /* Only this hub's own roster. localStorage is shared across every hub on a device
-     * (STORE_PREFIX 'g7.'), so g7.data also holds other grades' students — listing those here is
-     * what made a Grade 7 student appear on the Grade 8 dashboard. They are counted and reported
-     * below rather than silently dropped, so nothing looks like it has vanished. */
+    /* Only this hub's own roster. Listing anyone else is what made a Grade 7 student appear on the
+     * Grade 8 dashboard back when both hubs shared the 'g7.' namespace. The namespaces are split
+     * now, but a cloud pull or backup import can still introduce a foreign name, so the scoping
+     * stays. They are counted and reported below rather than silently dropped, so nothing looks
+     * like it has vanished. */
     var names=getRoster().slice();
     var foreign=Object.keys(data.students||{}).filter(function(n){
       return names.indexOf(n)<0 && Object.keys(((data.students[n]||{}).topics)||{}).length>0;
@@ -1269,10 +1321,11 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
         '<button class="btn ghost sm reset-pin" data-n="'+esc(n)+'">Reset PIN</button>'+
         '<button class="x" data-n="'+esc(n)+'" style="margin-left:0">Remove</button></span></div>';
     }).join(''):'<p class="muted-note">No names yet.</p>';
-    /* Records held on this device for someone who is not on this roster. localStorage is shared
-     * across every hub (STORE_PREFIX 'g7.'), so a tutor's browser accumulates other grades'
-     * students. They clutter this dashboard, and before the roster guard they were being
-     * republished under this hub id — which is why such a row reappeared after being deleted. */
+    /* Records held on this device for someone who is not on this roster. This used to be routine:
+     * every hub shared the 'g7.' namespace, so a tutor's browser accumulated every grade's students
+     * and republished them under this hub id — which is why such a row reappeared after being
+     * deleted. Since the split it should be rare, and anything showing up here is worth a look:
+     * a stale pre-migration record, a cloud pull, or a backup imported from another grade. */
     var _d=getData();
     var foreign=Object.keys((_d.students)||{}).filter(function(n){
       return roster.indexOf(n)<0 && Object.keys(((_d.students[n]||{}).topics)||{}).length>0;
@@ -1373,6 +1426,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     renderTopbar();
     if(current()) renderApp(); else renderSignIn();
   }
+  migrateStore();   // must run before anything reads storage, incl. applySeeds()
   try{wire();}catch(e){if(window.console)console.error('wire() failed:',e);}
   applySeeds();
   boot();

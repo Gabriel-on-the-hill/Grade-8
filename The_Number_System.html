@@ -304,7 +304,8 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
         <div class="hint-content">Only the 3 repeats, and a non-repeating digit comes first &mdash; multiply by two different powers of 10 so the repeats line up, then subtract.</div>
       </div>
     </div>
-  </div>  <div class="qcard" data-qid="2-5" data-exam="1">
+  </div>
+  <div class="qcard" data-qid="2-5" data-exam="1">
     <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">MCAP practice item &middot; 8.NS.A.1</span></div>
     <div class="qbody">
       <div class="step">
@@ -401,7 +402,8 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
         <button class="check-btn cr-save">Save response</button>
       </div>
     </div>
-  </div>  <div class="qcard" data-qid="3-5" data-exam="1">
+  </div>
+  <div class="qcard" data-qid="3-5" data-exam="1">
     <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">MCAP reasoning &middot; 8.NS.A.1</span></div>
     <div class="qbody">
       <div class="step">
@@ -633,7 +635,8 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
         <div class="mc-feedback"><span class="math">65/122 &asymp; 0.53</span>, and <span class="math">&radic;0.53 &asymp; 0.73</span>. Of the choices, <span class="math">8/11 &asymp; 0.73</span> is the closest.</div>
       </div>
     </div>
-  </div>  <div class="qcard" data-qid="6-5" data-exam="1">
+  </div>
+  <div class="qcard" data-qid="6-5" data-exam="1">
     <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">MCAP practice item &middot; 8.NS.A.2</span></div>
     <div class="qbody">
       <div class="step">
@@ -732,6 +735,9 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
 <script>
   // ===== Per-module identity (change these per unit) =====
   var G7_SYNC_HUB='grade8'; // shared-cloud namespace for this deployment
+  /* Storage namespace. MUST match the hub's STORE_PREFIX -- the module writes the progress the
+     hub's dashboard reads, so if these two disagree a student's work simply stops being seen. */
+  var G7_STORE='g8.';
   const G7_TOPIC_ID='number-system';
   const G7_TOPIC_TITLE='The Number System';
   const G7_SKILLS={
@@ -754,14 +760,14 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     'reasoning':'Reasoning & error analysis'};
 
   // ===== Shared Grade 8 Hub store =====
-  function g7current(){return localStorage.getItem('g7.current')||'Guest';}
-  function g7all(){try{return JSON.parse(localStorage.getItem('g7.data'))||{students:{}};}catch(e){return{students:{}};}}
-  function g7save(o){localStorage.setItem('g7.data',JSON.stringify(o));}
+  function g7current(){return localStorage.getItem(G7_STORE+'current')||'Guest';}
+  function g7all(){try{return JSON.parse(localStorage.getItem(G7_STORE+'data'))||{students:{}};}catch(e){return{students:{}};}}
+  function g7save(o){localStorage.setItem(G7_STORE+'data',JSON.stringify(o));}
   function g7topic(o){o.students=o.students||{};var s=g7current();o.students[s]=o.students[s]||{topics:{}};var T=o.students[s].topics;T[G7_TOPIC_ID]=T[G7_TOPIC_ID]||{title:G7_TOPIC_TITLE,tree:{},totalSteps:0,sectionTotals:{},lastPracticed:0,attempts:0,correct:0,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[]};return T[G7_TOPIC_ID];}
   function g7sectionTotals(){var m={};document.querySelectorAll('.qcard[data-qid]').forEach(function(c){var sec=(c.dataset.qid||'').split('-')[0];m[sec]=(m[sec]||0)+c.querySelectorAll('.step').length;});return m;}
   function loadData(){return g7topic(g7all()).tree;}
   function saveData(tree){var o=g7all();var t=g7topic(o);t.tree=tree;t.totalSteps=document.querySelectorAll('.qcard .step').length;t.sectionTotals=g7sectionTotals();t.lastPracticed=Date.now();g7save(o);schedulePush();}
-  function g7sheet(event,question,detail){var url=localStorage.getItem('g7.sheetURL');if(!url)return;try{fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({hub:G7_SYNC_HUB||'default',student:g7current(),topic:G7_TOPIC_TITLE,question:question||'',event:event,detail:detail||'',ts:Date.now()})});}catch(e){}}
+  function g7sheet(event,question,detail){var url=localStorage.getItem(G7_STORE+'sheetURL');if(!url)return;try{fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({hub:G7_SYNC_HUB||'default',student:g7current(),topic:G7_TOPIC_TITLE,question:question||'',event:event,detail:detail||'',ts:Date.now()})});}catch(e){}}
   // AS-4 (automatic): the lesson's own Learn->Stretch ladder IS the difficulty gradient, so the level is
   // read from the phase tag every stamped module already carries — no per-item tagging, no extra items,
   // and any new module built from Module_Template gets this for free. Untagged cards default to Target.
@@ -801,7 +807,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
   }
   function g7hwPost(qid,wrong){
     var c=g7hwCtx();if(!c)return;
-    var url=localStorage.getItem('g7.sheetURL');if(!url)return;
+    var url=localStorage.getItem(G7_STORE+'sheetURL');if(!url)return;
     try{fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},
       body:JSON.stringify({op:'hw',hub:G7_SYNC_HUB||'default',name:g7current(),pin:g7pin(),
         subject:c.subj,set:c.set,item:qid,outcome:wrong?'incorrect':'correct',ts:Date.now(),
@@ -873,14 +879,14 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
   /* ===== v1.5 cloud sync (offline-first; shared multi-hub backend) ===== */
   /* The /exec URL is public, so it grants nothing alone: a student authenticates with their
      own PIN and can only ever read/write their OWN record. Modules never hold the teacher key. */
-  function g7pin(){try{var m=JSON.parse(localStorage.getItem('g7.pins')||'{}');var n=g7current();return (n&&m&&m[n]!==undefined)?String(m[n]):'';}catch(e){return '';}}
-  function syncPush(kind,name,sub,payload){var u=localStorage.getItem('g7.sheetURL');if(!u)return;try{fetch(u,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({op:'put',hub:G7_SYNC_HUB||'default',kind:kind,name:name,sub:sub||'',payload:payload,ts:Date.now(),pin:g7pin()})}).catch(function(){});}catch(e){}}
-  function syncPull(cb){var u=localStorage.getItem('g7.sheetURL');if(!u){cb(null);return;}try{var nm='__modcb'+Math.floor(Math.random()*1e9);var s=document.createElement('script');
+  function g7pin(){try{var m=JSON.parse(localStorage.getItem(G7_STORE+'pins')||'{}');var n=g7current();return (n&&m&&m[n]!==undefined)?String(m[n]):'';}catch(e){return '';}}
+  function syncPush(kind,name,sub,payload){var u=localStorage.getItem(G7_STORE+'sheetURL');if(!u)return;try{fetch(u,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({op:'put',hub:G7_SYNC_HUB||'default',kind:kind,name:name,sub:sub||'',payload:payload,ts:Date.now(),pin:g7pin()})}).catch(function(){});}catch(e){}}
+  function syncPull(cb){var u=localStorage.getItem(G7_STORE+'sheetURL');if(!u){cb(null);return;}try{var nm='__modcb'+Math.floor(Math.random()*1e9);var s=document.createElement('script');
     window[nm]=function(doc){try{cb(doc||null);}finally{try{delete window[nm];}catch(e2){}if(s.parentNode)s.parentNode.removeChild(s);}};
     s.onerror=function(){try{delete window[nm];}catch(e2){}if(s.parentNode)s.parentNode.removeChild(s);cb(null);};
     s.src=u+(u.indexOf('?')>=0?'&':'?')+'op=pull&hub='+encodeURIComponent(G7_SYNC_HUB||'default')+'&cb='+nm+'&name='+encodeURIComponent(g7current()||'')+'&pin='+encodeURIComponent(g7pin());document.head.appendChild(s);}catch(e){cb(null);}}
   var _pushT=null;
-  function schedulePush(){if(!localStorage.getItem('g7.sheetURL'))return;clearTimeout(_pushT);_pushT=setTimeout(function(){try{var o=g7all();var s=g7current();var to=o.students&&o.students[s]&&o.students[s].topics&&o.students[s].topics[G7_TOPIC_ID];if(to)syncPush('topic',s,G7_TOPIC_ID,to);}catch(e){}},1500);}
+  function schedulePush(){if(!localStorage.getItem(G7_STORE+'sheetURL'))return;clearTimeout(_pushT);_pushT=setTimeout(function(){try{var o=g7all();var s=g7current();var to=o.students&&o.students[s]&&o.students[s].topics&&o.students[s].topics[G7_TOPIC_ID];if(to)syncPush('topic',s,G7_TOPIC_ID,to);}catch(e){}},1500);}
   function mergeCloudTopic(doc){if(!doc)return false;var s=g7current();var changed=false;
     var o=g7all();var t=g7topic(o);
     var c=doc.topics&&doc.topics[s]&&doc.topics[s][G7_TOPIC_ID];
@@ -997,7 +1003,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
 
   function restoreProgress(){
     var nm=document.getElementById('g7name');if(nm)nm.textContent=g7current();
-    if(!localStorage.getItem('g7.current')&&nm&&!document.getElementById('g7guestnote')){var gw=document.createElement('a');gw.id='g7guestnote';gw.href='Grade_8_Math_Hub.html';gw.style.cssText='margin-left:.6rem;color:var(--orange);font-weight:600;text-decoration:none';gw.textContent='Not signed in — choose your name in the Hub so your work is tracked';nm.parentNode.appendChild(gw);}
+    if(!localStorage.getItem(G7_STORE+'current')&&nm&&!document.getElementById('g7guestnote')){var gw=document.createElement('a');gw.id='g7guestnote';gw.href='Grade_8_Math_Hub.html';gw.style.cssText='margin-left:.6rem;color:var(--orange);font-weight:600;text-decoration:none';gw.textContent='Not signed in — choose your name in the Hub so your work is tracked';nm.parentNode.appendChild(gw);}
     var d=loadData();var topic=g7topic(g7all());
     document.querySelectorAll('.qcard').forEach(function(card){
       var qid=card.dataset.qid;if(!qid||!d[qid]||!d[qid].steps)return;

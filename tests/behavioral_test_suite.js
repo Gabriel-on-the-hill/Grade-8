@@ -12,6 +12,9 @@ const DIR=(process.argv[2]||'.').replace(/\/?$/,'/');
 let pass=0,fail=0;const ok=(c,m)=>{c?pass++:(fail++,console.log('  FAIL:',m));};
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const src=f=>fs.readFileSync(path.join(DIR,f),'utf8');
+/* Storage namespace under test. Must match the hub's STORE_PREFIX and the modules' G7_STORE;
+   asserted below so a hub/module/suite disagreement fails here rather than silently. */
+const P='g8.';
 function load(file,seed,rnd,qs){   // qs: query string, e.g. '?review=roots' (MR-1 phase-3)
   const dom=new JSDOM(src(file),{runScripts:'dangerously',url:'https://x.test/'+file+(qs||''),
     beforeParse(w){const store=Object.assign({'g8.gate':'ok'},seed||{});
@@ -32,8 +35,8 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
   ok(!d.getElementById('view-signin').classList.contains('hidden'),'hub: sign-in visible on cold boot');
   ok(d.querySelectorAll('.name-tile').length===0,'hub: NO roster list is ever shown');
   ok(!!d.getElementById('signin-name'),'hub: typed-name input present');
-  ok(w.localStorage.getItem('g7.teacherPass')==='Gabe','hub: teacher passcode seeded');
-  ok(JSON.parse(w.localStorage.getItem('g7.roster')).join(',')==='Divine,Ayodeji','hub: roster locked to Divine,Ayodeji');
+  ok(w.localStorage.getItem(P+'teacherPass')==='Gabe','hub: teacher passcode seeded');
+  ok(JSON.parse(w.localStorage.getItem(P+'roster')).join(',')==='Divine,Ayodeji','hub: roster locked to Divine,Ayodeji');
   // an unknown name is rejected, and never opens the PIN modal
   d.getElementById('signin-name').value='Somebody';d.getElementById('signin-go').click();
   ok(/couldn.t find/i.test(d.getElementById('signin-err').textContent),'hub: unknown name rejected');
@@ -48,12 +51,12 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
   // case-differing confirm is accepted (PINs are case-insensitive)
   d.getElementById('pin1').value='Ab';d.getElementById('pin2').value='aB';d.getElementById('pin-go').click();
   ok(!d.getElementById('view-app').classList.contains('hidden'),'hub: app opens after PIN set (case-insensitive confirm)');
-  ok(JSON.parse(w.localStorage.getItem('g7.pins')).Divine==='Ab','hub: PIN persisted');
-  ok(w.localStorage.getItem('g7.device')==='Divine','hub: device bound to Divine');
+  ok(JSON.parse(w.localStorage.getItem(P+'pins')).Divine==='Ab','hub: PIN persisted');
+  ok(w.localStorage.getItem(P+'device')==='Divine','hub: device bound to Divine');
   ok(d.querySelectorAll('.subject-tab').length===2,'hub: two subject tabs');
 }
 // ===== HUB: bound device never lists students; wrong then case-insensitive PIN =====
-{ const w=load(HUB,{'g7.device':'Divine','g7.pins':JSON.stringify({Divine:'Ab'})}).window,d=w.document;
+{ const w=load(HUB,{[P+'device']:'Divine',[P+'pins']:JSON.stringify({Divine:'Ab'})}).window,d=w.document;
   ok(d.querySelectorAll('.name-tile').length===0,'hub: bound device shows no list');
   ok(d.getElementById('signin-host').textContent.includes('Divine'),'hub: bound device shows only its own student');
   ok(!d.getElementById('signin-host').textContent.includes('Ayodeji'),'hub: bound device never shows the other student');
@@ -65,13 +68,50 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
   ok(!d.getElementById('view-app').classList.contains('hidden'),'hub: case-insensitive PIN entry signs in');
 }
 // ===== HUB: roster is authoritative — a stray name and its PIN are pruned on boot =====
-{ const w=load(HUB,{'g7.roster':JSON.stringify(['Divine','Ayodeji','Intruder']),'g7.pins':JSON.stringify({Divine:'1',Intruder:'9'})}).window;
-  ok(JSON.parse(w.localStorage.getItem('g7.roster')).indexOf('Intruder')<0,'hub: stray roster name pruned');
-  ok(!('Intruder' in JSON.parse(w.localStorage.getItem('g7.pins'))),'hub: stray PIN pruned');
+{ const w=load(HUB,{[P+'roster']:JSON.stringify(['Divine','Ayodeji','Intruder']),[P+'pins']:JSON.stringify({Divine:'1',Intruder:'9'})}).window;
+  ok(JSON.parse(w.localStorage.getItem(P+'roster')).indexOf('Intruder')<0,'hub: stray roster name pruned');
+  ok(!('Intruder' in JSON.parse(w.localStorage.getItem(P+'pins'))),'hub: stray PIN pruned');
+}
+// ===== HUB: one-time migration off the shared 'g7.' namespace (19 Jul 2026) =====
+/* This runs once on every returning student's device and cannot be re-run, so it is asserted
+   hard: it must carry OUR students' work across, leave Grade 7's store untouched, and drop the
+   foreign records whose presence was the bug being fixed. */
+{ const g7data={students:{
+    Divine:{topics:{'number-system':{title:'NS',tree:{'1-1':{steps:{0:true}}},totalSteps:31,sectionTotals:{},lastPracticed:5,attempts:9,correct:7,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[]}},assignments:{}},
+    Kayode:{topics:{'g7-topic':{title:'A Grade 7 topic',tree:{},totalSteps:10,sectionTotals:{},lastPracticed:5,attempts:4,correct:4,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[]}},assignments:{}}}};
+  const old={'g7.data':JSON.stringify(g7data),'g7.pins':JSON.stringify({Divine:'Ab',Kayode:'Zz'}),
+    'g7.pints':JSON.stringify({Divine:11,Kayode:22}),'g7.current':'Divine','g7.device':'Divine',
+    'g7.syncKey':'teacher-key','g7.seedv':'stale-seed-marker'};
+  const w=load(HUB,old).window;
+  const g8data=JSON.parse(w.localStorage.getItem(P+'data'));
+  ok(!!g8data.students.Divine,'migrate: our own student’s progress comes across');
+  ok(g8data.students.Divine.topics['number-system'].attempts===9,'migrate: the progress carried is the real record, not an empty one');
+  ok(!g8data.students.Kayode,'migrate: a student who is not on this roster does NOT come across');
+  ok(JSON.parse(w.localStorage.getItem('g7.data')).students.Kayode,'migrate: COPY not move — Grade 7’s store is left intact');
+  ok(JSON.parse(w.localStorage.getItem(P+'pins')).Divine==='Ab','migrate: our student’s PIN comes across');
+  ok(!('Kayode' in JSON.parse(w.localStorage.getItem(P+'pins'))),'migrate: a foreign PIN does not');
+  ok(JSON.parse(w.localStorage.getItem(P+'pints')).Divine===11,'migrate: per-PIN sync timestamps come across');
+  ok(w.localStorage.getItem(P+'current')==='Divine','migrate: a signed-in name that is ours is kept');
+  ok(w.localStorage.getItem(P+'device')==='Divine','migrate: device binding that is ours is kept');
+  ok(w.localStorage.getItem(P+'syncKey')==='teacher-key','migrate: device-level settings come across');
+  ok(w.localStorage.getItem(P+'seedv')!=='stale-seed-marker','migrate: seed markers are NOT copied, so this deployment’s seeds re-apply cleanly');
+  ok(w.localStorage.getItem(P+'migv')==='1','migrate: the device is marked migrated');
+}
+// ===== HUB: migration is one-shot and never clobbers newer data =====
+{ const g7data={students:{Divine:{topics:{'number-system':{title:'NS',tree:{},totalSteps:31,sectionTotals:{},lastPracticed:5,attempts:99,correct:99,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[]}},assignments:{}}}};
+  // a device that already has g8 data must keep it — the old namespace must not overwrite newer work
+  const g8data={students:{Divine:{topics:{'number-system':{title:'NS',tree:{},totalSteps:31,sectionTotals:{},lastPracticed:9,attempts:3,correct:3,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[]}},assignments:{}}}};
+  let w=load(HUB,{'g7.data':JSON.stringify(g7data),[P+'data']:JSON.stringify(g8data)}).window;
+  ok(JSON.parse(w.localStorage.getItem(P+'data')).students.Divine.topics['number-system'].attempts===3,
+     'migrate: never overwrites a key the new namespace already holds');
+  // once migv is set, a later change under g7. must not be dragged in a second time
+  w=load(HUB,{'g7.data':JSON.stringify(g7data),[P+'migv']:'1'}).window;
+  ok(w.localStorage.getItem(P+'data')===null||!JSON.parse(w.localStorage.getItem(P+'data')).students.Divine.topics,
+     'migrate: an already-migrated device does not re-import from the old namespace');
 }
 // ===== HUB: teacher modal, gated settings, Escape, takeover =====
-{ const w=load(HUB,{'g7.teacherPass':'studentmade'}).window,d=w.document;
-  ok(w.localStorage.getItem('g7.teacherPass')==='Gabe','hub: passcode takeover reclaims student-set passcode');
+{ const w=load(HUB,{[P+'teacherPass']:'studentmade'}).window,d=w.document;
+  ok(w.localStorage.getItem(P+'teacherPass')==='Gabe','hub: passcode takeover reclaims student-set passcode');
   d.getElementById('tb-settings').onclick?d.getElementById('tb-settings').click():null;
   ok(!d.getElementById('teacherModal').classList.contains('hidden'),'hub: Settings gear routes through teacher modal');
   ok(d.getElementById('settingsModal').classList.contains('hidden'),'hub: Settings NOT open before passcode');
@@ -91,12 +131,12 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
 { const data={students:{Divine:{topics:{'number-system':{title:'The Number System',tree:{'1-1':{steps:{0:true}},'1-2':{steps:{0:true}}},totalSteps:31,sectionTotals:{'1':5,'2':6},lastPracticed:Date.now(),attempts:14,correct:10,struggles:[],
     skillStats:{roots:{attempts:8,misses:1},estimate:{attempts:6,misses:3}},exam:{attempts:2,correct:1},
     responses:[{qid:'3-4',label:'Q11',text:'my reasoning',ts:1}]}},assignments:{math:{text:'Finish section 5',ts:1}}}}};
-  const w=load(HUB,{'g7.roster':JSON.stringify(['Divine']),'g7.pins':JSON.stringify({Divine:'1'}),'g7.current':'Divine','g7.data':JSON.stringify(data)}).window,d=w.document;
+  const w=load(HUB,{[P+'roster']:JSON.stringify(['Divine']),[P+'pins']:JSON.stringify({Divine:'1'}),[P+'current']:'Divine',[P+'data']:JSON.stringify(data)}).window,d=w.document;
   ok(d.getElementById('stat-tiles').innerHTML.includes('>1<'),'hub: skills-to-review decays (1 real pattern, not 2)');
   ok(d.querySelector('.tcard .secbars'),'hub: student topic card shows per-section bars');
   ok(d.getElementById('hw-banner').textContent.includes('Finish section 5'),'hub: teacher assignment shown');
   d.getElementById('hw-done').click();
-  ok(JSON.parse(w.localStorage.getItem('g7.data')).students.Divine.assignments.math.doneTs>0,'hub: Mark done persists');
+  ok(JSON.parse(w.localStorage.getItem(P+'data')).students.Divine.assignments.math.doneTs>0,'hub: Mark done persists');
   ok(d.getElementById('hw-banner').textContent.includes('done'),'hub: done state visible to student');
   d.getElementById('tb-teacher').click();
   d.getElementById('tm-pass').value='gabe';d.getElementById('tm-go').click();
@@ -104,7 +144,7 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
   ok(d.getElementById('dash').textContent.includes('Student marked this done'),'hub: teacher sees done note');
   const rev=d.querySelector('.cr-rev');ok(!!rev,'hub: Mark reviewed button present');
   rev.click();
-  ok(JSON.parse(w.localStorage.getItem('g7.data')).students.Divine.topics['number-system'].responses[0].reviewed>0,'hub: reviewed flag persists');
+  ok(JSON.parse(w.localStorage.getItem(P+'data')).students.Divine.topics['number-system'].responses[0].reviewed>0,'hub: reviewed flag persists');
 }
 // ===== HUB: spaced review (MR-1) — due-for-review ladder =====
 { const DAY=86400000, now=Date.now();
@@ -132,7 +172,7 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
 // ===== HUB: due-for-review renders (and stays empty when nothing is due) =====
 { const DAY=86400000, now=Date.now();
   const seed=lp=>({students:{Divine:{topics:{'number-system':{title:'The Number System',tree:{},totalSteps:31,sectionTotals:{},lastPracticed:lp,attempts:20,correct:19,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[]}},assignments:{}}}});
-  const store=lp=>({'g7.roster':JSON.stringify(['Divine']),'g7.pins':JSON.stringify({Divine:'1'}),'g7.current':'Divine','g7.data':JSON.stringify(seed(lp))});
+  const store=lp=>({[P+'roster']:JSON.stringify(['Divine']),[P+'pins']:JSON.stringify({Divine:'1'}),[P+'current']:'Divine',[P+'data']:JSON.stringify(seed(lp))});
   const w=load(HUB,store(now-50*DAY)).window,d=w.document;
   const dr=d.getElementById('due-review');
   ok(dr&&dr.querySelectorAll('.review-item').length===1,'review: hub surfaces a due item for an aged mastered topic');
@@ -152,9 +192,9 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
 // ===== MODULE: phase-2 engine writes the streak per spaced session =====
 { const DAY=86400000, now=Date.now(), today=Math.floor(now/DAY);
   const mk=(rs,rd)=>{const t={title:'The Number System',tree:{},totalSteps:31,sectionTotals:{},lastPracticed:now,attempts:0,correct:0,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[]};if(rs!==undefined)t.reviewStreak=rs;if(rd!==undefined)t.reviewDay=rd;return {students:{Divine:{topics:{'number-system':t},assignments:{}}}};};
-  const rec=w=>JSON.parse(w.localStorage.getItem('g7.data')).students.Divine.topics['number-system'];
+  const rec=w=>JSON.parse(w.localStorage.getItem(P+'data')).students.Divine.topics['number-system'];
   // fresh topic: a clean 3-item session earns rung 1, but only after >=3 first-attempts
-  let w=load(NS,{'g7.current':'Divine','g7.data':JSON.stringify(mk())}).window;
+  let w=load(NS,{[P+'current']:'Divine',[P+'data']:JSON.stringify(mk())}).window;
   w.__modReview.review(true,true);w.__modReview.review(true,true);
   ok(rec(w).reviewStreak===undefined,'review(engine): under 3 first-attempts does not commit a session');
   w.__modReview.review(true,true);
@@ -162,15 +202,15 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
   w.__modReview.review(true,true);
   ok(rec(w).reviewStreak===1,'review(engine): more clean items the same visit do not double-advance');
   // aged streak advances exactly one rung on a passing return
-  w=load(NS,{'g7.current':'Divine','g7.data':JSON.stringify(mk(2,today-1))}).window;
+  w=load(NS,{[P+'current']:'Divine',[P+'data']:JSON.stringify(mk(2,today-1))}).window;
   w.__modReview.review(true,true);w.__modReview.review(true,true);w.__modReview.review(true,true);
   ok(rec(w).reviewStreak===3,'review(engine): a passing return advances the streak one rung (2->3)');
   // a bad return (<80% first-attempt) resets to 0
-  w=load(NS,{'g7.current':'Divine','g7.data':JSON.stringify(mk(3,today-1))}).window;
+  w=load(NS,{[P+'current']:'Divine',[P+'data']:JSON.stringify(mk(3,today-1))}).window;
   w.__modReview.review(true,false);w.__modReview.review(true,false);w.__modReview.review(true,true);
   ok(rec(w).reviewStreak===0,'review(engine): a failing return resets the streak to 0');
   // day-guard: a second session the same day cannot advance again
-  w=load(NS,{'g7.current':'Divine','g7.data':JSON.stringify(mk(3,today))}).window;
+  w=load(NS,{[P+'current']:'Divine',[P+'data']:JSON.stringify(mk(3,today))}).window;
   w.__modReview.review(true,true);w.__modReview.review(true,true);w.__modReview.review(true,true);
   ok(rec(w).reviewStreak===3,'review(engine): a second session the same day does not advance the streak');
 }
@@ -178,19 +218,19 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
 { const DAY=86400000, now=Date.now(), today=Math.floor(now/DAY);
   const fresh={students:{Divine:{topics:{'number-system':{title:'NS',tree:{},totalSteps:31,sectionTotals:{},lastPracticed:now,attempts:0,correct:0,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[]}},assignments:{}}}};
   const aged={students:{Divine:{topics:{'number-system':{title:'NS',tree:{},totalSteps:31,sectionTotals:{},lastPracticed:now-50*DAY,attempts:20,correct:19,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[],reviewStreak:4,reviewDay:today-50}},assignments:{}}}};
-  const rec=w=>JSON.parse(w.localStorage.getItem('g7.data')).students.Divine.topics['number-system'];
-  let w=load(NS,{'g7.current':'Divine','g7.data':JSON.stringify(fresh)}).window;
+  const rec=w=>JSON.parse(w.localStorage.getItem(P+'data')).students.Divine.topics['number-system'];
+  let w=load(NS,{[P+'current']:'Divine',[P+'data']:JSON.stringify(fresh)}).window;
   ok(w.__modReview.wasDue({lastPracticed:now,attempts:0})===false,'AN-4: an unstarted/just-practiced topic is not due (acquisition)');
   w.__modReview.review(true,true);w.__modReview.review(true,false);
   ok(rec(w).acqFirst===2&&rec(w).acqCorrect===1&&rec(w).retFirst===undefined,'AN-4: first-attempts on a not-due topic bucket as acquisition');
-  w=load(NS,{'g7.current':'Divine','g7.data':JSON.stringify(aged)}).window;
+  w=load(NS,{[P+'current']:'Divine',[P+'data']:JSON.stringify(aged)}).window;
   ok(w.__modReview.wasDue({reviewStreak:4,lastPracticed:now-50*DAY,attempts:20})===true,'AN-4: an aged topic past its 42d rung is due (retention)');
   w.__modReview.review(true,true);w.__modReview.review(true,true);
   ok(rec(w).retFirst===2&&rec(w).retCorrect===2&&rec(w).acqFirst===undefined,'AN-4: first-attempts on a due topic bucket as retention');
 }
 // ===== AN-4: teacher dashboard shows acquisition vs retention =====
 { const data={students:{Divine:{topics:{'number-system':{title:'The Number System',tree:{},totalSteps:31,sectionTotals:{},lastPracticed:Date.now(),attempts:10,correct:8,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[],acqFirst:20,acqCorrect:17,retFirst:10,retCorrect:6}},assignments:{}}}};
-  const w=load(HUB,{'g7.roster':JSON.stringify(['Divine']),'g7.pins':JSON.stringify({Divine:'1'}),'g7.current':'Divine','g7.data':JSON.stringify(data)}).window,d=w.document;
+  const w=load(HUB,{[P+'roster']:JSON.stringify(['Divine']),[P+'pins']:JSON.stringify({Divine:'1'}),[P+'current']:'Divine',[P+'data']:JSON.stringify(data)}).window,d=w.document;
   d.getElementById('tb-teacher').click();d.getElementById('tm-pass').value='gabe';d.getElementById('tm-go').click();
   const dash=d.getElementById('dash');
   ok(dash.textContent.includes('Retrieval'),'AN-4: dashboard shows the retrieval readout');
@@ -200,7 +240,7 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
 }
 // ===== AS-4: per-skill difficulty calibration on the teacher dashboard =====
 { const data={students:{Divine:{topics:{'number-system':{title:'The Number System',tree:{},totalSteps:31,sectionTotals:{},lastPracticed:Date.now(),attempts:30,correct:23,struggles:[],skillStats:{easy1:{attempts:10,misses:0},hard1:{attempts:10,misses:5},sweet1:{attempts:10,misses:2},few:{attempts:2,misses:0}},exam:{attempts:0,correct:0},responses:[]}},assignments:{}}}};
-  const w=load(HUB,{'g7.roster':JSON.stringify(['Divine']),'g7.pins':JSON.stringify({Divine:'1'}),'g7.current':'Divine','g7.data':JSON.stringify(data)}).window,d=w.document;
+  const w=load(HUB,{[P+'roster']:JSON.stringify(['Divine']),[P+'pins']:JSON.stringify({Divine:'1'}),[P+'current']:'Divine',[P+'data']:JSON.stringify(data)}).window,d=w.document;
   d.getElementById('tb-teacher').click();d.getElementById('tm-pass').value='gabe';d.getElementById('tm-go').click();
   const dash=d.getElementById('dash');
   ok(dash.querySelectorAll('.cal-chip').length===3,'AS-4: only skills with enough evidence (>=4 attempts) are calibrated');
@@ -209,8 +249,8 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
   ok(dash.querySelector('.cal-chip.sweet')&&dash.querySelector('.cal-chip.sweet').textContent==='on target','AS-4: ~85% band flagged on target');
 }
 // ===== AS-4 (automatic): the lesson's own Learn->Stretch ladder supplies the difficulty level =====
-{ const w=load(NS,{'g7.current':'Divine'}).window,d=w.document;
-  const rec=()=>JSON.parse(w.localStorage.getItem('g7.data')).students.Divine.topics['number-system'].levelStats||{};
+{ const w=load(NS,{[P+'current']:'Divine'}).window,d=w.document;
+  const rec=()=>JSON.parse(w.localStorage.getItem(P+'data')).students.Divine.topics['number-system'].levelStats||{};
   const q41=d.querySelector('[data-qid="4-1"]');            // Learn  -> level 1
   q41.querySelector('.ans-input').value='9';q41.querySelector('.check-btn').click();
   ok(rec()['1']&&rec()['1'].attempts===1&&rec()['1'].misses===0,'AS-4: a Learn item logs to level 1 (foundational)');
@@ -224,7 +264,7 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
 }
 // ===== AS-4: dashboard shows where strength failed; stretch stays out of pass/fail =====
 { const data={students:{Divine:{topics:{'number-system':{title:'The Number System',tree:{},totalSteps:31,sectionTotals:{},lastPracticed:Date.now(),attempts:53,correct:38,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[],levelStats:{1:{attempts:20,misses:1},2:{attempts:20,misses:6},3:{attempts:10,misses:6},4:{attempts:3,misses:2}}}},assignments:{}}}};
-  const w=load(HUB,{'g7.roster':JSON.stringify(['Divine']),'g7.pins':JSON.stringify({Divine:'1'}),'g7.current':'Divine','g7.data':JSON.stringify(data)}).window,d=w.document;
+  const w=load(HUB,{[P+'roster']:JSON.stringify(['Divine']),[P+'pins']:JSON.stringify({Divine:'1'}),[P+'current']:'Divine',[P+'data']:JSON.stringify(data)}).window,d=w.document;
   d.getElementById('tb-teacher').click();d.getElementById('tm-pass').value='gabe';d.getElementById('tm-go').click();
   const ll=d.querySelector('.level-line');
   ok(ll&&ll.textContent.includes('Foundational 95%'),'AS-4: foundational level reported');
@@ -253,9 +293,9 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
     ok(!/data-answer="(?!k1:)/.test(h),f+': all answers encoded');
     ok(h.includes('user-select:none'),f+': copy-block CSS present');
   }
-  const nsdom=load(NS,{'g7.current':'Divine'});const nd=nsdom.window.document;
+  const nsdom=load(NS,{[P+'current']:'Divine'});const nd=nsdom.window.document;
   ok(nd.querySelectorAll('.qcard[data-exam] .hint-btn').length===0,'NS: no hints on exam capstones');
-  const ed=load(EE,{'g7.current':'Divine'}).window.document;
+  const ed=load(EE,{[P+'current']:'Divine'}).window.document;
   ok(ed.querySelectorAll('.qcard[data-exam] .hint-btn').length===0,'EE: no hints on exam capstones');
   const hints=(src(NS)+src(EE)).split('hint-content">').slice(1).map(s=>s.split('</div>')[0]);
   ok(hints.every(x=>!/90x = 57|= 9\.86|81 = 9&sup2;|&radic;36 = 6.*are rational|Distribute both/.test(x)),'NS/EE: hints are strategy-only (no worked answers)');
@@ -263,7 +303,7 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
 // ===== MODULE: shuffle + noshuffle =====
 { const d0=new JSDOM(src(NS)).window.document; // no scripts: source order
   const before=[...d0.querySelector('[data-qid="1-2"] .mc-group').children].map(e=>e.textContent.trim());
-  const w=load(NS,{'g7.current':'Divine'},()=>0).window,d=w.document;
+  const w=load(NS,{[P+'current']:'Divine'},()=>0).window,d=w.document;
   const after=[...d.querySelector('[data-qid="1-2"] .mc-group').children].map(e=>e.textContent.trim());
   ok(before.join('|')!==after.join('|'),'NS: 4-option MC shuffles');
   const ex0=[...d0.querySelector('[data-qid="3-3"] .ms-group').children].map(e=>e.textContent.trim());
@@ -274,7 +314,7 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
   ok(two0.join('|')===two1.join('|'),'NS: 2-option group keeps semantic order');
 }
 // ===== MODULE: engine behaviors =====
-{ const dom=load(NS,{'g7.current':'Divine'});const w=dom.window,d=w.document;
+{ const dom=load(NS,{[P+'current']:'Divine'});const w=dom.window,d=w.document;
   ok(d.getElementById('g7name').textContent==='Divine','NS: student name shown');
   ok(!d.getElementById('g7guestnote'),'NS: no guest warning when signed in');
   const fb=d.querySelector('[data-qid="1-2"] .mc-feedback');
@@ -292,25 +332,25 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
   ok(!g.classList.contains('answered'),'NS: wrong MC does not lock');
   ok(!rightOpt(g)[0].classList.contains('correct'),'NS: wrong MC does not reveal answer');
   ok(rightOpt(g)[0].classList.contains('cooldown'),'NS: cooldown after wrong guess');
-  let t=JSON.parse(w.localStorage.getItem('g7.data')).students.Divine.topics['number-system'];
+  let t=JSON.parse(w.localStorage.getItem(P+'data')).students.Divine.topics['number-system'];
   ok(t.exam.attempts===1&&t.exam.correct===0,'NS: exam counts first attempt as miss');
   await sleep(1700);
   ok(!rightOpt(g)[0].classList.contains('cooldown'),'NS: cooldown lifts');
   rightOpt(g)[0].click();
   ok(mcq.querySelector('.step').classList.contains('completed'),'NS: retry success completes step');
-  t=JSON.parse(w.localStorage.getItem('g7.data')).students.Divine.topics['number-system'];
+  t=JSON.parse(w.localStorage.getItem(P+'data')).students.Divine.topics['number-system'];
   ok(t.exam.attempts===1&&t.exam.correct===0,'NS: retry does not inflate exam stats');
   ok(mcq.querySelector('.mc-feedback').textContent.startsWith('✓'),'NS: explanation revealed after correct');
   // empty check no-op
   const before=t.attempts;
   d.querySelector('[data-qid="1-1"] .check-btn').click();
-  t=JSON.parse(w.localStorage.getItem('g7.data')).students.Divine.topics['number-system'];
+  t=JSON.parse(w.localStorage.getItem(P+'data')).students.Divine.topics['number-system'];
   ok(t.attempts===before,'NS: empty Check logs nothing');
   // fill-in exam first-attempt-only
   const q24=d.querySelector('[data-qid="7-1"]');
   q24.querySelector('.ans-input').value='0.5';q24.querySelector('.check-btn').click();
   q24.querySelector('.ans-input').value='0.625';q24.querySelector('.check-btn').click();
-  t=JSON.parse(w.localStorage.getItem('g7.data')).students.Divine.topics['number-system'];
+  t=JSON.parse(w.localStorage.getItem(P+'data')).students.Divine.topics['number-system'];
   ok(t.exam.attempts===2&&t.exam.correct===0,'NS: fill-in exam first-attempt-only');
   ok(q24.querySelector('.step').classList.contains('completed'),'NS: fill-in completes after retry');
   // two-part unlock + fraction equivalence
@@ -324,8 +364,8 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
   ok(rc&&rc.textContent.includes('Your section scores'),'NS: section report card injected');
   ok(rc.querySelectorAll('.sec-row').length===7,'NS: one row per section');
   // persistence
-  const store=w.localStorage.getItem('g7.data');
-  const w2=load(NS,{'g7.current':'Divine','g7.data':store}).window,d2=w2.document;
+  const store=w.localStorage.getItem(P+'data');
+  const w2=load(NS,{[P+'current']:'Divine',[P+'data']:store}).window,d2=w2.document;
   ok(d2.querySelector('[data-qid="7-1"] .step').classList.contains('completed'),'NS: restore after reload');
   ok(d2.querySelector('[data-qid="7-1"] .ans-input').value==='0.625','NS: restored value decoded');
   ok(d2.getElementById('sec-report').textContent.includes('Your section scores'),'NS: report card after reload');
@@ -335,11 +375,11 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
   ok(!!d.getElementById('g7guestnote'),'NS: guest warning when not signed in');
 }
 // ===== EE: smoke + exam MC =====
-{ const w=load(EE,{'g7.current':'Ayodeji'}).window,d=w.document;
+{ const w=load(EE,{[P+'current']:'Ayodeji'}).window,d=w.document;
   const m=d.querySelector('[data-qid="1-5"]');
   rightOpt(m.querySelector('.mc-group'))[0].click();
   ok(m.querySelector('.step').classList.contains('completed'),'EE: exam MC correct completes');
-  const t=JSON.parse(w.localStorage.getItem('g7.data')).students.Ayodeji.topics['expressions-equations'];
+  const t=JSON.parse(w.localStorage.getItem(P+'data')).students.Ayodeji.topics['expressions-equations'];
   ok(t.exam.attempts===1&&t.exam.correct===1,'EE: exam correct counted once');
   ok(d.getElementById('sec-report').querySelectorAll('.sec-row').length===7,'EE: section report card rows');
   const semantic=[...d.querySelector('[data-qid="5-1"] .mc-group').children].map(e=>e.textContent.trim());
@@ -347,14 +387,14 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
 }
 // ===== SYNC v1.5: hub merge rules =====
 { const data={students:{Divine:{topics:{'number-system':{title:'t',tree:{},totalSteps:31,sectionTotals:{},lastPracticed:5,attempts:0,correct:0,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[{qid:'3-4',label:'Q11',text:'r',ts:77}]}},assignments:{math:{text:'old',ts:5}}}}};
-  const w=load(HUB,{'g7.current':'Divine','g7.roster':JSON.stringify(['Divine']),'g7.pins':JSON.stringify({Divine:'1'}),'g7.data':JSON.stringify(data),'g7.sheetURL':'https://sheet.test/exec'}).window;
+  const w=load(HUB,{[P+'current']:'Divine',[P+'roster']:JSON.stringify(['Divine']),[P+'pins']:JSON.stringify({Divine:'1'}),[P+'data']:JSON.stringify(data),[P+'sheetURL']:'https://sheet.test/exec'}).window;
   ok(!!w.__hubSync,'sync: hub exposes sync API');
   const res=w.__hubSync.applyCloud({pins:{Divine:{v:'42',ts:9e15}},assign:{Divine:{math:{text:'cloud hw',ts:9e15}}},
     topics:{Divine:{'number-system':{title:'t',tree:{'1-1':{steps:{0:true}}},totalSteps:31,sectionTotals:{},lastPracticed:9e15,attempts:1,correct:1,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[{qid:'3-4',label:'Q11',text:'r',ts:77}]}}},
     reviews:{Divine:{'number-system':{'77':123}}}});
   ok(res.changed===true,'sync: cloud changes applied');
-  const d2=JSON.parse(w.localStorage.getItem('g7.data'));
-  ok(JSON.parse(w.localStorage.getItem('g7.pins')).Divine==='42','sync: newer cloud PIN wins (LWW)');
+  const d2=JSON.parse(w.localStorage.getItem(P+'data'));
+  ok(JSON.parse(w.localStorage.getItem(P+'pins')).Divine==='42','sync: newer cloud PIN wins (LWW)');
   ok(d2.students.Divine.assignments.math.text==='cloud hw','sync: newer cloud assignment wins (LWW)');
   ok(d2.students.Divine.topics['number-system'].lastPracticed===9e15,'sync: newer cloud topic replaces local');
   ok(d2.students.Divine.topics['number-system'].responses[0].reviewed===123,'sync: review overlay applied to responses');
@@ -362,8 +402,8 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
   ok(res2.pushTopics.some(p=>p.n==='Divine'&&p.tid==='number-system'),'sync: local-newer topic queued for push');
 }
 // ===== SYNC v1.5: teacher actions push =====
-{ const w=load(HUB,{'g7.sheetURL':'https://sheet.test/exec','g7.current':'Divine','g7.roster':JSON.stringify(['Divine']),'g7.pins':JSON.stringify({Divine:'1'}),
-    'g7.data':JSON.stringify({students:{Divine:{topics:{'number-system':{title:'t',tree:{},totalSteps:31,sectionTotals:{},lastPracticed:5,attempts:1,correct:1,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[{qid:'3-4',label:'Q',text:'r',ts:77}]}},assignments:{}}}})}).window,d=w.document;
+{ const w=load(HUB,{[P+'sheetURL']:'https://sheet.test/exec',[P+'current']:'Divine',[P+'roster']:JSON.stringify(['Divine']),[P+'pins']:JSON.stringify({Divine:'1'}),
+    [P+'data']:JSON.stringify({students:{Divine:{topics:{'number-system':{title:'t',tree:{},totalSteps:31,sectionTotals:{},lastPracticed:5,attempts:1,correct:1,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[{qid:'3-4',label:'Q',text:'r',ts:77}]}},assignments:{}}}})}).window,d=w.document;
   w.__spy=[];
   d.getElementById('tb-teacher').click();d.getElementById('tm-pass').value='gabe';d.getElementById('tm-go').click();
   const inp=d.querySelector('.assign-inp');inp.value='Do 5 problems';d.querySelector('.assign-save').click();
@@ -375,15 +415,15 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
   ok(w.__spy.some(b=>b.kind==='pin'&&b.payload.v===''),'sync: PIN reset pushed');
 }
 // ===== SYNC v1.5: student pushes + module merge =====
-{ const w=load(HUB,{'g7.sheetURL':'https://sheet.test/exec'}).window,d=w.document;
+{ const w=load(HUB,{[P+'sheetURL']:'https://sheet.test/exec'}).window,d=w.document;
   w.__spy=[];
   d.getElementById('signin-name').value='divine';d.getElementById('signin-go').click();d.getElementById('pin1').value='7';d.getElementById('pin2').value='7';d.getElementById('pin-go').click();
   ok(w.__spy.some(b=>b.kind==='pin'&&b.payload.v==='7'&&b.hub==='grade8'),'sync: PIN creation pushed');
-  const wm=load(NS,{'g7.current':'Divine','g7.sheetURL':'https://sheet.test/exec'}).window;
+  const wm=load(NS,{[P+'current']:'Divine',[P+'sheetURL']:'https://sheet.test/exec'}).window;
   ok(!!wm.__modSync,'sync: module exposes sync API');
   const changed=wm.__modSync.mergeCloudTopic({topics:{Divine:{'number-system':{title:'The Number System',tree:{'1-1':{steps:{0:true}}},totalSteps:31,sectionTotals:{'1':5},lastPracticed:9e15,attempts:1,correct:1,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[]}}},reviews:{}});
   ok(changed===true,'sync: module merges newer cloud topic');
-  ok(JSON.parse(wm.localStorage.getItem('g7.data')).students.Divine.topics['number-system'].tree['1-1'].steps[0]===true,'sync: merge lands in local store');
+  ok(JSON.parse(wm.localStorage.getItem(P+'data')).students.Divine.topics['number-system'].tree['1-1'].steps[0]===true,'sync: merge lands in local store');
   wm.__spy=[];
   const q=wm.document.querySelector('[data-qid="4-1"]');
   q.querySelector('.ans-input').value='9';q.querySelector('.check-btn').click();
@@ -392,13 +432,13 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
 }
 // ===== MODULE: Matter & Its Interactions (sci.matter, MS-PS1) =====
 { const MATTER='Matter_and_Its_Interactions.html';
-  const w=load(MATTER,{'g7.current':'Divine'}).window,d=w.document;
+  const w=load(MATTER,{[P+'current']:'Divine'}).window,d=w.document;
   ok(!d.getElementById('g8gate'),'matter: gate removed when g8.gate=ok');
   const mqids=[...d.querySelectorAll('.qcard[data-qid]')].map(c=>c.dataset.qid);
-  ok(mqids.length===27&&new Set(mqids).size===27,'matter: 27 unique qcards render');
+  ok(mqids.length===31&&new Set(mqids).size===31,'matter: 31 unique qcards render');
   ok(d.querySelector('[data-qid="7-1"]').dataset.exam==='1','matter: MISA item 7-1 is exam-graded');
   ok([...d.querySelectorAll('.qcard[data-exam="1"] .hint-content')].length===0,'matter: no hints behind exam capstones (hint integrity)');
-  const mtopic=()=>JSON.parse(w.localStorage.getItem('g7.data')).students.Divine.topics['sci.matter'];
+  const mtopic=()=>JSON.parse(w.localStorage.getItem(P+'data')).students.Divine.topics['sci.matter'];
   // fill-in: wrong then correct (qid 1-2 answer = 5)
   const c12=d.querySelector('[data-qid="1-2"]'),i12=c12.querySelector('.ans-input');
   i12.value='4';c12.querySelector('.check-btn').click();
@@ -450,7 +490,7 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
   ok(R.list({t:topic},['t'],now)[0].skill==='roots','p3: due row carries its sharpest-faded skill');
 
   const ago=now-60*DAY;
-  const S={'g7.current':'Divine','g7.data':JSON.stringify({students:{Divine:{topics:{
+  const S={[P+'current']:'Divine',[P+'data']:JSON.stringify({students:{Divine:{topics:{
     'number-system':{title:'T',tree:{'4-1':{steps:{0:true}},'1-1':{steps:{0:true}}},totalSteps:31,sectionTotals:{},
       lastPracticed:ago,attempts:20,correct:19,struggles:[],
       skillStats:{roots:{attempts:6,misses:0,last:ago},'rational-decimal':{attempts:8,misses:1,last:ago}},
@@ -474,7 +514,7 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
      'p3: an unknown skill falls back to the normal lesson');
   ok(!load('The_Number_System.html',S).window.document.body.classList.contains('g7-review-mode'),
      'p3: no ?review param leaves the lesson untouched');
-  const rec=()=>JSON.parse(dom.window.localStorage.getItem('g7.data')).students.Divine.topics['number-system'];
+  const rec=()=>JSON.parse(dom.window.localStorage.getItem(P+'data')).students.Divine.topics['number-system'];
   const t0=rec();
   dom.window.__modReview.review(true,true,'4-1');
   dom.window.__modReview.review(true,true,'4-2');
@@ -485,16 +525,16 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
   ok(t1.skillStats.roots.streak===3,'p3: two clean first attempts advance the skill one rung (proxy base 2 -> 3)');
   const dm=load('The_Number_System.html',S,null,'?review=roots');
   dm.window.__modReview.review(true,true,'4-1');dm.window.__modReview.review(true,false,'4-2');
-  ok(JSON.parse(dm.window.localStorage.getItem('g7.data')).students.Divine.topics['number-system']
+  ok(JSON.parse(dm.window.localStorage.getItem(P+'data')).students.Divine.topics['number-system']
      .skillStats.roots.streak===0,'p3: a missed review resets the skill to the bottom rung');
   const today=Math.floor(now/DAY);
-  const Sd={'g7.current':'Divine','g7.data':JSON.stringify({students:{Divine:{topics:{
+  const Sd={[P+'current']:'Divine',[P+'data']:JSON.stringify({students:{Divine:{topics:{
     'number-system':{title:'T',tree:{},totalSteps:31,sectionTotals:{},lastPracticed:ago,attempts:20,correct:19,
       struggles:[],skillStats:{roots:{attempts:6,misses:0,last:ago,streak:1,day:today}},
       exam:{attempts:0,correct:0},responses:[]}}}}})};
   const dd=load('The_Number_System.html',Sd,null,'?review=roots');
   dd.window.__modReview.review(true,true,'4-1');dd.window.__modReview.review(true,true,'4-2');
-  ok(JSON.parse(dd.window.localStorage.getItem('g7.data')).students.Divine.topics['number-system']
+  ok(JSON.parse(dd.window.localStorage.getItem(P+'data')).students.Divine.topics['number-system']
      .skillStats.roots.streak===1,'p3: a skill climbs at most one rung per calendar day');
 }
 console.log('\n'+pass+' passed, '+fail+' failed');process.exit(fail?1:0);
