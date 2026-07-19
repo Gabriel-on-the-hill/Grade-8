@@ -198,6 +198,57 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
     ok(V.validate(plan('Divine','sci')).errors.length===0,'subjects: ungated student can still be set Science homework');
   }
 }
+// ===== HUB: dashboard labels non-enrolment, and never hides a record =====
+{ /* The dashboard renders EVERY student, so an assertion on the whole panel leaks across
+   * students (Ayodeji's chip shows up while viewing Divine). Scope to one .student-block. */
+  const block=(who,data,of)=>{const w=load(HUB,{[P+'roster']:JSON.stringify(['Divine','Ayodeji']),
+      [P+'pins']:JSON.stringify({Divine:'1',Ayodeji:'1'}),[P+'current']:who,
+      [P+'data']:JSON.stringify(data||{students:{}})}).window,d=w.document;
+    d.getElementById('tb-teacher').click();
+    d.getElementById('tm-pass').value='gabe';d.getElementById('tm-go').click();
+    const b=[...d.getElementById('dash').querySelectorAll('.student-block')]
+      .find(x=>{const o=x.querySelector('.open-as');return o&&o.getAttribute('data-n')===(of||who);});
+    return b?b.textContent:'';};
+  // Heading text only — the empty-state note also contains "hidden from <name>", so a whole-block
+  // match cannot prove the heading chip exists. (Caught by mutation-testing.)
+  const heads=(who,data,of)=>{const w=load(HUB,{[P+'roster']:JSON.stringify(['Divine','Ayodeji']),
+      [P+'pins']:JSON.stringify({Divine:'1',Ayodeji:'1'}),[P+'current']:who,
+      [P+'data']:JSON.stringify(data||{students:{}})}).window,d=w.document;
+    d.getElementById('tb-teacher').click();
+    d.getElementById('tm-pass').value='gabe';d.getElementById('tm-go').click();
+    const b=[...d.getElementById('dash').querySelectorAll('.student-block')]
+      .find(x=>{const o=x.querySelector('.open-as');return o&&o.getAttribute('data-n')===(of||who);});
+    return b?[...b.querySelectorAll('.dash-subject')].map(x=>x.textContent).join(' | '):'';};
+  const sci=q=>({'sci.matter':{title:'Matter & Its Interactions',tree:q?{'1-1':{steps:{0:true}}}:{},totalSteps:31,
+    sectionTotals:{},lastPracticed:Date.now(),attempts:q?4:0,correct:q?3:0,struggles:[],skillStats:{},
+    exam:{attempts:0,correct:0},responses:[]}});
+
+  // Gated student, nothing in the hidden subject: labelled, not silently blank.
+  { const b=block('Ayodeji',{students:{Ayodeji:{topics:{}}}});
+    ok(/hidden from Ayodeji/.test(heads('Ayodeji',{students:{Ayodeji:{topics:{}}}})),
+       'dash: non-enrolled subject is labelled on the heading itself');
+    ok(/Not enrolled/.test(b),'dash: empty non-enrolled subject says why');
+    ok(!/No activity yet in Science/.test(b),'dash: "no activity yet" no longer misdescribes non-enrolment');
+    ok(/Science/.test(b),'dash: the subject is still listed, not removed');
+  }
+  // The whole point of not choosing option 3: a gated student WITH data still shows every row.
+  { const b=block('Ayodeji',{students:{Ayodeji:{topics:sci(true)}}});
+    ok(/Matter & Its Interactions/.test(b),'dash: hidden-subject records are still shown in full');
+    ok(!/Not enrolled/.test(b),'dash: the not-enrolled note yields to real data');
+    ok(/hidden from Ayodeji/.test(heads('Ayodeji',{students:{Ayodeji:{topics:sci(true)}}})),
+       'dash: heading still flags that the student cannot see it');
+  }
+  // Enrolled student is completely unchanged.
+  { const b=block('Divine',{students:{Divine:{topics:{}}}});
+    ok(!/hidden from/.test(b),'dash: enrolled student gets no hidden-from chip');
+    ok(!/Not enrolled/.test(b),'dash: enrolled student gets no not-enrolled note');
+    ok(/No activity yet/.test(b),'dash: enrolled student keeps the plain empty state');
+  }
+  // A teacher viewing as one student still sees the other's true state.
+  { const b=block('Divine',{students:{Ayodeji:{topics:sci(true)}}},'Ayodeji');
+    ok(/Matter & Its Interactions/.test(b),'dash: another student’s hidden-subject data is visible to the teacher');
+  }
+}
 // ===== HUB: homework ref:"task" — out-of-band items (snapshot-returned) =====
 { const mkPlan=items=>({students:{Ayodeji:{topics:{},hwplan:{math:{sets:[
       {id:'wk-t',label:'Set 1 — test',items:items}]}}}}});

@@ -1257,7 +1257,10 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
         var hasData=ids.some(function(id){return !!topics[id];});
         if(!subjectHasAvailable(subj) && !hasData) return; // nothing to show for this subject yet
         anyStudent=true;
-        html+='<div class="dash-subject">'+subj.icon+'<span>'+esc(subj.label)+'</span></div>';
+        var enrolled=subjectAllowed(name,subj.id);
+        html+='<div class="dash-subject">'+subj.icon+'<span>'+esc(subj.label)+'</span>'+
+          (enrolled?'':'<span class="muted-note" style="margin-left:.5rem;font-weight:400">hidden from '+esc(name)+'</span>')+
+          '</div>';
         var any=false;
         subj.units.forEach(function(u){u.topics.forEach(function(t){
           if(t.status!=='available')return;
@@ -1323,7 +1326,9 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
           }
           html+='</div>';
         });});
-        if(!any) html+='<p class="muted-note">No activity yet in '+esc(subj.label)+'.</p>';
+        if(!any) html+='<p class="muted-note">'+(enrolled
+          ?'No activity yet in '+esc(subj.label)+'.'
+          :'Not enrolled — this subject is hidden from '+esc(name)+', so there is nothing to show.')+'</p>';
         var av=getAssign(stuA, subj.id);var avo=getAssignObj(stuA, subj.id);
         html+='<div class="assign-box"><input class="field assign-inp" data-s="'+esc(subj.id)+'" placeholder="Set '+esc(subj.label)+' homework for '+esc(name)+'..." value="'+esc(av)+'"/><button class="btn sm assign-save" data-n="'+esc(name)+'" data-s="'+esc(subj.id)+'">Save</button></div>'+(avo&&avo.doneTs?'<div class="muted-note" style="margin-top:.25rem">Student marked this done '+relTime(avo.doneTs)+'.</div>':'');
       });
