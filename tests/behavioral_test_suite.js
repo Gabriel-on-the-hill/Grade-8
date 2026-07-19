@@ -146,6 +146,111 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
   rev.click();
   ok(JSON.parse(w.localStorage.getItem(P+'data')).students.Divine.topics['number-system'].responses[0].reviewed>0,'hub: reviewed flag persists');
 }
+// ===== HUB: per-student subject visibility (STUDENT_SUBJECTS) =====
+{ const boot=(who,extra)=>load(HUB,Object.assign({[P+'roster']:JSON.stringify(['Divine','Ayodeji']),
+    [P+'pins']:JSON.stringify({Divine:'1',Ayodeji:'1'}),[P+'current']:who},extra||{})).window;
+
+  // Gated student: one subject, no tab bar.
+  { const w=boot('Ayodeji'),d=w.document,tabs=d.getElementById('subject-tabs');
+    const labels=[...tabs.querySelectorAll('.subject-tab')].map(b=>b.textContent);
+    ok(labels.length===1,'subjects: gated student sees exactly one subject tab');
+    ok(/Mathematics/.test(labels[0]||''),'subjects: gated student sees Mathematics');
+    ok(!/Science/.test(tabs.textContent),'subjects: gated student does not see Science');
+    ok(tabs.style.display==='none','subjects: single-subject tab bar is hidden as noise');
+  }
+  // Ungated student is untouched.
+  { const w=boot('Divine'),d=w.document,tabs=d.getElementById('subject-tabs');
+    const labels=[...tabs.querySelectorAll('.subject-tab')].map(b=>b.textContent);
+    ok(labels.length>1,'subjects: unlisted student still sees every subject');
+    ok(/Science/.test(tabs.textContent),'subjects: unlisted student still sees Science');
+    ok(tabs.style.display!=='none','subjects: multi-subject tab bar stays visible');
+  }
+  // g8.subject is DEVICE-level: another student's stored choice must not strand a gated student.
+  { const w=boot('Ayodeji',{[P+'subject']:'sci'}),d=w.document;
+    ok(!d.getElementById('view-app').classList.contains('hidden'),'subjects: gated student still reaches the app');
+    /* Assert on the RESOLVED subject, not the tab bar: the tabs are filtered by visibleSubjects()
+     * regardless, so a tab-only assertion passes even when curSubject() honours the foreign id and
+     * renderApp() goes on to render the wrong subject's content under a correct-looking tab bar.
+     * (Caught by mutation-testing — the tab-only version of this check passed vacuously.) */
+    const sub=d.getElementById('greeting-sub').textContent;
+    ok(/Mathematics/.test(sub),'subjects: stored foreign subject resolves back to an allowed subject');
+    ok(!/Science/.test(sub),'subjects: foreign subject content is not rendered');
+    ok(/The Number System/.test(d.getElementById('view-app').textContent),'subjects: allowed subject topics are the ones listed');
+    ok(!/Matter/.test(d.getElementById('view-app').textContent),'subjects: hidden subject topics are not listed');
+  }
+  // The teacher dashboard is deliberately UNFILTERED.
+  { const data={students:{Ayodeji:{topics:{'sci.matter':{title:'Matter',tree:{'1-1':{steps:{0:true}}},totalSteps:31,
+      sectionTotals:{},lastPracticed:Date.now(),attempts:3,correct:2,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[]}}}}};
+    const w=boot('Ayodeji',{[P+'data']:JSON.stringify(data)}),d=w.document;
+    d.getElementById('tb-teacher').click();
+    d.getElementById('tm-pass').value='gabe';d.getElementById('tm-go').click();
+    ok(/Science/.test(d.getElementById('dash').textContent),'subjects: teacher still sees a hidden subject in the dashboard');
+    ok(/Matter/.test(d.getElementById('dash').textContent),'subjects: hidden-subject data is retained, not deleted');
+  }
+  // Publishing a plan for a subject the student cannot see must fail closed.
+  { const V=load(HUB).window.__hubHw;
+    const plan=(who,subject)=>[{student:who,subject:subject,sets:[{id:'s1',label:'L',
+      items:[{ref:'module',topic:subject==='sci'?'sci.matter':'number-system',qid:'1-1'}]}]}];
+    const bad=V.validate(plan('Ayodeji','sci'));
+    ok(bad.errors.length===1&&/cannot see subject/.test(bad.errors[0]),'subjects: plan for a hidden subject is rejected');
+    ok(bad.plans.length===0,'subjects: hidden-subject plan publishes nothing (fails closed)');
+    ok(V.validate(plan('Ayodeji','math')).errors.length===0,'subjects: allowed-subject plan still validates');
+    ok(V.validate(plan('Divine','sci')).errors.length===0,'subjects: ungated student can still be set Science homework');
+  }
+}
+// ===== HUB: homework ref:"task" — out-of-band items (snapshot-returned) =====
+{ const mkPlan=items=>({students:{Ayodeji:{topics:{},hwplan:{math:{sets:[
+      {id:'wk-t',label:'Set 1 — test',items:items}]}}}}});
+  const MOD={ref:'module',topic:'number-system',qid:'4-1'};
+  const TASK={ref:'task',text:'List 30 perfect squares and 30 perfect cubes.'};
+  const boot=data=>load(HUB,{[P+'roster']:JSON.stringify(['Ayodeji']),[P+'pins']:JSON.stringify({Ayodeji:'1'}),
+    [P+'current']:'Ayodeji',[P+'data']:JSON.stringify(data)}).window;
+
+  // --- render ---
+  { const d=boot(mkPlan([MOD,TASK])).document, hw=d.getElementById('hw-sets');
+    ok(hw.textContent.includes('List 30 perfect squares'),'hw task: instruction text is rendered to the student');
+    ok(hw.textContent.includes('send your tutor a snapshot'),'hw task: names its out-of-band return route');
+    ok(!!hw.querySelector('.hw-task'),'hw task: rendered in its own .hw-task block');
+    ok(hw.textContent.includes('0/1 done'),'hw task: excluded from the progress total (1 module item, not 2)');
+    ok(!!hw.querySelector('a.btn[href*="?q=4-1"]'),'hw task: sibling module link still built');
+    ok(!/undefined|\[object/.test(hw.textContent),'hw task: no undefined/object leakage in the card');
+  }
+  // A task must never block the set reaching done — the engine cannot mark it.
+  { const data=mkPlan([MOD,TASK]);
+    data.students.Ayodeji.hwstate={math:{items:{'wk-t':{'number-system|4-1':1}},sets:{}}};
+    const w=boot(data),hw=w.document.getElementById('hw-sets');
+    ok(hw.textContent.includes('done ✓'),'hw task: all module items done ⇒ set completes despite an open task');
+    ok(JSON.parse(w.localStorage.getItem(P+'data')).students.Ayodeji.hwstate.math.sets['wk-t'].completedTs>0,
+       'hw task: completion persists (task is not counted as outstanding)');
+  }
+  // A task-only set has no engine-markable items; it must not auto-complete at 0/0.
+  { const hw=boot(mkPlan([TASK])).document.getElementById('hw-sets');
+    ok(!hw.textContent.includes('done ✓'),'hw task: task-only set does not auto-complete');
+    ok(hw.textContent.includes('List 30 perfect squares'),'hw task: task-only set still shows its instruction');
+  }
+  // Task text is escaped, not injected — plans are tutor-authored files but still untrusted input.
+  { const hw=boot(mkPlan([MOD,{ref:'task',text:'<img src=x onerror=alert(1)>pwn'}])).document.getElementById('hw-sets');
+    ok(!hw.querySelector('img'),'hw task: text is escaped, not parsed as HTML');
+    ok(hw.textContent.includes('pwn'),'hw task: escaped text still displays');
+  }
+  // --- validation (fails closed: one bad item publishes nothing) ---
+  { const V=load(HUB).window.__hubHw;
+    ok(V&&typeof V.validate==='function','hw task: hub exposes __hubHw API');
+    const mk=items=>[{student:'Ayodeji',subject:'math',sets:[{id:'s1',label:'L',items:items}]}];
+    ok(V.validate(mk([TASK])).errors.length===0,'hw task: valid task item passes validation');
+    ok(V.validate(mk([TASK])).plans.length===1,'hw task: valid task item publishes');
+    const noText=V.validate(mk([{ref:'task'}]));
+    ok(noText.errors.length===1&&/task item needs text/.test(noText.errors[0]),'hw task: task without text is rejected');
+    ok(noText.plans.length===0,'hw task: a bad task item publishes nothing (fails closed)');
+    ok(/ref must be "module", "bank" or "task"/.test(V.validate(mk([{ref:'nope'}])).errors[0]||''),
+       'hw task: unknown ref still rejected, message lists all three kinds');
+    ok(V.validate(mk([MOD])).errors.length===0,'hw task: module items unaffected by the new kind');
+    ok(V.validate(mk([{ref:'bank'}])).errors.length===1,'hw task: bank items still require an id');
+    // progress/links accounting
+    ok(V.progress({items:[MOD,TASK]},{}).total===1,'hw task: hwSetProgress counts module items only');
+    ok(V.links({items:[MOD,TASK]}).filter(g=>g.kind==='other').length===1,'hw task: hwLinks emits the task as a non-module group');
+  }
+}
 // ===== HUB: spaced review (MR-1) — due-for-review ladder =====
 { const DAY=86400000, now=Date.now();
   const R=load(HUB).window.__hubReview;

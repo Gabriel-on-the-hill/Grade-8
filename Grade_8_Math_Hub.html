@@ -126,6 +126,7 @@ input.field:focus{outline:none;border-color:var(--green)}
 .struggle-list div{padding:.18rem 0;color:#5a4a2a}
 .struggle-list .q{font-weight:600;color:var(--ink)}
 .muted-note{color:var(--muted);font-size:.86rem}
+    .hw-task{margin-top:.45rem;padding-left:.85rem;border-left:2px solid var(--gold)}
 
 /* roster manager + settings */
 .panel{background:var(--card);border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow);padding:1.1rem;margin-bottom:1rem}
@@ -393,7 +394,8 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
   function setCurrent(n){ if(n){LS.setItem(K('current'),n);} else {LS.removeItem(K('current'));} }
   function sheetURL(){return LS.getItem(K('sheetURL'))||'';}
   function teacherPass(){return LS.getItem(K('teacherPass'))||'';}
-  function curSubject(){var v=LS.getItem(K('subject'));return (v&&subjectById(v))?v:firstSubject().id;}
+  function curSubject(){var v=LS.getItem(K('subject'));
+    return (v&&subjectById(v)&&subjectAllowed(current(),v))?v:firstSubject().id;}
   function setSubject(id){LS.setItem(K('subject'),id);}
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function initials(n){return String(n||'?').trim().split(/\s+/).map(function(w){return w[0]||'';}).slice(0,2).join('').toUpperCase();}
@@ -489,6 +491,12 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
      students created during old forced setup). To change it for good, change the
      seed and redeploy; Settings changes last only until the seed changes. */
   var ROSTER_SEED=['Divine','Ayodeji'];
+  /* Per-student subject visibility (edit-per-deployment, seeded like ROSTER_SEED — NOT synced, so
+     every device is identical). A student listed here sees ONLY the subject ids given; a student
+     NOT listed sees every subject. This is a VISIBILITY gate, not security: module files stay
+     reachable by direct URL and no student data is hidden or deleted. The teacher dashboard is
+     deliberately unfiltered — the teacher always sees every subject for every student. */
+  var STUDENT_SUBJECTS={Ayodeji:['math']};
   var TEACHER_PASS_SEED=atob('R2FiZQ==');  // lightly encoded; checked case-insensitively
   var SYNC_HUB_ID='grade8';   /* namespace in the shared multi-hub cloud backend (SAT / Grade 7 / Grade 8 share one Sheet) */
   var GRADE_LABEL='Grade 8';  /* shown beside each student on the teacher dashboard */
@@ -640,15 +648,26 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     if(!resolveName(p.n))return;var d=getData();var to=d.students[p.n]&&d.students[p.n].topics&&d.students[p.n].topics[p.tid];if(to)syncPush('topic',p.n,p.tid,to);});if(res.changed&&after)after();});}
   function rerenderView(){try{if(!document.getElementById('view-teacher').classList.contains('hidden')){renderTeacher();}else if(!document.getElementById('view-app').classList.contains('hidden')){renderApp();}}catch(e){}}
   window.__hubSync={applyCloud:applyCloud,recTs:recTs,reviewMapFor:reviewMapFor,pingText:pingStatusText};
+  window.__hubHw={validate:hwValidatePlans,links:hwLinks,progress:hwSetProgress};
 
 
   function subjectById(id){for(var i=0;i<SUBJECTS.length;i++){if(SUBJECTS[i].id===id)return SUBJECTS[i];}return null;}
+  /* Student-facing subject visibility. NOTE: subjectById/eachTopic/topicMeta are deliberately NOT
+     filtered — they are data plumbing (sync merge, homework topic ownership, dashboard), and
+     filtering them would orphan records a student already has. Only the three student-facing
+     entry points below consult this. */
+  function allowedSubjectIds(name){var a=STUDENT_SUBJECTS&&STUDENT_SUBJECTS[name];return (a&&a.length)?a:null;}
+  function subjectAllowed(name,sid){var a=allowedSubjectIds(name);return !a||a.indexOf(sid)>=0;}
+  function visibleSubjects(name){var a=allowedSubjectIds(name);
+    if(!a)return SUBJECTS;
+    var out=SUBJECTS.filter(function(s){return a.indexOf(s.id)>=0;});
+    return out.length?out:SUBJECTS;}   // never strand a student with no subject at all
   function eachTopic(fn){SUBJECTS.forEach(function(s){s.units.forEach(function(u){u.topics.forEach(function(t){fn(t,u,s);});});});}
   function topicMeta(id){var found=null;eachTopic(function(t){if(t.id===id)found=t;});return found;}
   function subjectForTopic(id){var found=null;eachTopic(function(t,u,s){if(t.id===id)found=s;});return found;}
   function subjectTopicIds(s){var ids=[];s.units.forEach(function(u){u.topics.forEach(function(t){ids.push(t.id);});});return ids;}
   function subjectHasAvailable(s){var has=false;s.units.forEach(function(u){u.topics.forEach(function(t){if(t.status==='available')has=true;});});return has;}
-  function firstSubject(){for(var i=0;i<SUBJECTS.length;i++){if(subjectHasAvailable(SUBJECTS[i]))return SUBJECTS[i];}return SUBJECTS[0];}
+  function firstSubject(){var V=visibleSubjects(current());for(var i=0;i<V.length;i++){if(subjectHasAvailable(V[i]))return V[i];}return V[0];}
 
   function studentTopics(name){var d=getData();return (d.students&&d.students[name]&&d.students[name].topics)||{};}
   function topicProgress(t){
@@ -845,7 +864,9 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
   // ---- student app ----
   function renderSubjectTabs(activeId){
     var el=document.getElementById('subject-tabs');
-    el.innerHTML=SUBJECTS.map(function(s){
+    var V=visibleSubjects(current());
+    el.style.display=(V.length<=1)?'none':'';    // set both ways: the element persists across renders
+    el.innerHTML=V.map(function(s){
       var soon=!subjectHasAvailable(s);
       return '<button class="subject-tab'+(s.id===activeId?' active':'')+'" data-s="'+esc(s.id)+'">'+s.icon+'<span>'+esc(s.label)+'</span>'+(soon?'<span class="cs">soon</span>':'')+'</button>';
     }).join('');
@@ -1050,7 +1071,8 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
       }else if(status==='done'){
         rows+='<div class="item">'+label+' — <strong>done ✓</strong></div>';
       }else{
-        var links=hwLinks(set).map(function(g){
+        var groups=hwLinks(set);
+        var links=groups.map(function(g){
           if(g.kind!=='module')return '';
           var t=topicMeta(g.topic);if(!t||!t.file)return '';
           /* hw/subj travel with the link so the module knows these attempts are homework and can
@@ -1058,8 +1080,16 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
           return '<a class="btn sm" href="'+esc(t.file)+'?q='+encodeURIComponent(g.qids.join(','))+
                  '&hw='+encodeURIComponent(set.id)+'&subj='+encodeURIComponent(subj.id)+'">'+esc(t.title)+' →</a>';
         }).filter(Boolean).join(' ');
+        /* ref:"task" — shown as an instruction, never engine-marked. hwSetProgress already excludes
+         * non-module items, so a task can never block the set reaching "done ✓"; the tutor checks it
+         * by hand from the snapshot the student sends. */
+        var tasks=groups.map(function(g){
+          if(g.kind!=='other'||!g.item||g.item.ref!=='task'||!g.item.text)return '';
+          return '<div class="hw-task">'+esc(g.item.text)+
+                 '<span class="muted-note"> — not marked in the app; send your tutor a snapshot.</span></div>';
+        }).filter(Boolean).join('');
         rows+='<div class="item">'+label+' — '+prog.done+'/'+prog.total+' done'+
-              '<div style="margin-top:.35rem">'+links+'</div></div>';
+              '<div style="margin-top:.35rem">'+links+'</div>'+tasks+'</div>';
       }
     });
     el.innerHTML=rows?('<div class="hw-card"><h3>Your '+esc(subj.label)+' homework</h3>'+rows+'</div>'):'';
@@ -1080,6 +1110,10 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
       if(!name){errs.push(where+': student "'+((p&&p.student)||'')+'" is not on this hub’s roster');return;}
       var subj=subjectById((p&&p.subject)||'');
       if(!subj){errs.push(where+' ('+name+'): unknown subject "'+((p&&p.subject)||'')+'"');return;}
+      /* Fails closed: hwPlanFor() is keyed by subject, so a plan for a subject this student cannot
+       * see would validate, publish, and render NOTHING — a silently lost week. */
+      if(!subjectAllowed(name,subj.id)){errs.push(where+' ('+name+'): '+name+' cannot see subject "'+
+        subj.id+'" (STUDENT_SUBJECTS) — this plan would publish but never appear');return;}
       var sets=(p.sets||[]);
       if(!sets.length){errs.push(where+' ('+name+'): no sets');return;}
       var seen={};
@@ -1093,10 +1127,14 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
         if(!items.length){errs.push(w+': no items');return;}
         items.forEach(function(it,k){
           var wi=w+' item '+(k+1);
-          if(!it||(it.ref!=='module'&&it.ref!=='bank')){errs.push(wi+': ref must be "module" or "bank"');return;}
+          if(!it||(it.ref!=='module'&&it.ref!=='bank'&&it.ref!=='task')){errs.push(wi+': ref must be "module", "bank" or "task"');return;}
           if(it.ref==='module'){
             if(!it.topic||!it.qid){errs.push(wi+': module item needs topic and qid');return;}
             if(!topicMeta(it.topic))errs.push(wi+': this hub does not own topic "'+it.topic+'"');
+          }else if(it.ref==='task'){
+            /* An out-of-band task: the student returns it to the tutor directly (a photo of written
+             * work), so the engine never marks it. It needs text and nothing else. */
+            if(!it.text)errs.push(wi+': task item needs text');
           }else if(!it.id){errs.push(wi+': bank item needs an id');}
         });
       });
