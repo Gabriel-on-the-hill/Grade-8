@@ -674,7 +674,10 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
       var cur=parseFloat(inp.value);
       if(!isNaN(cur)&&cur>=mn&&cur<=mx) parts.push('<circle class="pt" cx="'+px(cur).toFixed(1)+'" cy="'+y+'" r="7"/>');
       parts.push('<rect class="hit" x="0" y="0" width="'+W+'" height="'+H+'"/>');
-      sv='<svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" role="img" aria-label="Number line from '+mn+' to '+mx+'. Click to place a point.">'+parts.join('')+'</svg>';
+      var _cur=parseFloat(inp.value);
+      sv='<svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" tabindex="0" role="slider" '+
+        'aria-valuemin="'+mn+'" aria-valuemax="'+mx+'" aria-valuenow="'+(isNaN(_cur)?'':_cur)+'" '+
+        'aria-label="Number line from '+mn+' to '+mx+'. Use the arrow keys to move the point, or click.">'+parts.join('')+'</svg>';
     } else {
       var xmn=g7plotNum(box,'xmin',0), xmx=g7plotNum(box,'xmax',10), xst=g7plotNum(box,'xstep',1);
       var ymn=g7plotNum(box,'ymin',0), ymx=g7plotNum(box,'ymax',10), yst=g7plotNum(box,'ystep',1);
@@ -699,13 +702,15 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
           g.push('<circle class="pt" cx="'+gx(cx).toFixed(1)+'" cy="'+gy(cy).toFixed(1)+'" r="7"/>');
       }
       g.push('<rect class="hit" x="0" y="0" width="'+W+'" height="'+H+'"/>');
-      sv='<svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" role="img" aria-label="Coordinate grid, x from '+xmn+' to '+xmx+', y from '+ymn+' to '+ymx+'. Click to plot a point.">'+g.join('')+'</svg>';
+      sv='<svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" tabindex="0" role="application" '+
+        'aria-label="Coordinate grid, x from '+xmn+' to '+xmx+', y from '+ymn+' to '+ymx+'. '+
+        'Use the arrow keys to move the point, or click. Current point: '+(inp.value||'none')+'.">'+g.join('')+'</svg>';
     }
     var old=box.querySelector('svg'); if(old)old.parentNode.removeChild(old);
     box.insertAdjacentHTML('afterbegin',sv);
     var ro=box.querySelector('.readout');
     if(!ro){ro=document.createElement('div');ro.className='readout';box.appendChild(ro);}
-    ro.textContent=inp.value?('Placed: '+(box.dataset.plot==='grid'?'('+inp.value+')':inp.value)):'Click to place your point.';
+    ro.textContent=inp.value?('Placed: '+(box.dataset.plot==='grid'?'('+inp.value+')':inp.value)):'Click to place your point, or focus it and use the arrow keys.';
     box.classList.toggle('locked',!!inp.disabled);
   }
   function g7plotSet(box,evt){
@@ -740,7 +745,53 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     var box=e.target.closest&&e.target.closest('.plotbox');
     if(box&&e.target.classList.contains('hit'))g7plotSet(box,e);
   });
-  window.__modPlot={sync:g7plotSync,draw:g7plotDraw};
+
+  /* Keyboard operation. Shipped click-only, which locked keyboard and screen-reader users out of
+     every plot item — including a real released MCAP capstone. Arrow keys step the point; Home/End
+     jump to the ends; the first press on an empty plot starts in the middle rather than doing
+     nothing, so there is always a way in without a pointer. */
+  function g7plotKey(box, e){
+    var inp=box.querySelector('.ans-input');
+    if(!inp||inp.disabled)return;
+    var k=e.key, grid=(box.dataset.plot||'line')==='grid';
+    var mn,mx,st,xmn,xmx,xst,ymn,ymx,yst,vx,vy;
+    var clamp=function(v,a,b){return Math.min(b,Math.max(a,Math.round(v*1e6)/1e6));};
+    if(!grid){
+      mn=g7plotNum(box,'min',-10); mx=g7plotNum(box,'max',10); st=g7plotNum(box,'step',1);
+      var cur=parseFloat(inp.value);
+      if(isNaN(cur)){ if(k.indexOf('Arrow')!==0&&k!=='Home'&&k!=='End')return;
+        cur=clamp(mn+Math.round(((mn+mx)/2-mn)/st)*st,mn,mx); }
+      else if(k==='ArrowLeft'||k==='ArrowDown')cur=clamp(cur-st,mn,mx);
+      else if(k==='ArrowRight'||k==='ArrowUp')cur=clamp(cur+st,mn,mx);
+      else if(k==='Home')cur=mn; else if(k==='End')cur=mx;
+      else return;
+      inp.value=String(cur);
+    } else {
+      xmn=g7plotNum(box,'xmin',0); xmx=g7plotNum(box,'xmax',10); xst=g7plotNum(box,'xstep',1);
+      ymn=g7plotNum(box,'ymin',0); ymx=g7plotNum(box,'ymax',10); yst=g7plotNum(box,'ystep',1);
+      var pr=String(inp.value||'').split(','); vx=parseFloat(pr[0]); vy=parseFloat(pr[1]);
+      if(isNaN(vx)||isNaN(vy)){ if(k.indexOf('Arrow')!==0&&k!=='Home'&&k!=='End')return;
+        vx=clamp(xmn+Math.round(((xmn+xmx)/2-xmn)/xst)*xst,xmn,xmx);
+        vy=clamp(ymn+Math.round(((ymn+ymx)/2-ymn)/yst)*yst,ymn,ymx); }
+      else if(k==='ArrowLeft')vx=clamp(vx-xst,xmn,xmx);
+      else if(k==='ArrowRight')vx=clamp(vx+xst,xmn,xmx);
+      else if(k==='ArrowDown')vy=clamp(vy-yst,ymn,ymx);
+      else if(k==='ArrowUp')vy=clamp(vy+yst,ymn,ymx);
+      else if(k==='Home'){vx=xmn;vy=ymn;} else if(k==='End'){vx=xmx;vy=ymx;}
+      else return;
+      inp.value=vx+','+vy;
+    }
+    e.preventDefault();
+    inp.classList.remove('correct','wrong');
+    g7plotDraw(box);
+    var sv=box.querySelector('svg'); if(sv&&sv.focus)sv.focus();   // redraw replaces the node
+  }
+  document.addEventListener('keydown',function(e){
+    var box=e.target.closest&&e.target.closest('.plotbox');
+    if(box)g7plotKey(box,e);
+  });
+
+  window.__modPlot={sync:g7plotSync,draw:g7plotDraw,key:g7plotKey};
 
   /* ===== spaced review (MR-1) phase-3: in-module retrieval mode, ?review=<skill> ===== */
   // Why this exists: restoreProgress() re-fills a completed item with its own correct answer, so a
