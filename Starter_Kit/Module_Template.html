@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module Template — [GRADE] Hub</title>
+<title>Module Template — Grade 8 Hub</title>
 <style>
 :root{
   --pitch-green:#14532D; --gold:#FAC415; --navy:#0F172A; --bg:#F5F4EE; --card:#FFFFFF; --muted:#64748B;
@@ -63,9 +63,7 @@ section.topic > p.intro{margin:.4rem 0 .5rem;color:var(--muted);font-size:.95rem
 .mc-option.correct{background:var(--ok-bg);border-color:var(--ok);color:var(--ok);font-weight:600}
 .mc-option.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad);font-weight:600}
 .mc-option.disabled{pointer-events:none;opacity:.55} .mc-option.disabled.correct,.mc-option.disabled.wrong{opacity:1}
-.mc-option.cooldown{pointer-events:none;opacity:.7}
-.mc-feedback{display:none;margin-top:.4rem;font-size:.86rem;font-weight:500}
-.mc-feedback.correct,.mc-feedback.wrong{display:block}
+.mc-feedback{margin-top:.4rem;font-size:.86rem;font-weight:500;min-height:1.1em}
 .mc-feedback.correct{color:var(--ok)} .mc-feedback.wrong{color:var(--bad)}
 .ms-group{display:flex;flex-direction:column;gap:.4rem;margin:.4rem 0}
 .ms-option{display:flex;align-items:center;gap:.55rem;background:#fff;border:2px solid var(--border);padding:.45rem .8rem;border-radius:7px;cursor:pointer;font-size:.9rem;font-family:inherit;text-align:left}
@@ -94,10 +92,33 @@ table.gtable th{background:var(--pitch-green);color:#fff;font-weight:600} table.
 .challenge{background:#F3EEFB;border:1px solid #D6C9F0;border-left:5px solid var(--purple);border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem}
 .challenge h3{margin:0 0 .5rem;color:var(--purple);font-size:1.04rem}
 .legend{font-size:.86rem;color:var(--muted);margin:.5rem 0 1rem} .legend strong{color:var(--pitch-green)}
-/* v1.4.2 anti-cheat: question text unselectable (typing areas exempt) */
+footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;border-top:1px solid var(--border);margin-top:3rem}
+@media(max-width:640px){main{padding:1rem .75rem 3rem}.qcard,.tcard,.challenge,.guide{padding:.85rem}.qtitle{margin-left:0;width:100%;font-size:.93rem}header.mod h1{font-size:1.25rem}}
+
+    /* ===== plot input (6th format): click-to-place on a number line or grid ===== */
+    .plotbox{margin:.45rem 0 .2rem}
+    .plotbox svg{max-width:100%;height:auto;touch-action:manipulation}
+    .plotbox .hit{cursor:pointer;fill:transparent}
+    .plotbox.locked .hit{cursor:not-allowed}
+    .plotbox .pt{fill:#FAC415;stroke:#0F3D22;stroke-width:2}
+    .plotbox .gridline{stroke:#D9E4DC;stroke-width:1}
+    .plotbox .axis{stroke:#0F3D22;stroke-width:1.8}
+    .plotbox .tick{stroke:#0F3D22;stroke-width:1.4}
+    .plotbox .tlab{font-size:11px;fill:#0F172A}
+    .plotbox .hint-dot{fill:#B7CBBE}
+    .plotbox .readout{font-size:.82rem;color:var(--muted);margin-top:.2rem}
+  </style>
+<style>
+/* v1.4 engine deltas: gate MC feedback until answered + MC cooldown + locked-step dimming */
+.mc-feedback{display:none;margin-top:.4rem;font-size:.86rem;font-weight:500;min-height:0}
+.mc-feedback.correct,.mc-feedback.wrong{display:block}
+.mc-feedback.correct{color:var(--ok)} .mc-feedback.wrong{color:var(--bad)}
+.mc-option.cooldown{pointer-events:none;opacity:.7}
+.step.locked .ans-input,.step.locked button,.step.locked .mc-option,.step.locked .ms-option{opacity:.5}
+/* v1.4.2 anti-cheat: question text not selectable/copyable (typing areas stay editable) */
 .qcard{-webkit-user-select:none;-moz-user-select:none;user-select:none}
 .qcard input,.qcard textarea{-webkit-user-select:text;-moz-user-select:text;user-select:text}
-/* v1.4.3 student section report card */
+/* v1.4.3 section report card (student-facing per-section progress) */
 .sec-report{background:#fff;border:1px solid var(--border);border-radius:10px;padding:.85rem 1rem;margin-bottom:1.2rem}
 .sec-report h3{margin:0 0 .5rem;font-size:.95rem;color:var(--pitch-green)}
 .sec-row{display:flex;align-items:center;gap:.6rem;margin:.3rem 0;font-size:.85rem}
@@ -106,19 +127,29 @@ table.gtable th{background:var(--pitch-green);color:#fff;font-weight:600} table.
 .sec-row .bar{flex:1;height:7px;background:#EDEBE2;border-radius:99px;overflow:hidden}
 .sec-row .bar>span{display:block;height:100%;background:var(--gold);border-radius:99px}
 .sec-row.full .bar>span{background:var(--ok)}
-footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;border-top:1px solid var(--border);margin-top:3rem}
-@media(max-width:640px){main{padding:1rem .75rem 3rem}.qcard,.tcard,.challenge,.guide{padding:.85rem}.qtitle{margin-left:0;width:100%;font-size:.93rem}header.mod h1{font-size:1.25rem}}
+.sec-row .val{flex:none;width:96px;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+/* MR-1 phase-3: retrieval-practice review mode (?review=<skill>) — the due skill's own
+   authored items, cleared for a fresh attempt. Everything else is hidden so the session is
+   a retrieval, not a re-read; nothing is removed from the DOM, so the step totals stay honest. */
+.g7-review-mode section.topic,.g7-review-mode .overall-progress,.g7-review-mode #sec-report,.g7-review-mode .toc{display:none}
+.rev-panel{background:#fff;border:1px solid var(--border);border-left:4px solid var(--gold);border-radius:10px;padding:1rem 1.1rem;margin-bottom:1.2rem}
+.rev-panel h2{margin:0 0 .35rem;font-size:1.15rem;color:var(--pitch-green)}
+.rev-sub{margin:0 0 1rem;font-size:.88rem;color:var(--muted);line-height:1.5}
+.rev-done{margin-top:1rem;display:flex;gap:.6rem;flex-wrap:wrap}
+.rev-done .btn{display:inline-block;background:var(--pitch-green);color:#fff;border:none;border-radius:8px;padding:.55rem 1rem;font-size:.88rem;font-weight:600;text-decoration:none;cursor:pointer}
+.rev-done .btn.ghost{background:transparent;color:var(--navy);border:1px solid var(--border)}
 </style>
 </head>
 <body>
 
+
 <header class="mod">
   <h1>Module Template</h1>
-  <p>[GRADE] Hub &middot; reusable module skeleton &amp; format showcase</p>
+  <p>Grade 8 Hub &middot; reusable module skeleton &amp; format showcase</p>
 </header>
 
 <div id="g7bar">
-  <a href="Grade_7_Math_Hub.html">&#8592; Back to Hub</a>
+  <a href="Grade_8_Math_Hub.html">&#8592; Back to Hub</a>
   <span style="margin-left:auto">Student: <strong id="g7name" style="color:var(--pitch-green)">Guest</strong></span>
 </div>
 
@@ -144,21 +175,9 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     </div>
   </div>
 
-  <div class="guide">
-    <h3>Entering your answers</h3>
-    <p>Type each answer the way you would on a computer-based test:</p>
-    <ul>
-      <li><strong>Fractions:</strong> type with a slash, like <code>5/11</code>. Any equal form is accepted (<code>6/9</code> = <code>2/3</code>) &mdash; you'll be nudged to simplify.</li>
-      <li><strong>Exponents:</strong> when a box asks for an exponent, type just that number.</li>
-      <li><strong>Negatives:</strong> include the minus sign, like <code>-5</code>.</li>
-      <li><strong>Whole &amp; decimal numbers:</strong> digits only, no commas &mdash; type <code>53000</code>, not <code>53,000</code>.</li>
-    </ul>
-    <p>On many computer-based tests, a symbol palette builds fractions, exponents and square roots for you. If you're unsure, fill in what you can &mdash; partial answers can still earn credit.</p>
-  </div>
-
   <section class="topic" id="guide">
   <h2>Template guide</h2>
-  <p class="intro">This file is the canonical module skeleton. Every [GRADE] unit is stamped from it for consistency.</p>
+  <p class="intro">This file is the canonical module skeleton. Every Grade 7 unit is stamped from it for consistency.</p>
   <div class="guide">
     <h3>Anatomy of a module (the baseline)</h3>
     <p>Header (title · unit · standard · objectives) → hub bar → progress → <strong>5–8 sections</strong>, each = an <em>objective</em>, a <em>teach card + worked example</em>, then a climb of questions: <code>Learn → Guided → Practice → Apply → Exam</code> (with hints, step-locking) → <strong>module check</strong> → <strong>make-your-own</strong> challenge → export/reset.</p>
@@ -188,12 +207,26 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <div class="keyfact"><strong>Tip:</strong> answers can be entered in any equivalent form; the checker accepts them and nudges to simplify.</div>
   </div>
 
+  <div class="qcard" data-qid="d2">
+    <div class="qhead"><span class="qtag guided">Guided</span><span class="qtitle">Single multiple-choice</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Q2 &middot; Which is greater?</div>
+        <div class="mc-group">
+          <button class="mc-option" data-k="k1:MHwx">-3</button>
+          <button class="mc-option" data-k="k1:MXww">-5</button>
+        </div>
+        <div class="mc-feedback">-3 is closer to zero, so it is greater.</div>
+      </div>
+    </div>
+  </div>
+
   <div class="qcard" data-qid="d1">
     <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Your turn (fill-in)</span></div>
     <div class="qbody">
       <div class="step">
         <div class="step-label">Q1 &middot; <span class="math">1/2 + 1/4</span> = (lowest terms)</div>
-        <div class="input-row"><input type="text" class="ans-input" data-type="text" placeholder="e.g. 5/11" data-answer="k1:My80"/><span class="feedback"></span></div>
+        <div class="input-row"><input type="text" class="ans-input" data-type="text" data-answer="k1:My80"/><span class="feedback"></span></div>
         <button class="check-btn">Check</button>
         <button class="hint-btn">Hint</button>
         <div class="hint-content">Common denominator first: rewrite <span class="math">1/2</span> in quarters, then add the numerators. An equivalent fraction is accepted, with a nudge to simplify.</div>
@@ -201,19 +234,6 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     </div>
   </div>
 
-  <div class="qcard" data-qid="d2">
-    <div class="qhead"><span class="qtag guided">Guided</span><span class="qtitle">Single multiple-choice</span></div>
-    <div class="qbody">
-      <div class="step">
-        <div class="step-label">Q2 &middot; Which is greater?</div>
-        <div class="mc-group">
-          <button class="mc-option" data-k="k1:OTJ8MQ==">-3</button>
-          <button class="mc-option" data-k="k1:OTN8MA==">-5</button>
-        </div>
-        <div class="mc-feedback">-3 is closer to zero, so it is greater.</div>
-      </div>
-    </div>
-  </div>
   </section>
 
   <section class="topic" id="formats">
@@ -227,10 +247,10 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
       <div class="step">
         <div class="step-label">Q3 &middot; Select every expression equal to 12.</div>
         <div class="ms-group">
-          <button class="ms-option" data-k="k1:OTR8MQ=="><span class="box"></span>3 &times; 4</button>
-          <button class="ms-option" data-k="k1:OTV8MQ=="><span class="box"></span>6 + 6</button>
-          <button class="ms-option" data-k="k1:OTZ8MA=="><span class="box"></span>5 &times; 3</button>
-          <button class="ms-option" data-k="k1:OTd8MQ=="><span class="box"></span>10 + 2</button>
+          <button class="ms-option" data-k="k1:Mnwx"><span class="box"></span>3 &times; 4</button>
+          <button class="ms-option" data-k="k1:M3wx"><span class="box"></span>6 + 6</button>
+          <button class="ms-option" data-k="k1:NHww"><span class="box"></span>5 &times; 3</button>
+          <button class="ms-option" data-k="k1:NXwx"><span class="box"></span>10 + 2</button>
         </div>
         <button class="check-btn ms-check">Check</button>
         <button class="hint-btn">Hint</button>
@@ -238,6 +258,15 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
       </div>
     </div>
   </div>
+
+  <div class="qcard" data-qid="d10"><div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Plot a point (6th format)</span></div><div class="qbody">
+    <div class="step"><div class="step-label">Step 1 &middot; Plot the value of <span class="math">-7 + 4</span> on the number line.</div>
+      <div class="plotbox" data-plot="line" data-min="-10" data-max="10" data-step="1"><input type="hidden" class="ans-input" data-answer="k1:LTM=" data-tol="0"/></div>
+      <button class="check-btn">Check</button></div>
+    <div class="step locked"><div class="step-label">Step 2 &middot; A proportional relationship has <span class="math">k = 4</span>. Plot the point where <span class="math">x = 3</span>.</div>
+      <div class="plotbox" data-plot="grid" data-xmin="0" data-xmax="6" data-xstep="1" data-ymin="0" data-ymax="20" data-ystep="2"><input type="hidden" class="ans-input" data-type="text" data-answer="k1:MywxMg=="/></div>
+      <button class="check-btn">Check</button></div>
+  </div></div>
 
   <div class="qcard" data-qid="d4">
     <div class="qhead"><span class="qtag apply">Apply</span><span class="qtitle">Two-part (A unlocks B)</span></div>
@@ -298,34 +327,44 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     <h3>Make your own</h3>
     <p>Every module closes by handing ownership to the student: invent a problem of your own that uses this unit's skills, solve it, and bring it to your next session. (This is also the natural <strong>homework</strong> anchor — see below.)</p>
   </div>
+    <div class="qcard" data-qid="d8" data-exam="1"><div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">Reasoning capstone (machine-scored &mdash; copy this shape)</span></div><div class="qbody">
+    <div class="step"><div class="step-label">Q &middot; A student simplifies <span class="math">3 + 4 &times; 2</span> to <span class="math">14</span>. Is that right?</div>
+      <div class="mc-group"><button class="mc-option" data-k="k1:NTAxfDE=">No &mdash; multiplication comes first, so it is <span class="math">11</span></button><button class="mc-option" data-k="k1:NTAyfDA=">Yes &mdash; work left to right, so <span class="math">14</span> is correct</button><button class="mc-option" data-k="k1:NTAzfDA=">No &mdash; it should be <span class="math">24</span></button><button class="mc-option" data-k="k1:NTA0fDA=">Yes &mdash; addition binds tighter than multiplication</button></div>
+      <div class="mc-feedback">Order of operations: <span class="math">4 &times; 2 = 8</span> first, then <span class="math">3 + 8 = 11</span>. <strong>Authoring note:</strong> a reasoning item must be <em>machine-scored</em> to count toward exam-readiness. Keep the constructed-response one as well &mdash; it does different work &mdash; but never let a strand rely on CR alone.</div></div>
+  </div></div>
+
+  <div class="qcard" data-qid="d9" data-exam="1"><div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">Modelling capstone (multi-part &mdash; copy this shape)</span></div><div class="qbody">
+      <p class="muted-note" style="font-size:.82rem">Several parts, one situation &mdash; this is the shape of a multi-point modelling task on the exam. Each part builds on the last.</p>
+    <div class="step"><div class="step-label">Part A &middot; A tank holds <span class="math">240</span> L and drains at <span class="math">15</span> L per minute. How much is left after <span class="math">6</span> minutes?</div>
+      <div class="input-row"><span class="lbl">volume =</span><input type="number" step="1" class="ans-input" data-answer="k1:MTUw" data-tol="0"/><span class="lbl">L</span><span class="feedback"></span></div><button class="check-btn">Check</button></div>
+    <div class="step locked"><div class="step-label">Part B &middot; After how many minutes is the tank empty?</div>
+      <div class="input-row"><span class="lbl">minutes =</span><input type="number" step="1" class="ans-input" data-answer="k1:MTY=" data-tol="0"/><span class="feedback"></span></div><button class="check-btn">Check</button></div>
+  </div></div>
+
   </section>
 
-  <footer>Module Template &middot; [GRADE] Hub. Duplicate this file, set the topic id/title/skill map, and author sections in the corrected flow.</footer>
+  <footer>Module Template &middot; Grade 8 Hub. Duplicate this file, set the topic id/title/skill map, and author sections in the corrected flow.</footer>
 </main>
 <script>
   // ===== Per-module identity (change these per unit) =====
-  var G7_SYNC_HUB='';       // EDIT PER DEPLOYMENT: shared-cloud namespace, e.g. 'grade9'
-  var G7_STORE='g7.';       // EDIT PER DEPLOYMENT: MUST match the hub's STORE_PREFIX, e.g. 'g9.'
-  /* ^ Two hubs left sharing one prefix put both grades' rosters, PINs and progress into one set
-     of keys, and a module whose G7_STORE differs from its hub writes progress the dashboard
-     never reads. Both have already happened -- see Grade 8, 19 Jul 2026. */
   const G7_TOPIC_ID='template-demo';
   const G7_TOPIC_TITLE='Module Template (Demo)';
-  const G7_SKILLS={'d1':'demo','d2':'demo','d3':'demo','d4':'demo','d5':'reasoning','d6':'demo','d7':'demo'};
-  const G7_SKILL_LABELS={'demo':'Template skill','reasoning':'Reasoning & error analysis',
+  var G7_SYNC_HUB='grade8'; // shared-cloud namespace for this deployment (must match the hub's SYNC_HUB_ID)
+  const G7_SKILLS={'d1':'demo','d2':'demo','d3':'demo','d4':'demo','d5':'reasoning','d6':'demo','d7':'demo','d8':'reasoning','d9':'modeling','d10':'demo'};
+  const G7_SKILL_LABELS={'modeling':'Modelling multi-step problems','demo':'Template skill','reasoning':'Reasoning & error analysis',
     'rationals':'Rational numbers & ordering','numberline':'Number line, opposites & absolute value',
     'addsub-int':'Adding & subtracting integers','addsub-rat':'Adding & subtracting fractions & decimals',
     'muldiv':'Multiplying & dividing','decimals':'Decimals: forms & conversions','realworld':'Real-world multi-step problems'};
 
   // ===== Shared [GRADE] Hub store =====
-  function g7current(){return localStorage.getItem(G7_STORE+'current')||'Guest';}
-  function g7all(){try{return JSON.parse(localStorage.getItem(G7_STORE+'data'))||{students:{}};}catch(e){return{students:{}};}}
-  function g7save(o){localStorage.setItem(G7_STORE+'data',JSON.stringify(o));}
+  function g7current(){return localStorage.getItem('g8.current')||'Guest';}
+  function g7all(){try{return JSON.parse(localStorage.getItem('g8.data'))||{students:{}};}catch(e){return{students:{}};}}
+  function g7save(o){localStorage.setItem('g8.data',JSON.stringify(o));}
   function g7topic(o){o.students=o.students||{};var s=g7current();o.students[s]=o.students[s]||{topics:{}};var T=o.students[s].topics;T[G7_TOPIC_ID]=T[G7_TOPIC_ID]||{title:G7_TOPIC_TITLE,tree:{},totalSteps:0,sectionTotals:{},lastPracticed:0,attempts:0,correct:0,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[]};return T[G7_TOPIC_ID];}
   function g7sectionTotals(){var m={};document.querySelectorAll('.qcard[data-qid]').forEach(function(c){var sec=(c.dataset.qid||'').split('-')[0];m[sec]=(m[sec]||0)+c.querySelectorAll('.step').length;});return m;}
   function loadData(){return g7topic(g7all()).tree;}
   function saveData(tree){var o=g7all();var t=g7topic(o);t.tree=tree;t.totalSteps=document.querySelectorAll('.qcard .step').length;t.sectionTotals=g7sectionTotals();t.lastPracticed=Date.now();g7save(o);schedulePush();}
-  function g7sheet(event,question,detail){var url=localStorage.getItem(G7_STORE+'sheetURL');if(!url)return;try{fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({hub:G7_SYNC_HUB||'default',student:g7current(),topic:G7_TOPIC_TITLE,question:question||'',event:event,detail:detail||'',ts:Date.now()})});}catch(e){}}
+  function g7sheet(event,question,detail){var url=localStorage.getItem('g8.sheetURL');if(!url)return;try{fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({hub:G7_SYNC_HUB||'default',student:g7current(),topic:G7_TOPIC_TITLE,question:question||'',event:event,detail:detail||'',ts:Date.now()})});}catch(e){}}
   // AS-4 (automatic): the lesson's own Learn->Stretch ladder IS the difficulty gradient, so the level is
   // read from the phase tag every stamped module already carries — no per-item tagging, no extra items,
   // and any new module built from this template gets this for free. Untagged cards default to Target.
@@ -338,7 +377,40 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     if(/(^|\s)(learn|guided)(\s|$)/.test(cls))return 1;             // 1 = foundational (supported)
     return 2;                                                       // 2 = target (independent, grade level)
   }
-  function g7log(qid,wrong,label,your,exam){var o=g7all();var t=g7topic(o);var sk=G7_SKILLS[qid]||'reasoning';t.skillStats[sk]=t.skillStats[sk]||{attempts:0,misses:0};t.skillStats[sk].attempts++;t.attempts=(t.attempts||0)+1;if(wrong){t.skillStats[sk].misses++;t.struggles.push({qid:qid,label:(label||qid).trim(),skill:sk,skillLabel:G7_SKILL_LABELS[sk],your:your||'',ts:Date.now()});if(t.struggles.length>120)t.struggles=t.struggles.slice(-120);}else{t.correct=(t.correct||0)+1;}if(exam){t.exam=t.exam||{attempts:0,correct:0};t.exam.attempts++;if(!wrong)t.exam.correct++;}var _lv=g7level(qid);t.levelStats=t.levelStats||{};t.levelStats[_lv]=t.levelStats[_lv]||{attempts:0,misses:0};t.levelStats[_lv].attempts++;if(wrong)t.levelStats[_lv].misses++;t.lastPracticed=Date.now();g7save(o);g7sheet(wrong?'struggle':'step_complete',(label||qid).trim(),wrong?('typed "'+(your||'')+'"'):'');schedulePush();}
+  /* ===== homework tagging =====
+   * The hub passes hw=<setId>&subj=<subjectId> on the link. When those are present the student is
+   * doing HOMEWORK, not free practice, so each attempt is also posted to the Homework tab. Without
+   * this the Sheet cannot tell the two apart: the topic record and the activity Log look identical
+   * either way, and the Homework tab only ever saw a row once a whole set was finished. */
+  function g7hwCtx(){try{var p=new URLSearchParams(location.search);var s=p.get('hw');
+    return s?{set:s,subj:p.get('subj')||''}:null;}catch(e){return null;}}
+  /* Mark this item done AS HOMEWORK, locally and in the cloud. Completion must not be inferred from
+   * the module tree: that records any past practice, so a set could show progress — or even auto-
+   * complete and post a score — for work never done as homework. Keyed by topic|qid because the
+   * same qid exists in more than one module. */
+  function g7hwMark(qid,wrong){
+    var c=g7hwCtx();if(!c)return;
+    try{
+      var o=g7all(),s=g7current();
+      o.students=o.students||{};o.students[s]=o.students[s]||{topics:{}};
+      var hs=o.students[s].hwstate=o.students[s].hwstate||{};
+      var rec=hs[c.subj]=hs[c.subj]||{sets:{},items:{},ts:0};
+      rec.items=rec.items||{};
+      var m=rec.items[c.set]=rec.items[c.set]||{};
+      m[G7_TOPIC_ID+'|'+qid]={ts:Date.now(),wrong:!!wrong};
+      rec.ts=Date.now();g7save(o);
+      syncPush('hwstate',s,c.subj,rec);
+    }catch(e){}
+  }
+  function g7hwPost(qid,wrong){
+    var c=g7hwCtx();if(!c)return;
+    var url=localStorage.getItem('g8.sheetURL');if(!url)return;
+    try{fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({op:'hw',hub:G7_SYNC_HUB||'default',name:g7current(),pin:g7pin(),
+        subject:c.subj,set:c.set,item:qid,outcome:wrong?'incorrect':'correct',ts:Date.now(),
+        payload:{topic:G7_TOPIC_ID,title:G7_TOPIC_TITLE}})}).catch(function(){});}catch(e){}
+  }
+  function g7log(qid,wrong,label,your,exam){var o=g7all();var t=g7topic(o);var sk=G7_SKILLS[qid]||'reasoning';t.skillStats[sk]=t.skillStats[sk]||{attempts:0,misses:0};t.skillStats[sk].attempts++;t.skillStats[sk].last=Date.now();t.attempts=(t.attempts||0)+1;if(wrong){t.skillStats[sk].misses++;t.struggles.push({qid:qid,label:(label||qid).trim(),skill:sk,skillLabel:G7_SKILL_LABELS[sk],your:your||'',ts:Date.now()});if(t.struggles.length>120)t.struggles=t.struggles.slice(-120);}else{t.correct=(t.correct||0)+1;}if(exam){t.exam=t.exam||{attempts:0,correct:0};t.exam.attempts++;if(!wrong)t.exam.correct++;}var _lv=g7level(qid);t.levelStats=t.levelStats||{};t.levelStats[_lv]=t.levelStats[_lv]||{attempts:0,misses:0};t.levelStats[_lv].attempts++;if(wrong)t.levelStats[_lv].misses++;t.lastPracticed=Date.now();g7save(o);g7sheet(wrong?'struggle':'step_complete',(label||qid).trim(),wrong?('typed "'+(your||'')+'"'):'');g7hwPost(qid,wrong);g7hwMark(qid,wrong);schedulePush();}
 
   /* ===== spaced review (MR-1) phase-2: stored consecutive-session streak ===== */
   // A "review session" = one module visit. We count only FIRST-attempt graded items;
@@ -346,6 +418,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
   // it to 0, at most once per calendar day (later same-day visits don't move it). The hub
   // reads t.reviewStreak when present, else falls back to the phase-1 inferred proxy.
   var _revFirst=0,_revCorrect=0,_revCommitted=false,_revBase=0,_revWasDue=false;
+  var _revSkill={};   // phase-3: per-skill session tally, keyed by skill
   var REVIEW_RUNGS=[1,3,7,21,42];
   function g7streakOf(t){return (typeof t.reviewStreak==='number')?t.reviewStreak:g7revProxy(t);}
   function g7wasDue(t){var last=(t&&t.lastPracticed)||0;if(!last||((t&&t.attempts)||0)<=0)return false;return Date.now()>=last+REVIEW_RUNGS[g7streakOf(t)]*86400000;}
@@ -353,7 +426,19 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
   // Snapshot the pre-session streak AND whether the topic was due, at load, before this visit's answers.
   function g7reviewInit(){try{if(!g7current())return;var o=g7all(),t=g7topic(o);_revBase=(typeof t.reviewStreak==='number')?t.reviewStreak:g7revProxy(t);_revWasDue=g7wasDue(t);}catch(e){}}
   window.addEventListener('load',g7reviewInit);
-  function g7review(first,correct){
+  // phase-3: the same ladder, one level down — per *skill*, so a topic that is solid overall can
+  // still bring back the one skill inside it that is fading. Same shape as the topic proxy, read
+  // off skillStats; a skill needs only >=2 first-attempt items in a session (a module authors far
+  // fewer items per skill than per topic), still at most one rung per calendar day.
+  function g7skillProxy(t,sk){
+    var s=(t&&t.skillStats&&t.skillStats[sk])||null,a=(s&&s.attempts)||0;
+    if(a<=0)return 0;
+    var acc=(a-((s&&s.misses)||0))/a;
+    var base=acc>=0.95?4:acc>=0.85?3:acc>=0.70?2:acc>=0.50?1:0;
+    var cap=a>=12?4:a>=8?3:a>=4?2:a>=2?1:0;
+    return Math.min(base,cap);
+  }
+  function g7review(first,correct,qid){
     if(!first)return;                                  // only first attempts test retrieval
     _revFirst++;if(correct)_revCorrect++;
     var o=g7all(),t=g7topic(o);
@@ -367,31 +452,26 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
       t.reviewStreak=pass?Math.min(4,_revBase+1):0;
       t.reviewDay=today;
     }
-    g7save(o);schedulePush();
+    if(qid){
+      var sk=G7_SKILLS[qid]||'reasoning';
+      var ss=t.skillStats[sk]=t.skillStats[sk]||{attempts:0,misses:0};
+      // base is snapshotted the first time this skill is seen this session — before any write below
+      var S=_revSkill[sk]=_revSkill[sk]||{first:0,correct:0,committed:false,
+        base:(typeof ss.streak==='number')?ss.streak:g7skillProxy(t,sk)};
+      S.first++;if(correct)S.correct++;
+      if(S.first>=2 && !(!S.committed && ss.day===today)){
+        S.committed=true;
+        ss.streak=(S.correct/S.first)>=0.8?Math.min(4,S.base+1):0;
+        ss.day=today;
+      }
+    }
+    g7save(o);
+    // v1.5: the streak and the acquisition/retention buckets are part of the topic record, so they
+    // must reach the cloud like any other write. Guarded because not every stamped copy carries the
+    // sync layer (the Starter_Kit template does not) — there it is simply a no-op.
+    if(typeof schedulePush==='function')schedulePush();
   }
-  window.__modReview={review:g7review,proxy:g7revProxy,init:g7reviewInit,wasDue:g7wasDue};
-
-  /* ===== v1.5 cloud sync (offline-first; shared multi-hub backend) ===== */
-  /* The /exec URL is public, so it grants nothing alone: a student authenticates with their
-     own PIN and can only ever read/write their OWN record. Modules never hold the teacher key. */
-  function g7pin(){try{var m=JSON.parse(localStorage.getItem(G7_STORE+'pins')||'{}');var n=g7current();return (n&&m&&m[n]!==undefined)?String(m[n]):'';}catch(e){return '';}}
-  function syncPush(kind,name,sub,payload){var u=localStorage.getItem(G7_STORE+'sheetURL');if(!u)return;try{fetch(u,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({op:'put',hub:G7_SYNC_HUB||'default',kind:kind,name:name,sub:sub||'',payload:payload,ts:Date.now(),pin:g7pin()})}).catch(function(){});}catch(e){}}
-  function syncPull(cb){var u=localStorage.getItem(G7_STORE+'sheetURL');if(!u){cb(null);return;}try{var nm='__modcb'+Math.floor(Math.random()*1e9);var s=document.createElement('script');
-    window[nm]=function(doc){try{cb(doc||null);}finally{try{delete window[nm];}catch(e2){}if(s.parentNode)s.parentNode.removeChild(s);}};
-    s.onerror=function(){try{delete window[nm];}catch(e2){}if(s.parentNode)s.parentNode.removeChild(s);cb(null);};
-    s.src=u+(u.indexOf('?')>=0?'&':'?')+'op=pull&hub='+encodeURIComponent(G7_SYNC_HUB||'default')+'&cb='+nm+'&name='+encodeURIComponent(g7current()||'')+'&pin='+encodeURIComponent(g7pin());document.head.appendChild(s);}catch(e){cb(null);}}
-  var _pushT=null;
-  function schedulePush(){if(!localStorage.getItem(G7_STORE+'sheetURL'))return;clearTimeout(_pushT);_pushT=setTimeout(function(){try{var o=g7all();var s=g7current();var to=o.students&&o.students[s]&&o.students[s].topics&&o.students[s].topics[G7_TOPIC_ID];if(to)syncPush('topic',s,G7_TOPIC_ID,to);}catch(e){}},1500);}
-  function mergeCloudTopic(doc){if(!doc)return false;var s=g7current();var changed=false;
-    var o=g7all();var t=g7topic(o);
-    var c=doc.topics&&doc.topics[s]&&doc.topics[s][G7_TOPIC_ID];
-    if(c&&((c.lastPracticed||0)>(t.lastPracticed||0))){o.students[s].topics[G7_TOPIC_ID]=c;changed=true;}
-    var m=doc.reviews&&doc.reviews[s]&&doc.reviews[s][G7_TOPIC_ID];
-    if(m){var to=o.students[s].topics[G7_TOPIC_ID];((to&&to.responses)||[]).forEach(function(r){var k=String(r.ts);if(Object.prototype.hasOwnProperty.call(m,k)&&(r.reviewed||0)!==(m[k]||0)){r.reviewed=m[k]||0;changed=true;}});}
-    if(changed){g7save(o);}else if((t.lastPracticed||0)>((c&&c.lastPracticed)||0)){schedulePush();}
-    return changed;}
-  window.__modSync={mergeCloudTopic:mergeCloudTopic,schedulePush:schedulePush};
-  window.addEventListener('load',function(){syncPull(function(doc){if(mergeCloudTopic(doc))restoreProgress();});});
+  window.__modReview={review:g7review,proxy:g7revProxy,init:g7reviewInit,wasDue:g7wasDue,skillProxy:g7skillProxy};
 
   // ===== answer helpers =====
   function kdec(s){try{return atob(s);}catch(e){return '';}}
@@ -424,7 +504,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
       var fiFirst=!step.dataset.att;step.dataset.att='1';
       if(all){step.classList.add('completed');e.target.classList.add('done');e.target.textContent='Step complete';unlockNext(step);if(card)saveStepDone(card,step);if(!step.dataset.logged){g7log(qid,false,lbl,'',exam&&fiFirst);step.dataset.logged='1';}}
       else{var your=Array.prototype.slice.call(inputs).map(function(i){return i.value;}).filter(function(v){return v!=='';}).join(', ');g7log(qid,true,lbl,your,exam&&fiFirst);}
-      g7review(fiFirst,all);
+      g7review(fiFirst,all,qid);
     }
     if(e.target.closest('.mc-option')){
       var opt=e.target.closest('.mc-option');var group=opt.closest('.mc-group');if(!group||group.classList.contains('answered')||opt.classList.contains('disabled'))return;
@@ -432,7 +512,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
       var fb=group.parentElement.querySelector('.mc-feedback');if(fb&&fb.dataset.exp===undefined)fb.dataset.exp=fb.textContent||'';
       var mcStep=group.closest('.step');var mcCard=group.closest('.qcard');var mcQid=mcCard?mcCard.dataset.qid:'';var mcLbl=mcStep?((mcStep.querySelector('.step-label')||{}).textContent||''):'';var mcExam=mcCard&&mcCard.dataset.exam==='1';
       var mcFirst=mcStep&&!mcStep.dataset.att;if(mcStep)mcStep.dataset.att='1';
-      g7log(mcQid,!correct,mcLbl,(opt.textContent||'').trim(),mcExam&&mcFirst);g7review(mcFirst,correct);
+      g7log(mcQid,!correct,mcLbl,(opt.textContent||'').trim(),mcExam&&mcFirst);g7review(mcFirst,correct,mcQid);
       if(correct){
         group.classList.add('answered');group.querySelectorAll('.mc-option').forEach(function(b){b.classList.add('disabled');});opt.classList.add('correct');
         if(fb){fb.textContent='✓ Correct! '+(fb.dataset.exp||'');fb.classList.remove('wrong');fb.classList.add('correct');}
@@ -455,7 +535,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
       var msFirst=!st.dataset.att;st.dataset.att='1';
       if(ok){grp.classList.add('answered');opts.forEach(function(o){o.classList.add('disabled');if(optCorrect(o))o.classList.add('correct');});st.classList.add('completed');e.target.classList.add('done');e.target.textContent='Correct';unlockNext(st);if(card2)saveStepDone(card2,st);if(!st.dataset.logged){g7log(qid2,false,lbl2,'',exam2&&msFirst);st.dataset.logged='1';}}
       else{var your2=opts.filter(function(o){return o.classList.contains('sel');}).map(function(o){return (o.textContent||'').trim().slice(0,24);}).join('; ');opts.forEach(function(o){if(o.classList.contains('sel')&&!optCorrect(o))o.classList.add('wrong');});g7log(qid2,true,lbl2,your2,exam2&&msFirst);setTimeout(function(){opts.forEach(function(o){o.classList.remove('wrong');});},1100);}
-      g7review(msFirst,ok);
+      g7review(msFirst,ok,qid2);
       return;
     }
     if(e.target.matches('.cr-save')){
@@ -474,12 +554,11 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
   document.addEventListener('wheel',function(e){if(e.target&&e.target.matches&&e.target.matches('.ans-input')&&document.activeElement===e.target)e.target.blur();},{passive:true});
   /* v1.4.2 anti-cheat: block copy/cut from question cards (typing areas exempt) */
   ['copy','cut'].forEach(function(ev){document.addEventListener(ev,function(e){var t=e.target;if(t&&t.closest&&t.closest('.qcard')&&!(t.matches&&t.matches('input,textarea')))e.preventDefault();});});
-  /* v1.4.2 anti-cheat: shuffle MC/MS options on load (3+ options; data-noshuffle opts out — exam capstones and numeric/semantic scales keep their real order) */
+  /* v1.4.2 anti-cheat: shuffle MC/MS options on load (3+ options only; add data-noshuffle to a group to opt out) */
   document.querySelectorAll('.mc-group,.ms-group').forEach(function(g){if(g.hasAttribute('data-noshuffle'))return;var o=Array.prototype.slice.call(g.querySelectorAll('.mc-option,.ms-option'));if(o.length<3)return;for(var i=o.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=o[i];o[i]=o[j];o[j]=t;}o.forEach(function(b){g.appendChild(b);});});
 
   function countAllSteps(){return document.querySelectorAll('.qcard .step').length;}
   function refreshOverall(){var d=loadData(),done=0;document.querySelectorAll('.qcard').forEach(function(c){var q=c.dataset.qid;if(q&&d[q]&&d[q].steps)done+=Object.keys(d[q].steps).filter(function(k){return d[q].steps[k];}).length;});var tot=countAllSteps();document.getElementById('op-done').textContent=done;document.getElementById('op-total').textContent=tot;document.getElementById('op-pct').textContent=(tot?Math.round(done/tot*100):0)+'%';renderSecReport();}
-
   /* v1.4.3: student-facing per-section report card, injected after the overall progress box */
   function renderSecReport(){
     var host=document.querySelector('.overall-progress');if(!host)return;
@@ -491,14 +570,14 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
       var done=sec.querySelectorAll('.qcard .step.completed').length;
       var h=sec.querySelector('h2');var name=(h?h.textContent:sec.id).replace(/[<>&]/g,'').trim();
       var pct=steps.length?Math.round(done/steps.length*100):0;
-      rows+='<div class="sec-row'+(pct>=100?' full':'')+'"><a href="#'+sec.id+'">'+name+'</a><span class="bar"><span style="width:'+pct+'%"></span></span><span class="val">'+done+'/'+steps.length+' \u00b7 '+pct+'%</span></div>';
+      rows+='<div class="sec-row'+(pct>=100?' full':'')+'"><a href="#'+sec.id+'">'+name+'</a><span class="bar"><span style="width:'+pct+'%"></span></span><span class="val">'+done+'/'+steps.length+' · '+pct+'%</span></div>';
     });
     if(rows)box.innerHTML='<h3>Your section scores</h3>'+rows; else box.style.display='none';
   }
 
   function restoreProgress(){
     var nm=document.getElementById('g7name');if(nm)nm.textContent=g7current();
-    if(!localStorage.getItem(G7_STORE+'current')&&nm&&!document.getElementById('g7guestnote')){var gw=document.createElement('a');gw.id='g7guestnote';gw.href='Grade_8_Math_Hub.html';gw.style.cssText='margin-left:.6rem;color:var(--orange);font-weight:600;text-decoration:none';gw.textContent='Not signed in — choose your name in the Hub so your work is tracked';nm.parentNode.appendChild(gw);}
+    if(!localStorage.getItem('g8.current')&&nm&&!document.getElementById('g7guestnote')){var gw=document.createElement('a');gw.id='g7guestnote';gw.href='Grade_8_Math_Hub.html';gw.style.cssText='margin-left:.6rem;color:var(--orange);font-weight:600;text-decoration:none';gw.textContent='Not signed in — choose your name in the Hub so your work is tracked';nm.parentNode.appendChild(gw);}
     var d=loadData();var topic=g7topic(g7all());
     document.querySelectorAll('.qcard').forEach(function(card){
       var qid=card.dataset.qid;if(!qid||!d[qid]||!d[qid].steps)return;
@@ -518,6 +597,244 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     refreshOverall();
   }
   window.addEventListener('load',restoreProgress);
+
+  /* ===== v1.5 cloud sync (offline-first; shared multi-hub backend) ===== */
+  /* The /exec URL is public, so it grants nothing alone: a student authenticates with their
+     own PIN and can only ever read/write their OWN record. Modules never hold the teacher key.
+     Ported from Grade 8, which had this layer first. */
+  function g7pin(){try{var m=JSON.parse(localStorage.getItem('g8.pins')||'{}');var n=g7current();return (n&&m&&m[n]!==undefined)?String(m[n]):'';}catch(e){return '';}}
+  function syncPush(kind,name,sub,payload){var u=localStorage.getItem('g8.sheetURL');if(!u)return;try{fetch(u,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({op:'put',hub:G7_SYNC_HUB||'default',kind:kind,name:name,sub:sub||'',payload:payload,ts:Date.now(),pin:g7pin()})}).catch(function(){});}catch(e){}}
+  function syncPull(cb){var u=localStorage.getItem('g8.sheetURL');if(!u){cb(null);return;}try{var nm='__modcb'+Math.floor(Math.random()*1e9);var s=document.createElement('script');
+    window[nm]=function(doc){try{cb(doc||null);}finally{try{delete window[nm];}catch(e2){}if(s.parentNode)s.parentNode.removeChild(s);}};
+    s.onerror=function(){try{delete window[nm];}catch(e2){}if(s.parentNode)s.parentNode.removeChild(s);cb(null);};
+    s.src=u+(u.indexOf('?')>=0?'&':'?')+'op=pull&hub='+encodeURIComponent(G7_SYNC_HUB||'default')+'&cb='+nm+'&name='+encodeURIComponent(g7current()||'')+'&pin='+encodeURIComponent(g7pin());document.head.appendChild(s);}catch(e){cb(null);}}
+  var _pushT=null;
+  /* Debounced: a student answering quickly would otherwise fire a push per keystroke-check.
+     It re-reads storage when it fires, so every write since the last push rides along. */
+  function schedulePush(){if(!localStorage.getItem('g8.sheetURL'))return;clearTimeout(_pushT);_pushT=setTimeout(function(){try{var o=g7all();var s=g7current();var to=o.students&&o.students[s]&&o.students[s].topics&&o.students[s].topics[G7_TOPIC_ID];if(to)syncPush('topic',s,G7_TOPIC_ID,to);}catch(e){}},1500);}
+  function mergeCloudTopic(doc){if(!doc)return false;var s=g7current();var changed=false;
+    var o=g7all();var t=g7topic(o);
+    var c=doc.topics&&doc.topics[s]&&doc.topics[s][G7_TOPIC_ID];
+    if(c&&((c.lastPracticed||0)>(t.lastPracticed||0))){o.students[s].topics[G7_TOPIC_ID]=c;changed=true;}
+    var m=doc.reviews&&doc.reviews[s]&&doc.reviews[s][G7_TOPIC_ID];
+    if(m){var to=o.students[s].topics[G7_TOPIC_ID];((to&&to.responses)||[]).forEach(function(r){var k=String(r.ts);if(Object.prototype.hasOwnProperty.call(m,k)&&(r.reviewed||0)!==(m[k]||0)){r.reviewed=m[k]||0;changed=true;}});}
+    if(changed){g7save(o);}else if((t.lastPracticed||0)>((c&&c.lastPracticed)||0)){schedulePush();}
+    return changed;}
+  window.__modSync={mergeCloudTopic:mergeCloudTopic,schedulePush:schedulePush};
+  window.addEventListener('load',function(){syncPull(function(doc){if(mergeCloudTopic(doc))restoreProgress();g7plotSync();});});
+
+
+  /* ===== plot input (6th format) =============================================================
+     A number line or coordinate grid the student clicks to place a point. The value lives in a
+     hidden .ans-input inside the same .step, so the ordinary engine does all the real work:
+     checkInput (numeric tolerance or text match), setStepDisabled (locking), restoreProgress
+     (re-fill), g7revReset (clearing for retrieval). Nothing here touches an answer handler.
+     Markup:
+       <div class="plotbox" data-plot="line" data-min="-10" data-max="10" data-step="1">
+         <input type="hidden" class="ans-input" data-answer="k1:..." data-tol="0"/></div>
+       <div class="plotbox" data-plot="grid" data-xmax="10" data-ymax="20" data-xstep="1" data-ystep="2">
+         <input type="hidden" class="ans-input" data-type="text" data-answer="k1:..."/></div>
+  ============================================================================================ */
+  function g7plotNum(el,name,dflt){var v=parseFloat(el.dataset[name]);return isNaN(v)?dflt:v;}
+  function g7plotDraw(box){
+    var inp=box.querySelector('.ans-input'); if(!inp)return;
+    var kind=box.dataset.plot||'line', W=360, sv;
+    if(kind==='line'){
+      var mn=g7plotNum(box,'min',-10), mx=g7plotNum(box,'max',10), st=g7plotNum(box,'step',1);
+      var H=88, x0=26, x1=W-26, y=52;
+      var px=function(v){return x0+(v-mn)/(mx-mn)*(x1-x0);};
+      var parts=['<line class="axis" x1="'+x0+'" y1="'+y+'" x2="'+x1+'" y2="'+y+'"/>'];
+      for(var v=mn; v<=mx+1e-9; v+=st){
+        parts.push('<line class="tick" x1="'+px(v).toFixed(1)+'" y1="'+(y-6)+'" x2="'+px(v).toFixed(1)+'" y2="'+(y+6)+'"/>');
+        parts.push('<text class="tlab" x="'+px(v).toFixed(1)+'" y="'+(y+22)+'" text-anchor="middle">'+(Math.round(v*100)/100)+'</text>');
+        parts.push('<circle class="hint-dot" cx="'+px(v).toFixed(1)+'" cy="'+y+'" r="2"/>');
+      }
+      var cur=parseFloat(inp.value);
+      if(!isNaN(cur)&&cur>=mn&&cur<=mx) parts.push('<circle class="pt" cx="'+px(cur).toFixed(1)+'" cy="'+y+'" r="7"/>');
+      parts.push('<rect class="hit" x="0" y="0" width="'+W+'" height="'+H+'"/>');
+      sv='<svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" role="img" aria-label="Number line from '+mn+' to '+mx+'. Click to place a point.">'+parts.join('')+'</svg>';
+    } else {
+      var xmn=g7plotNum(box,'xmin',0), xmx=g7plotNum(box,'xmax',10), xst=g7plotNum(box,'xstep',1);
+      var ymn=g7plotNum(box,'ymin',0), ymx=g7plotNum(box,'ymax',10), yst=g7plotNum(box,'ystep',1);
+      var H=300, L=44, R=W-16, T=16, B=H-40;
+      var gx=function(v){return L+(v-xmn)/(xmx-xmn)*(R-L);};
+      var gy=function(v){return B-(v-ymn)/(ymx-ymn)*(B-T);};
+      var g=[],i;
+      for(i=xmn;i<=xmx+1e-9;i+=xst){
+        g.push('<line class="gridline" x1="'+gx(i).toFixed(1)+'" y1="'+T+'" x2="'+gx(i).toFixed(1)+'" y2="'+B+'"/>');
+        g.push('<text class="tlab" x="'+gx(i).toFixed(1)+'" y="'+(B+18)+'" text-anchor="middle">'+(Math.round(i*100)/100)+'</text>');
+      }
+      for(i=ymn;i<=ymx+1e-9;i+=yst){
+        g.push('<line class="gridline" x1="'+L+'" y1="'+gy(i).toFixed(1)+'" x2="'+R+'" y2="'+gy(i).toFixed(1)+'"/>');
+        g.push('<text class="tlab" x="'+(L-7)+'" y="'+(gy(i)+4).toFixed(1)+'" text-anchor="end">'+(Math.round(i*100)/100)+'</text>');
+      }
+      g.push('<line class="axis" x1="'+L+'" y1="'+B+'" x2="'+R+'" y2="'+B+'"/>');
+      g.push('<line class="axis" x1="'+L+'" y1="'+T+'" x2="'+L+'" y2="'+B+'"/>');
+      var pr=String(inp.value||'').split(',');
+      if(pr.length===2){
+        var cx=parseFloat(pr[0]), cy=parseFloat(pr[1]);
+        if(!isNaN(cx)&&!isNaN(cy)&&cx>=xmn&&cx<=xmx&&cy>=ymn&&cy<=ymx)
+          g.push('<circle class="pt" cx="'+gx(cx).toFixed(1)+'" cy="'+gy(cy).toFixed(1)+'" r="7"/>');
+      }
+      g.push('<rect class="hit" x="0" y="0" width="'+W+'" height="'+H+'"/>');
+      sv='<svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" role="img" aria-label="Coordinate grid, x from '+xmn+' to '+xmx+', y from '+ymn+' to '+ymx+'. Click to plot a point.">'+g.join('')+'</svg>';
+    }
+    var old=box.querySelector('svg'); if(old)old.parentNode.removeChild(old);
+    box.insertAdjacentHTML('afterbegin',sv);
+    var ro=box.querySelector('.readout');
+    if(!ro){ro=document.createElement('div');ro.className='readout';box.appendChild(ro);}
+    ro.textContent=inp.value?('Placed: '+(box.dataset.plot==='grid'?'('+inp.value+')':inp.value)):'Click to place your point.';
+    box.classList.toggle('locked',!!inp.disabled);
+  }
+  function g7plotSet(box,evt){
+    var inp=box.querySelector('.ans-input');
+    if(!inp||inp.disabled)return;                       // a locked step must stay locked
+    var svg=box.querySelector('svg'); if(!svg)return;
+    // Read the viewBox ATTRIBUTE rather than svg.viewBox.baseVal: the SVG DOM geometry interfaces
+    // are not universally implemented (jsdom has none), and an attribute parse works everywhere.
+    var r=svg.getBoundingClientRect();
+    var vb=String(svg.getAttribute('viewBox')||'0 0 360 100').split(/[\s,]+/).map(parseFloat);
+    var vw=vb[2]||360, vh=vb[3]||100;
+    var sx=vw/(r.width||vw), sy=vh/(r.height||vh);
+    var px=(evt.clientX-r.left)*sx, py=(evt.clientY-r.top)*sy;
+    var snap=function(v,st,mn,mx){var n=mn+Math.round((v-mn)/st)*st;return Math.min(mx,Math.max(mn,Math.round(n*1e6)/1e6));};
+    if((box.dataset.plot||'line')==='line'){
+      var mn=g7plotNum(box,'min',-10), mx=g7plotNum(box,'max',10), st=g7plotNum(box,'step',1);
+      var x0=26, x1=360-26;
+      var v=mn+(px-x0)/(x1-x0)*(mx-mn);
+      inp.value=String(snap(v,st,mn,mx));
+    } else {
+      var xmn=g7plotNum(box,'xmin',0), xmx=g7plotNum(box,'xmax',10), xst=g7plotNum(box,'xstep',1);
+      var ymn=g7plotNum(box,'ymin',0), ymx=g7plotNum(box,'ymax',10), yst=g7plotNum(box,'ystep',1);
+      var L=44, R=360-16, T=16, B=300-40;
+      var vx=xmn+(px-L)/(R-L)*(xmx-xmn), vy=ymn+(B-py)/(B-T)*(ymx-ymn);
+      inp.value=snap(vx,xst,xmn,xmx)+','+snap(vy,yst,ymn,ymx);
+    }
+    inp.classList.remove('correct','wrong');
+    g7plotDraw(box);
+  }
+  function g7plotSync(){Array.prototype.forEach.call(document.querySelectorAll('.plotbox'),g7plotDraw);}
+  document.addEventListener('click',function(e){
+    var box=e.target.closest&&e.target.closest('.plotbox');
+    if(box&&e.target.classList.contains('hit'))g7plotSet(box,e);
+  });
+  window.__modPlot={sync:g7plotSync,draw:g7plotDraw};
+
+  /* ===== spaced review (MR-1) phase-3: in-module retrieval mode, ?review=<skill> ===== */
+  // Why this exists: restoreProgress() re-fills a completed item with its own correct answer, so a
+  // student sent back by the hub's "Due for review" would have re-read an answer key — the opposite
+  // of retrieval. Review mode takes the due skill's ALREADY-AUTHORED items (no new content), clears
+  // them for a real attempt, and hides the rest of the lesson. The stored tree is never touched, so
+  // the mastery bar stays monotonic; the re-attempt logs normally and lands in the AN-4 retention
+  // bucket because the topic was due when the session started.
+  var _oCap=false;
+  function g7capture(){                                   // originals, snapshotted before any restore
+    if(_oCap)return;_oCap=true;
+    Array.prototype.forEach.call(document.querySelectorAll('.qcard .step'),function(s){
+      s.dataset.olock=s.classList.contains('locked')?'1':'0';
+      var b=s.querySelector('.check-btn');if(b&&b.dataset.olbl===undefined)b.dataset.olbl=b.textContent;
+      var f=s.querySelector('.mc-feedback');if(f&&f.dataset.exp===undefined)f.dataset.exp=f.textContent||'';
+    });
+  }
+  g7capture();
+  function g7hubHref(){var a=document.querySelector('a[href$="Hub.html"]');return (a&&a.getAttribute('href'))||'index.html';}
+  function g7revParam(){try{return (new URLSearchParams(location.search)).get('review')||'';}catch(e){return '';}}
+  // The retrieval core for a skill: its Target/Exam items. Learn/Guided are scaffolded re-reads and
+  // Stretch is beyond the standard, so neither belongs in a review set — but if a skill authored
+  // nothing else, fall back to what exists rather than showing an empty panel.
+  function g7revSet(sk){
+    var core=[],any=[];
+    Array.prototype.forEach.call(document.querySelectorAll('.qcard[data-qid]'),function(c){
+      var q=c.dataset.qid;if((G7_SKILLS[q]||'reasoning')!==sk)return;
+      any.push(c);var lv=g7level(q);if(lv===2||lv===3)core.push(c);
+    });
+    return (core.length?core:any).slice(0,4);           // a short set — review is a pass, not a re-run
+  }
+  function g7revReset(card){
+    Array.prototype.forEach.call(card.querySelectorAll('.step'),function(s){
+      s.classList.remove('completed');
+      delete s.dataset.att;delete s.dataset.logged;
+      var lock=s.dataset.olock==='1';
+      s.classList.toggle('locked',lock);setStepDisabled(s,lock);
+      var b=s.querySelector('.check-btn');
+      if(b){b.classList.remove('done');if(b.dataset.olbl!==undefined)b.textContent=b.dataset.olbl;b.disabled=lock;}
+      Array.prototype.forEach.call(s.querySelectorAll('.ans-input'),function(i){
+        i.value='';i.classList.remove('correct','wrong');i.dataset.simplify='';});
+      Array.prototype.forEach.call(s.querySelectorAll('.feedback'),function(f){
+        f.textContent='';f.classList.remove('correct','wrong');});
+      var mc=s.querySelector('.mc-group');
+      if(mc){mc.classList.remove('answered');Array.prototype.forEach.call(mc.querySelectorAll('.mc-option'),function(o){
+        o.classList.remove('disabled','correct','wrong','sel','cooldown');});}
+      var mfb=s.querySelector('.mc-feedback');
+      if(mfb){mfb.classList.remove('correct','wrong');if(mfb.dataset.exp!==undefined)mfb.textContent=mfb.dataset.exp;}
+      var ms=s.querySelector('.ms-group');
+      if(ms){ms.classList.remove('answered');Array.prototype.forEach.call(ms.querySelectorAll('.ms-option'),function(o){
+        o.classList.remove('disabled','correct','wrong','sel');});}
+      var ta=s.querySelector('.cr-area');if(ta)ta.value='';
+      var sv=s.querySelector('.cr-saved');if(sv&&sv.parentNode)sv.parentNode.removeChild(sv);
+      var hc=s.querySelector('.hint-content');if(hc)hc.classList.remove('show');
+      var hb=s.querySelector('.hint-btn');if(hb)hb.textContent='Hint';
+    });
+    if(window.__modPlot)Array.prototype.forEach.call(card.querySelectorAll('.plotbox'),g7plotDraw);
+  }
+  function g7reviewMode(){
+    var sk=g7revParam();if(!sk)return;
+    var set=g7revSet(sk);if(!set.length)return;          // unknown/unauthored skill -> the normal lesson
+    var panel=document.createElement('div');panel.className='rev-panel';panel.id='g7-review-panel';
+    var h=document.createElement('h2');h.textContent='Review — '+(G7_SKILL_LABELS[sk]||sk);
+    var p=document.createElement('p');p.className='rev-sub';
+    p.textContent=set.length+' item'+(set.length===1?'':'s')+' you have worked before, cleared for a fresh '+
+      'attempt. Answer from memory — pulling it back is what makes it stick. Nothing here can move your '+
+      'mastery bar down.';
+    panel.appendChild(h);panel.appendChild(p);
+    set.forEach(function(c){g7revReset(c);panel.appendChild(c);});   // moved, never removed: totals stay honest
+    var done=document.createElement('div');done.className='rev-done';
+    var a1=document.createElement('a');a1.className='btn';a1.href=g7hubHref();a1.textContent='Done — back to the Hub';
+    var a2=document.createElement('a');a2.className='btn ghost';
+    a2.href=(location.pathname.split('/').pop()||'');a2.textContent='Open the full lesson';
+    done.appendChild(a1);done.appendChild(a2);panel.appendChild(done);
+    var first=document.querySelector('section.topic');
+    if(first&&first.parentNode)first.parentNode.insertBefore(panel,first);
+    else (document.querySelector('.container')||document.body).appendChild(panel);
+    document.body.classList.add('g7-review-mode');
+  }
+  /* ===== homework deep-link: ?q=<qid>[,<qid>...] =====
+   * A homework set can reference exact questions in this module. Reuses the review reset so the
+   * student makes a REAL attempt; the stored tree is untouched, so the hub reads completion back. */
+  function g7hwParam(){try{return (new URLSearchParams(location.search)).get('q')||'';}catch(e){return '';}}
+  function g7hwSet(csv){
+    var want=String(csv||'').split(',').map(function(s){return s.trim();}).filter(Boolean);
+    var byId={};
+    Array.prototype.forEach.call(document.querySelectorAll('.qcard[data-qid]'),function(c){byId[c.dataset.qid]=c;});
+    var out=[];
+    want.forEach(function(q){var c=byId[q];if(c&&out.indexOf(c)<0)out.push(c);});
+    return out;                                           // order follows the homework set, not the page
+  }
+  function g7homeworkMode(){
+    var csv=g7hwParam();if(!csv)return false;
+    var set=g7hwSet(csv);if(!set.length)return false;     // unknown qid -> fall through to the normal lesson
+    var panel=document.createElement('div');panel.className='rev-panel';panel.id='g7-homework-panel';
+    var h=document.createElement('h2');h.textContent='Homework';
+    var p=document.createElement('p');p.className='rev-sub';
+    p.textContent=set.length+' question'+(set.length===1?'':'s')+' set for you, cleared for a fresh '+
+      'attempt. Work each one out before you answer.';
+    panel.appendChild(h);panel.appendChild(p);
+    set.forEach(function(c){g7revReset(c);panel.appendChild(c);});
+    var done=document.createElement('div');done.className='rev-done';
+    var a1=document.createElement('a');a1.className='btn';a1.href=g7hubHref();a1.textContent='Done — back to the Hub';
+    var a2=document.createElement('a');a2.className='btn ghost';
+    a2.href=(location.pathname.split('/').pop()||'');a2.textContent='Open the full lesson';
+    done.appendChild(a1);done.appendChild(a2);panel.appendChild(done);
+    var first=document.querySelector('section.topic');
+    if(first&&first.parentNode)first.parentNode.insertBefore(panel,first);
+    else (document.querySelector('.container')||document.body).appendChild(panel);
+    document.body.classList.add('g7-review-mode');
+    return true;
+  }
+  // Homework wins over review: it is an explicit instruction, not a suggestion.
+  window.addEventListener('load',function(){if(!g7homeworkMode())g7reviewMode();});
+  window.__modHomeworkMode={set:g7hwSet,mode:g7homeworkMode,param:g7hwParam};
+  window.__modReviewMode={set:g7revSet,reset:g7revReset,mode:g7reviewMode,param:g7revParam};
 
   document.getElementById('btn-export').addEventListener('click',function(){
     var d=loadData();var cards=document.querySelectorAll('.qcard');var lines=[],td=0,ts=0;
