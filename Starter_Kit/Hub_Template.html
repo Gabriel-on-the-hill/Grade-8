@@ -283,7 +283,15 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
   /* Storage namespace. EDIT PER DEPLOYMENT: every hub MUST own its own prefix, and the modules'
      G7_STORE must match it exactly. Two hubs left sharing one prefix put both grades' rosters,
      PINs and progress in one set of keys -- see Grade 8, 19 Jul 2026. */
-  var STORE_PREFIX='g7.';
+  var STORE_PREFIX='CHANGEME.';
+  (function(){ if(String(STORE_PREFIX).indexOf('CHANGEME')<0)return;
+    var f=function(){var b=document.createElement('div');b.setAttribute('role','alert');
+      b.style.cssText='position:fixed;inset:0 0 auto 0;z-index:99999;background:#B91C1C;color:#fff;font:600 15px/1.45 system-ui,sans-serif;padding:.9rem 1.1rem';
+      b.innerHTML='<strong>Starter Kit not configured.</strong> Set <code>STORE_PREFIX</code> (and <code>SYNC_HUB_ID</code>) in this file before use \u2014 otherwise this hub shares storage with the deployment it was copied from.';
+      (document.body||document.documentElement).appendChild(b);};
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',f);else f();
+  })();
+
   function K(s){return STORE_PREFIX+s;}
   function jget(k,f){try{var v=JSON.parse(LS.getItem(k));return (v===null||v===undefined)?f:v;}catch(e){return f;}}
   function jset(k,v){LS.setItem(k,JSON.stringify(v));}
