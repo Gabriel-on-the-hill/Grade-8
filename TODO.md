@@ -7,9 +7,9 @@ provenance is in [MCAP_PROVENANCE.md](MCAP_PROVENANCE.md); the MCCRS 2025 map is
 [MCCRS_2025_DUAL_CODING.md](MCCRS_2025_DUAL_CODING.md); the textbook survey and lift register are in
 [TEXTBOOK_SOURCES.md](TEXTBOOK_SOURCES.md).
 
-**P3.1 — the 8.F/Functions build — is next, and it is now fully scoped**: 6 standards, sources
-mapped lesson-for-lesson, one standard (`8.AT.D.9`) known to need authoring, and one blocker
-(`plot_format`, P5).
+**P3.1 — the 8.F/Functions build — is next, and it is now unblocked and fully scoped**: 6 standards,
+sources mapped lesson-for-lesson, one standard (`8.AT.D.9`) known to need authoring, and the plot
+format now guarded (P5) so the sketch-a-graph items can be built at their real bar.
 
 > **Read the dual-coding before building any new unit.** It revised P3 and P4 on 21 Jul 2026: 8.G is
 > a 5-standard build rather than 9, two new standards have no 2010 predecessor (so no 2010-coded
@@ -44,7 +44,8 @@ keys and reasoning: [MCAP_PROVENANCE.md](MCAP_PROVENANCE.md).
       release's rather than the label dropped.
 - [x] **The guard exists.** `tests/mcap_provenance.test.js` ported and extended to two label
       families, mutation-checked on four paths (unbacked claim, stale row, cross-table sourcing,
-      renamed headings). **10 guards green, behavioural 269.**
+      renamed headings). **10 guards green, behavioural 269** — the count as it stood that day;
+      `plot_format` later made it 11.
 
 **Nothing was relabelled *up* to compensate**, and the demoted items are not bad items — they are
 ours, and now say so.
@@ -110,12 +111,13 @@ Every one of these is a hub tile a student sees as *coming soon*. See the matrix
 breakdown. **Revised 21 Jul 2026 against the MCCRS 2025 crosswalk** — the dual-coding changed the
 scope of two of these items and added a third. 2025 codes in brackets.
 
-> **Dependency the order below does not remove: three of these need the plot format** (P5), which is
-> ported into the Starter Kit template but used by no module and guarded by no test. `8.AT.D.11`
-> *sketch a graph from a narrative*, `8.AT.B.4` *represent the solution set on a number line*, and
-> `8.DS.B.2` *construct a scatter plot* all have **construction verbs**. Assessing them with
-> multiple-choice would meet the letter of `exam_coverage` and quietly lower the bar — the standard's
-> verb *is* the bar. **Port `plot_format.test.js` and use the format before, or with, item 1.**
+> **Three of these need the plot format**, which is now guarded (P5, done 21 Jul) but still used by
+> no module. `8.AT.D.11` *sketch a graph from a narrative*, `8.AT.B.4` *represent the solution set on
+> a number line*, and `8.DS.B.2` *construct a scatter plot* all have **construction verbs**.
+> Assessing them with multiple-choice would meet the letter of `exam_coverage` and quietly lower the
+> bar — the standard's verb *is* the bar. The guard made the format safe to use; **using it is the
+> remaining work**, and `8.AT.D.11`'s own textbook source items are "Sketch a graph" on an empty
+> grid (`TEXTBOOK_SOURCES.md`).
 
 - [ ] **8.F Functions — absent.** 5 standards `[8.AT.C.6–8, 8.AT.D.10–11]`, **+1 new**
       `[8.AT.D.9 — interpret the graph of y=mx+b]`. **Still build first, and now on better evidence:**
@@ -165,27 +167,30 @@ scope of two of these items and added a third. 2025 codes in brackets.
 
 ## P5 · Guards this app does not have
 
-Grade 7 runs 13 `.test.js`; Grade 8 runs **10** (3 of which arrived on 21 Jul). *(Corrected 21 Jul —
-this line and P1 both said 11. The four missing below, less `homework_backend.test.js` which Grade 7
-does not have, is exactly the 13 → 10 difference.)* Still missing:
+Grade 7 runs 13 `.test.js`; Grade 8 runs **11** (4 of which arrived on 21 Jul). *(This line and P1 both said 11
+when the true count was 10; corrected, then `plot_format` took it to a real 11. The three still
+missing below, less `homework_backend.test.js` which Grade 7 does not have, is the 13 → 11
+difference.)* Still missing:
 
 - [x] `mcap_provenance.test.js` — **done 21 Jul 2026**, covering both MCAP and MISA (see P1).
 - [ ] `module_smoke.test.js` — catches a module that loads but does not work.
-- [ ] `plot_format.test.js` — **re-scoped 21 Jul 2026; the old entry was wrong in both directions.**
-      It said the guard is "only needed once Grade 8 uses the click-to-plot input". But
-      `Starter_Kit/Module_Template.html` **already carries the plot format** — ported in `478816d`,
-      shipping both the number-line and grid variants as the documented *6th* format. So Grade 8 has
-      an **unexercised, unguarded response format**: no module uses it, and nothing checks it still
-      works when one does. Grade 7's guard proves the five invariants that matter (a click writes a
-      value · a click on a **locked** step writes nothing · wrong placement doesn't advance · correct
-      placement grades through the normal `.check-btn` path · snapping is exact). Port it now rather
-      than at first use — it is the lock-ladder bypass that makes this urgent, not the drawing.
-      - **Two live standards are under-assessed today** because built modules don't use it:
+- [x] `plot_format.test.js` — **ported 21 Jul 2026. 26 assertions, mutation-checked on five paths**
+      (lock-guard removed · snapping un-rounded · `role="slider"` dropped · the `d10` demo card
+      removed · the keyboard handler neutered — each caught, template restored bit-identically).
+      **The old entry was wrong in both directions:** it said the guard was "only needed once Grade 8
+      uses the click-to-plot input", but `Starter_Kit/Module_Template.html` **already carried the
+      format** (`478816d`, both number-line and grid variants). Grade 8 had a shipped, working,
+      **entirely unexercised** response format that nothing would have noticed rotting. Geometry is
+      identical to Grade 7's, so the assertions ported unchanged; only the path differs.
+      **Grade-8 addition:** Part B sweeps any *module* that adopts the format and holds it to the same
+      structure, so the first unit to use the plot cannot quietly diverge. It iterates zero files
+      today and **says so** — "0 files checked" and "all files passed" otherwise print identically.
+      - **Two live standards are still under-assessed** because built modules don't use the format:
         `8.AT.A.1a` *"**Graph** proportional relationships"* — E&E §3 is four read-off/compute items
         (`Find the slope`, `Write the equation`, `read m and b`, `Unit rate as slope`), none placing
         anything; and `8.NOS.A.2` *"estimate their **locations on a number line**"* — NS `5-4`
         *"Locate between integers"* names the two integers rather than placing the point.
-      - **`PROJECT_STANDARD.md` §5 still says "Five item formats"** — it is six. Fix with the port.
+        **The guard does not fix these** — it makes the format safe to use. Using it is the fix.
 - [ ] `starter_kit.test.js` — **Grade 8 does carry its own kit** (`Starter_Kit/Hub_Template.html`
       and `Starter_Kit/Module_Template.html`), and it is **half-fixed**. Checked 21 Jul 2026:
       neither template hardcodes a `gN.` storage literal ✅ and both ship the namespace as
@@ -223,4 +228,4 @@ for t in tests/*.test.js; do node "$t" || echo "FAILED: $t"; done
 node tests/behavioral_test_suite.js .
 ```
 
-Currently **10 guards green, behavioural 269**.
+Currently **11 guards green, behavioural 269**.
