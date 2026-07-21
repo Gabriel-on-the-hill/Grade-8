@@ -209,9 +209,9 @@ Engine v1.2 (v1.1 + the multi-subject hub layer: flat `UNITS` replaced by `SUBJE
 
 - [x] **2026-07-19 — dashboard labels non-enrolment** — pushed in `4feb7ee`; **verified live** (served hub carries the `hidden from <name>` chip).
 
-- [ ] **2026-07-21 — Functions unit (`Functions.html`) + hub tile now `available`** — **not yet verified live**; fetch the deployed hub and confirm the Functions tile links, and that `Functions.html` returns HTTP 200, before clearing this line.
+- [x] **2026-07-21 — Functions unit (`Functions.html`) + hub tile now `available`** — pushed in `7bfaaae`; **verified live by fetching the deployed site**: `Functions.html` returns HTTP 200 and serves `G7_TOPIC_ID='functions'`, `G7_STORE='g8.'`, `G7_SYNC_HUB='grade8'`, 36 qcards, 9 exam items, 4 `MCAP ·` titles and **zero plaintext answers**; the served hub carries `file:'Functions.html',status:'available'`. Topic id and store prefix were checked against the served file specifically — those two are what decide whether a student's work reaches the dashboard.
 
-*Nothing outstanding as of 19 Jul 2026, through `4feb7ee`. Verified by fetching the deployed site, not by assuming a push shipped — a green `git push` only proves the remote updated, and Pages rebuilds a minute or two later.*
+*Nothing outstanding as of 21 Jul 2026, through `7bfaaae`. Verified by fetching the deployed site, not by assuming a push shipped — a green `git push` only proves the remote updated, and Pages rebuilds a minute or two later.*
 
 - Repo: **https://github.com/Gabriel-on-the-hill/Grade-8** → GitHub Pages at **https://gabriel-on-the-hill.github.io/Grade-8/** (branch `main`, root). `index.html` redirects to `Grade_8_Math_Hub.html`.
 - **Publish only** the original web app + docs: `index.html`, the hub, the module HTML files, `README.md`, this standard, `Starter_Kit/`.
