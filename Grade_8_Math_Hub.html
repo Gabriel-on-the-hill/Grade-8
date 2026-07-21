@@ -180,7 +180,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
 </head>
 <body>
 <div id="pinModal" class="modal-bg hidden">
-  <div class="modal" style="max-width:340px;border-top:5px solid var(--gold)">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="pin-title" style="max-width:340px;border-top:5px solid var(--gold)">
     <div style="display:flex;align-items:center;gap:.6rem">
       <span id="pin-av" style="width:42px;height:42px;border-radius:50%;background:var(--green-soft);color:var(--green);display:grid;place-items:center;font-weight:700;font-size:1.05rem"></span>
       <div><h2 id="pin-title" style="margin:0;font-size:1.1rem"></h2><p id="pin-sub" style="margin:.1rem 0 0;color:var(--muted);font-size:.8rem"></p></div>
@@ -275,8 +275,8 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
 
 <!-- Settings modal -->
 <div id="settingsModal" class="modal-bg hidden">
-  <div class="modal">
-    <h2>Settings</h2>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <h2 id="settings-title">Settings</h2>
     <p>Connect the shared Google Sheet web app to enable <strong>cloud sync</strong> — student progress reaches your dashboard from any device, and homework, PIN resets and reviews reach the students — plus an activity log. One URL serves all hubs (see the setup guide).</p>
     <label class="muted-note">Google Sheet web app URL</label>
     <input id="sheet-url" class="field" placeholder="https://script.google.com/.../exec" style="margin-top:.3rem"/>
@@ -319,7 +319,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
 </div>
 
 <div id="teacherModal" class="modal-bg hidden">
-  <div class="modal" style="max-width:340px;border-top:5px solid var(--green)">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="tm-title" style="max-width:340px;border-top:5px solid var(--green)">
     <h2 id="tm-title" style="margin:.1rem 0 .2rem">Teacher access</h2>
     <p id="tm-sub">Enter the teacher passcode to open the dashboard.</p>
     <input id="tm-pass" class="field" type="password" autocomplete="off" placeholder="Teacher passcode">
@@ -424,7 +424,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     'sci-reasoning':'Scientific reasoning & explanation'
   };
 
-  function svg(paths){return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+paths+'</svg>';}
+  function svg(paths){return '<svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+paths+'</svg>';}
   var IC={
     num:svg('<line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="10" y1="4" x2="8" y2="20"/><line x1="16" y1="4" x2="14" y2="20"/>'),
     ratio:svg('<circle cx="7" cy="7" r="2.4"/><circle cx="17" cy="17" r="2.4"/><line x1="6" y1="18" x2="18" y2="6"/>'),
