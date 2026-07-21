@@ -1,62 +1,44 @@
 # Grade 8 — open issues
 
 **Raised 21 Jul 2026** from the Grade 7 session (scrutiny item **S6** in `../Grade 7/HANDOFF.md`),
-which had never been done for this app. Findings only — nothing here has been acted on except where
-it says *done*. Detail for the coverage half is in [STANDARDS_COVERAGE_MATRIX.md](STANDARDS_COVERAGE_MATRIX.md).
+which had never been done for this app. **P1 has since been worked and closed**; everything else is a
+finding, not yet acted on. Coverage detail is in
+[STANDARDS_COVERAGE_MATRIX.md](STANDARDS_COVERAGE_MATRIX.md); provenance working is in
+[MCAP_PROVENANCE.md](MCAP_PROVENANCE.md).
 
 Ordered by *what could mislead a student*, then *what is missing*, then *what could regress*.
 
 ---
 
-## P1 · Truth — an exam claim with nothing behind it
+## P1 · Truth — RESOLVED 21 Jul 2026
 
-- [ ] **`MISA ·` labels are unbacked — and the first check does not look good.** Ten items in
-      `Matter_and_Its_Interactions.html` are titled `MISA ·` (Maryland Integrated Science Assessment),
-      asserting to the student that they are sitting a real released item. There is **no provenance
-      manifest in this repo and no guard**. This is precisely the failure
-      `../Grade 7/MCAP_PROVENANCE.md` was created to prevent, in a different programme's name.
+All 30 exam-authority claims were adjudicated against the packets in `MCAP MATHS/` and
+`MCAP SCIENCE/`, every one read off the **rendered** page. **11 verified, 9 demoted.** Full working,
+keys and reasoning: [MCAP_PROVENANCE.md](MCAP_PROVENANCE.md).
 
-      **What a first pass found (21 Jul 2026).** `MCAP SCIENCE/` holds **10 genuine MSDE public-release
-      packets** (verified by rendering, not by filename — they are titled *"8th Grade MISA · Released
-      Questions in Standard …"*). Between them they cover:
+- [x] **`MISA ·` labels resolved — 6 of 10 are real.** The first pass looked bad: the four items
+      naming a standard cited `MS-PS1-2`, `MS-PS1-3` and `MS-PS1-5`, none of which has a packet.
+      **Rendering the `MS-PS1-1 and MS-PS1-4` packet changed the answer** — six of the ten are
+      faithful lifts from its sugar-and-water item set, and carry no standard code in their titles,
+      which is exactly why a code-based search missed them. The split is almost too neat: **the six
+      with no code are the six that are real; the four with codes are the four that are not.**
+      `4-4`, `4-5`, `5-5`, `6-5` demoted to `Exam-style ·`. **Trap #11 nearly cost six real items.**
+- [x] **MCAP maths claims resolved — 5 of 10 are real.** `3-3`=Q7, `6-4`=Q5, `1-5`=Q1, `2-4`=Q9,
+      `4-4`=Q6, all from the Math 8 2024 release. `2-5`, `3-5`, `6-5`, `5-5`, `6-3` demoted.
+      **Arithmetic broke this open before any reading did:** the entire released 8.NS supply is
+      **two** items and the module claimed **five**.
+- [x] **Both footers reworded.** They told the student *"Real MCAP practice items are marked Exam"*,
+      which was true of 5 of 20 exam items. They now say lifted items are titled `MCAP` and cited in
+      the manifest, and the rest are ours, titled `Exam-style`.
+- [x] **`6-4` fidelity repair.** It printed `√(65/122)`; MCAP prints `√65 ÷ √122`. Equal in value,
+      but the released form is what makes the item test `√a/√b = √(a/b)`. Notation restored to the
+      release's rather than the label dropped.
+- [x] **The guard exists.** `tests/mcap_provenance.test.js` ported and extended to two label
+      families, mutation-checked on four paths (unbacked claim, stale row, cross-table sourcing,
+      renamed headings). **11 guards green, behavioural 269.**
 
-      > MS-ESS1-1/2/3/4 · MS-ESS2-2/3/4 · MS-ESS3-1 · MS-LS1-1/3 · MS-LS2-1/2/3 · MS-LS3-2 ·
-      > MS-LS4-4 · MS-PS1-1 · **MS-PS1-4** · MS-PS2-1/3/4/5 · MS-PS3-3/4/5
-
-      Four of our ten `MISA ·` items name a standard in their title, and they name
-      **`MS-PS1-2` (×2), `MS-PS1-3` and `MS-PS1-5`** — **none of which appears in any packet**, by
-      title or in the extracted text. The remaining six name no standard at all (*"structure of table
-      sugar"*, *"why water is a molecule"*, …).
-
-      This is **not** proof the items are invented — the author may have used a source not in this
-      repo. It does mean **the claim cannot be verified from anything here**, which is the whole
-      problem. Grade 7's trap #11 cuts both ways: do not demote on a failed search either. **Render
-      the packets and look before deciding.**
-
-      **Do:** port `MCAP_PROVENANCE.md` + `tests/mcap_provenance.test.js`, then resolve all ten. Any
-      that cannot be traced to a real released item get relabelled `Exam-style ·` — *never* the
-      reverse, and never by relabelling something else up to compensate.
-
-- [ ] **Both maths modules claim their exam items are real MCAP — and this one is fully checkable.**
-      The page description reads *"Aligned to MCCRS 8.NS.A.1–8.NS.A.2 and MCAP. **Real MCAP practice
-      items are marked Exam.**"* (and the same for 8.EE). That is **20 exam items** carrying an
-      exam-authority claim. **This may well be true — the point is that nothing records it and nothing
-      checks it.**
-
-      Unlike the science half, the sources are all here: **`MCAP MATHS/` holds 7 MSDE public-release
-      packets** — *Math 8 2024*, plus per-domain packets for *The Number System, Functions, Geometry,
-      Statistics and Probability, Reasoning* and *Modeling*. Every one of the 20 claims can be
-      resolved against them.
-
-      **Do:** work one packet at a time, and **count sources against claims** — Grade 7 found two real
-      errors that way (a packet holding five items with seven rows citing it). Record each in the
-      manifest with packet + question number. Anything unresolved becomes `Exam-style ·`.
-      Grade 7 shipped 19 falsely-labelled capstones on 20 Jul 2026 for exactly this reason: the title
-      convention was copied from the genuinely sourced item next door.
-
-- [ ] **No `exam_coverage` pressure valve.** Grade 7's manifest documents that a guard rewarding
-      *having* a capstone creates pressure to manufacture one. Grade 8 runs `exam_coverage.test.js`
-      with no provenance guard beside it — the same pressure, none of the counterweight.
+**Nothing was relabelled *up* to compensate**, and the demoted items are not bad items — they are
+ours, and now say so.
 
 ## P2 · Adopt Grade 7's sourcing practice
 
@@ -116,9 +98,9 @@ breakdown.
 
 ## P5 · Guards this app does not have
 
-Grade 7 runs 13; Grade 8 runs 10 (2 of which arrived on 21 Jul). Missing, in rough value order:
+Grade 7 runs 13; Grade 8 runs **11** (3 of which arrived on 21 Jul). Still missing:
 
-- [ ] `mcap_provenance.test.js` — see P1. **Highest value of the four.**
+- [x] `mcap_provenance.test.js` — **done 21 Jul 2026**, covering both MCAP and MISA (see P1).
 - [ ] `module_smoke.test.js` — catches a module that loads but does not work.
 - [ ] `plot_format.test.js` — only needed once Grade 8 uses the click-to-plot input (8.F and 8.SP will
       want it; `a11y.test.js` already guards its keyboard affordances *if* it appears).
