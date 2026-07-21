@@ -25,6 +25,8 @@
 >   - `MD1126620_Gr8Mth_PT.pdf` — Grade 8 Paper Practice Test (real items).
 >   - `MCAP_2025-26_PT-Answer-Key_Math_Grade-8_Paper_FINAL.pdf` — answer key + standards alignment.
 >   - `Curriculum/` — `Math_Standards.pdf`, MCCRS Standards Companion Guide, Crosswalk, MCAP Blueprint, MCAP Grade 8 Reference Sheet.
+>     **Acquired 21 Jul 2026** (see `SOURCE_ACQUISITION.md`): `Grade_8_Evidence_Statements-A.pdf` (33 pp — the per-standard evidence statements the maths blueprint references but we never held; covers all 28 Grade 8 standards), `MCAP-Science-Blueprint-Grade-8-2024-A.pdf` (**Oct 2024** — newer than the Sept 2022 maths blueprint), plus the Grade 5 science blueprint and the Life Science MISA standards for reference.
+>   - **`MCAP MATHS/` is now complete at 8 of 8 released modules.** The 8th — **Expressions & Equations** — was missing until 21 Jul 2026 and is stored as **self-contained HTML, not PDF**: the live page renders its items inside collapsed accordions, so print-to-PDF captures only headers. Images are inlined; accordions forced open.
 >   - `Rising Math 8 Summer Packet.pdf` — Grade 7 review (prerequisite framing).
 >   - `Summer Boost Grade 8 (IXL Skill Plan).pdf` — skill sequencing reference.
 >   - `eq-editor-tips_GR6-8v7.pdf` — how MCAP's equation/answer entry works (informs fill-in answer phrasing).

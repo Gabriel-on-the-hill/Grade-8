@@ -85,6 +85,29 @@ the headings.** The *identity* of each item is not in doubt — only its ordinal
 These were titled `MCAP` or `MISA` and are now `Exam-style ·`. They are **not bad items**; they are
 ours, and they are now labelled as ours. Nothing was relabelled *up* to compensate.
 
+> ## ⚠ Re-adjudication required (raised 21 Jul 2026)
+>
+> **This audit was carried out against 7 of the 8 released Math 8 modules.** MSDE publishes **eight**;
+> the folder held seven. The missing one was **`Math 8 Expressions and Equations`** — acquired
+> 21 Jul 2026 — and it carries its own items for `8.EE.A.1`, `A.2`, `A.3`, `B.5`, `B.6`, `C.7` and `C.8`.
+>
+> **What this does and does not change.** The three verified E&E rows are safe: `1-5`, `2-4` and `4-4`
+> cite the 2024 release and those same items appear in the new packet too. **The demotion of `6-3` is
+> not safe.** Its stated reason is *"Every released 8.EE.C.8 item was checked — Q11, Q15, Q17, Q27,
+> Q28, Q34"*, and that enumeration could not have included this packet's own **two-part 8.EE.C.8
+> drop-down item about the graph of a system**. The demotion may still be right, but **its reasoning
+> is unsound as written** and must be redone against the packet. `5-5` should be rechecked in the same
+> pass (the packet's `8.EE.C.7` item is the same `5(x − 6) − 2(x + 3) = 12` already cited by `4-4`, so
+> that demotion probably stands — but *probably* is not the standard this file holds itself to).
+>
+> **The lesson is the one this file already teaches, applied to itself:** a negative claim needs its
+> search space proved complete. "Every released item was checked" was true of every packet *we had*,
+> and nobody had checked that we had them all. The count was on MSDE's own collection page all along.
+>
+> **Unused capstone supply now available:** `8.EE.A.2` (`x² = 49/16`), `8.EE.B.5` (two-part, key-chain
+> fundraiser) and — directly relevant to the `8.AT.A.2` derivation built 21 Jul — a real `8.EE.B.6`
+> **similar-triangles-on-the-coordinate-plane** item (triangles *PRT* and *QRS*). None is yet lifted.
+
 | File | qid | Claimed | Why demoted |
 |---|---|---|---|
 | `The_Number_System.html` | `2-5` | MCAP · 8.NS.A.1 | The entire released 8.NS supply is **two items** — Q5 and Q7 — and this is neither. |

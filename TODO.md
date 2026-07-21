@@ -245,6 +245,29 @@ why they survived: every one sat outside what the guards could see.
       **Only three MS-PS1 codes appear in the file at all**; a code search is not a coverage audit.
       **Not dual-coded** — no science crosswalk is in `Curriculum/`; treat it as 2013-NGSS.
 
+## P5.6 · Sources acquired 21 Jul 2026 — two findings that change other items
+
+Full report: [SOURCE_ACQUISITION.md](SOURCE_ACQUISITION.md).
+
+- [x] **Science dual-coding question closed.** No science crosswalk exists, and the evidence says
+      none should: Maryland adopted **NGSS unchanged** in 2013, so the 2025 MCCRS re-cut has no
+      science counterpart, and the **Oct 2024** MISA blueprint still cites the full 6–8 NGSS band.
+- [ ] **Science scope: the exam is not the course.** The Grade 8 MISA is **~1/3 Earth & Space,
+      ~1/3 Life, ~1/3 Physical**, drawn from all of Grades 6–8. The hub's Science plan is Physical
+      Science plus a space unit — **no Life Science unit at all**. §2.2 is *curriculum ∪ exam*, and
+      only the curriculum half is met. **Nine of ten released MISA packets are unused** for the same
+      reason. Decide this deliberately; the Matter unit itself is fine.
+- [ ] **Re-adjudicate `6-3` (and recheck `5-5`).** The P1 audit ran against **7 of 8** released Math
+      8 modules; the missing one was **Expressions & Equations**. `6-3`'s demotion reason claims
+      *every* released `8.EE.C.8` item was checked — it could not have included this packet's own
+      two-part `8.EE.C.8` graph item. The verdict may hold; the reasoning does not.
+- [ ] **Lift the new `8.EE.B.6` capstone.** The packet carries a real **similar-triangles on the
+      coordinate plane** item (triangles *PRT*/*QRS*) — the exact standard whose derivation was built
+      21 Jul with no MCAP capstone available. Also unused: `8.EE.A.2` (`x² = 49/16`), two-part `8.EE.B.5`.
+- [ ] **Use the evidence statements.** `Curriculum/Grade_8_Evidence_Statements-A.pdf` (33 pp, all 28
+      standards) is the sharpest guide to what an exam item must *elicit*. It was referenced by the
+      blueprint all along and never held; no authored capstone has been checked against it.
+
 ## P6 · Housekeeping
 
 - [x] **Accessibility — done 21 Jul 2026.** Icon glyphs marked `aria-hidden`, and all three modals

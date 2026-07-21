@@ -134,9 +134,31 @@ mathematics.
   P1 provenance audit nearly discard six real MISA items. **A code search is not a coverage audit**,
   in either direction.
 
-**Not yet dual-coded.** Maryland's 2025 re-cut covered mathematics; whether MISA/NGSS Grade 8 science
-shifts for SY 2026-27 has **not** been checked, and no science crosswalk is in `Curriculum/`. Treat
-this table as 2013-NGSS-coded until someone reads a science crosswalk.
+**Dual-coding question settled 21 Jul 2026 — there is nothing to crosswalk.** Maryland adopted NGSS
+*unchanged* in 2013; the 2025 re-cut revised Maryland's own MCCRS, which has no science counterpart.
+The **October 2024** MISA blueprint still cites the Maryland NGSS and the full 6–8 band. Treat this
+table as 2013-NGSS-coded, and treat that as **answered**, not unknown (`SOURCE_ACQUISITION.md`).
+
+### But the exam is not the course — a scope finding, not a module defect
+
+`Curriculum/MCAP-Science-Blueprint-Grade-8-2024-A.pdf` (acquired 21 Jul) says the Grade 8 MISA uses
+**all Middle School (6–8) performance expectations**, split roughly evenly:
+
+| Domain | Percent of blueprint | Units planned in this hub |
+|---|---|---|
+| Earth and Space Science | 30–35% | one space topic |
+| Life Science | 30–35% | **none** |
+| Physical Science | 30–35% | all four |
+
+The hub's Science subject follows the MCPS *Investigations in Physical Science* course, which is
+right for the **curriculum** — but two thirds of the **exam** is Life and Earth/Space, taught in
+Grades 6–7. §2.2 requires *curriculum ∪ exam, never a trade-off*; today only the curriculum half is
+met. This also explains why **nine of the ten released MISA packets are unused** — they span ESS and
+LS because the exam does. The blueprint also splits the paper by **practice** (Sensemaking 50–67%,
+Investigating 17–33%, Critiquing 17–33%), which no module has been checked against.
+
+**The Matter unit is not at fault** — it is on-curriculum, on-grade and complete for MS-PS1. This is
+a scope decision about the Science subject, to be taken deliberately rather than by default.
 
 ## The MCCRS 2026-27 handoff does not currently land
 
