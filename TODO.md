@@ -124,6 +124,13 @@ scope of two of these items and added a third. 2025 codes in brackets.
       it is the **highest-weight unbuilt domain on the blueprint (5 of 23 content items)**, one of
       only three domains carrying a Reasoning statement, and under 2025 it **completes 8.AT**
       alongside the built Expressions & Equations. Author `8.AT.D.9` in from the start.
+      **Capstones pre-cleared 21 Jul 2026** (`MCAP_PROVENANCE.md`): the `Math 8 Functions` packet
+      holds exactly five items, one per 8.F standard, all read off the rendered page with keys
+      recomputed independently. **Four are usable** (Q2 → `8.AT.C.6`, Q20 → `8.AT.C.7`,
+      Q35 → `8.AT.D.10`, Q14 → `8.AT.D.11`). **Q8 is blocked:** it asks for *any two points* on
+      `x + 3y = −3`, and the engine matches one exact string — constrain it and it loses the label,
+      multiple-choice it and it lowers the bar. Cover `8.AT.C.8` from the textbook instead.
+      So: **4 MCAP capstones + 1 textbook item + 1 authored (`8.AT.D.9`).**
 - [ ] **`8.AT.B.4` linear inequalities — absent, and new.** Solve linear inequalities in one
       variable; represent the solution set on a number line. **No 2010 predecessor**, so no audit
       built on 2010 codes could see it: "inequality" appears **nowhere in the repo**. It sits inside

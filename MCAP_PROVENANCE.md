@@ -118,6 +118,68 @@ codes from the standards list rather than from a packet.
 **The rule that saved them: a negative search is not proof of absence. Render the pages and look
 before demoting an item — the same discipline that governs lifting one.**
 
+## Pre-cleared for the Functions build — adjudicated 21 Jul 2026, not yet used
+
+**These are not claims yet.** No module carries them, so they are deliberately **outside the
+"Verified items" tables above** — `tests/mcap_provenance.test.js` parses only those two headings, and
+a row there pointing at no card would (correctly) fail as a stale row. Move a row up into the MCAP
+table **in the same commit** as the item that uses it.
+
+**Why clear them before authoring rather than after.** The P1 audit above exists because labels were
+applied first and checked never. Doing it in this order costs nothing and makes the mistake
+structurally impossible: by the time an item can be titled `MCAP ·`, its stem, its citation and its
+independently recomputed key are already written down.
+
+The `Math 8 Functions` packet holds **exactly five items — one per 8.F standard.** All five were read
+off the rendered page (`MCAP MATHS/…Math 8 Functions…pdf`, pp. 2–6). Citations are as MSDE prints
+them, including the internal item codes.
+
+| Packet p. | Citation | Standard | Format | Fit |
+|---|---|---|---|---|
+| 2 | Math 8 2024 Release, Question 2 (8.F.A.1-1) — No Calculator | 8.F.A.1 → `8.AT.C.6` | multi-select | ✅ direct |
+| 3 | Math 8 2024 Release, Question 8 (8.F.A.3-1) — No Calculator | 8.F.A.3 → `8.AT.C.8` | **place two points** | ⚠️ **blocked — see below** |
+| 4 | Math 8 2024 Release, Question 14 (8.F.B.5-1) — No Calculator | 8.F.B.5 → `8.AT.D.11` | single MC | ✅ direct |
+| 5 | Math 8 2024 Release, Question 20 (8.F.A.2) — Calculator | 8.F.A.2 → `8.AT.C.7` | two drop-downs | ✅ as a two-part item |
+| 6 | Math 8 2024 Release, Question 35 (8.F.B.4) — Calculator | 8.F.B.4 → `8.AT.D.10` | single MC | ✅ direct |
+
+**Keys, recomputed independently (`fractions.Fraction`, never floats) before any published key was
+consulted:**
+
+| Citation | Working | Key |
+|---|---|---|
+| Q2 | Distinct inputs: A `1,2,3` ✓ · B `2,2,4` ✗ · C `3,4,5` ✓ · D `6,6,6` ✗ · E `7,8,9` ✓ (repeated *outputs* are fine) | **A, C, E** |
+| Q14 | Constant rate of change = the one **straight** segment. `P→Q` is a line segment; `Q→R`, `R→S`, `S→T` are curved | **A — from `P` to `Q`** |
+| Q20 | J: `(7−2)/(1−0)=5` and `(12−7)/(2−1)=5` — one slope, so linear; `b=2`. K: `y=3x+8` → `m=3`, `b=8` | slope J **greater than** K; y-intercept J **less than** K |
+| Q35 | `m=(600−450)/(20−10)=15`; `b=450−15·10=300`. Only `y=15x+300` fits both `(10,450)` and `(20,600)` | **C — `y = 15x + 300`** |
+
+### `Q8` is blocked, and the reason is worth keeping
+
+The item gives `x + 3y = −3` and asks the student to **place two points** on a −9…9 grid; MCAP then
+draws the line through them. Its integer lattice points in view are `(−9,2) (−6,1) (−3,0) (0,−1)
+(3,−2) (6,−3) (9,−4)` — and **any two distinct points on the line are correct**, plus non-lattice
+points MCAP's interface also accepts.
+
+Our engine grades a plot by exact string match on one hidden `.ans-input`. It cannot express *"any
+two of infinitely many"*. Three options, and only one is honest:
+
+1. **Constrain it** — "place the point where the line crosses the y-axis", then the x-axis. This
+   grades cleanly, but it **changes the response format and the reasoning**: the released item tests
+   *generate any solution*, the constrained one tests *find the intercepts*. Per §7.7.4 that is an
+   adaptation, so it **loses the MCAP label** and ships as `Exam-style ·`.
+2. **Multiple-choice the points.** Worse — it converts production to recognition, the bar-lowering
+   §5 warns about.
+3. **Leave it out** and cover `8.AT.C.8` with the textbook supply (Additional Practice 3-3, *Compare
+   Linear and Nonlinear Functions* — `TEXTBOOK_SOURCES.md`).
+
+**Take option 1 or 3, never 2, and never option 1 while keeping the label.** This is precisely the
+pressure that produced the nine demotions above: a real item that *almost* fits, and a label that
+travels with the shape instead of the source.
+
+So the Functions module can carry **four** genuine MCAP capstones covering `8.AT.C.6`, `8.AT.C.7`,
+`8.AT.D.10` and `8.AT.D.11`. `8.AT.C.8` gets a textbook-sourced item, and **`8.AT.D.9` has no
+released item at all** — it is new in MCCRS 2025, and the 2024 release predates it
+(`MCCRS_2025_DUAL_CODING.md`).
+
 ## Known-good items not yet used
 
 Real released items available for future capstones, from the 2024 Math 8 release (33 questions):
