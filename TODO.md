@@ -135,11 +135,15 @@ scope of two of these items and added a third. 2025 codes in brackets.
       `x + 3y = −3`, and the engine matches one exact string — constrain it and it loses the label,
       multiple-choice it and it lowers the bar. Cover `8.AT.C.8` from the textbook instead.
       So: **4 MCAP capstones + 1 textbook item + 1 authored (`8.AT.D.9`).**
-- [ ] **`8.AT.B.4` linear inequalities — absent, and new.** Solve linear inequalities in one
-      variable; represent the solution set on a number line. **No 2010 predecessor**, so no audit
-      built on 2010 codes could see it: "inequality" appears **nowhere in the repo**. It sits inside
-      Expressions & Equations, which the matrix calls *built, one gap* — from SY 2026-27 that is
-      **two** gaps, and this is the larger one.
+- [x] **`8.AT.B.4` linear inequalities — BUILT 21 Jul 2026.** Expressions & Equations gained a
+      **new section 8** (5 items, 1 exam-grade): solve two-step and bracketed inequalities, the
+      sign-flip on dividing by a negative, a contextual range that must be rounded *down* to make
+      sense, and the solution set on a number line. **The number-line item is deliberately
+      decomposed** — plot the boundary, then choose open/closed and the direction — because the plot
+      format places a point and cannot draw a ray; the student still *produces* the boundary rather
+      than picking the right picture. Section numbering: it is section **8** sitting before section
+      **7** on the page, and that is deliberate — see `PROJECT_STANDARD.md` §5, section numbers are
+      allocation ids frozen at ship because qids key live student progress and published homework.
 - [ ] **8.SP Statistics & Probability — absent.** 4 standards `[8.DS.B.2–4, 8.DS.C.5]`, **+1 new**
       `[8.DS.A.1 — evaluate predictions and conclusions; bias and generalisation]`, **+1 inbound**
       `[8.DS.C.6 compound events, from 7.SP.C.8]` = **6**. Depends on 8.F for the linear-model work.
@@ -155,7 +159,12 @@ scope of two of these items and added a third. 2025 codes in brackets.
       `PROJECT_STANDARD.md` §2.8. Handle the transformations block as a prerequisite note.
       **The hub tile currently promises three topics that will not be in it** — correct its `desc`
       when the unit ships.
-- [ ] **`8.EE.6` is partial — build the 2025 derivation, not the 2010 one** `[8.AT.A.2]`. The module
+- [x] **`8.EE.6` derivation — BUILT 21 Jul 2026** `[8.AT.A.2]`. A teach card now derives why slope is
+      well defined from **equivalent ratios** across three different point-pairs on one line, with
+      `3-6` (compute the second ratio) and `3-7` (say *why* it must be the same) to test it. Similar
+      triangles get one parenthetical sentence as the classical framing, exactly as planned below.
+      Also added `3-5`, a click-to-plot item for `8.AT.A.1a` *"graph proportional relationships"*.
+      *Original entry, for the reasoning:* The module
       states and uses `y = mx` and `y = mx + b` but never says *why slope is well defined*. 2010 said
       *use similar triangles*; **2025 says use proportional reasoning — show the ratios of vertical to
       horizontal change between points are equivalent.** Build the ratio-equivalence argument;

@@ -108,6 +108,17 @@ table.gtable th{background:var(--pitch-green);color:#fff;font-weight:600} table.
 .sec-row.full .bar>span{background:var(--ok)}
 footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;border-top:1px solid var(--border);margin-top:3rem}
 @media(max-width:640px){main{padding:1rem .75rem 3rem}.qcard,.tcard,.challenge,.guide{padding:.85rem}.qtitle{margin-left:0;width:100%;font-size:.93rem}header.mod h1{font-size:1.25rem}}
+    .plotbox{margin:.45rem 0 .2rem}
+    .plotbox svg{max-width:100%;height:auto;touch-action:manipulation}
+    .plotbox .hit{cursor:pointer;fill:transparent}
+    .plotbox.locked .hit{cursor:not-allowed}
+    .plotbox .pt{fill:#FAC415;stroke:#0F3D22;stroke-width:2}
+    .plotbox .gridline{stroke:#D9E4DC;stroke-width:1}
+    .plotbox .axis{stroke:#0F3D22;stroke-width:1.8}
+    .plotbox .tick{stroke:#0F3D22;stroke-width:1.4}
+    .plotbox .tlab{font-size:11px;fill:#0F172A}
+    .plotbox .hint-dot{fill:#B7CBBE}
+    .plotbox .readout{font-size:.82rem;color:var(--muted);margin-top:.2rem}
 /* MR-1 phase-3: retrieval-practice review mode (?review=<skill>) — the due skill's own
    authored items, cleared for a fresh attempt. Everything else is hidden so the session is
    a retrieval, not a re-read; nothing is removed from the DOM, so the step totals stay honest. */
@@ -560,6 +571,24 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
       </div>
     </div>
   </div>
+
+  <div class="qcard" data-qid="5-5">
+    <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Place them on the number line</span></div>
+    <div class="qbody">
+      <p class="muted-note" style="font-size:.86rem">Estimating is only useful if you can say <em>where</em> the number sits. Place each value on the line below.</p>
+      <div class="step">
+        <div class="step-label">Step 1 &middot; Plot the whole number that <span class="math">&radic;17</span> is closest to.</div>
+        <div class="plotbox" data-plot="line" data-min="0" data-max="12" data-step="1"><input type="hidden" class="ans-input" data-type="text" data-answer="k1:NA=="/></div>
+        <button class="check-btn">Check</button>
+      </div>
+      <div class="step locked">
+        <div class="step-label">Step 2 &middot; Plot the whole number that <span class="math">&pi;&sup2;</span> is closest to.</div>
+        <div class="plotbox" data-plot="line" data-min="0" data-max="12" data-step="1"><input type="hidden" class="ans-input" data-type="text" data-answer="k1:MTA="/></div>
+        <button class="check-btn">Check</button>
+      </div>
+    </div>
+  </div>
+
   </section>
 
   <section class="topic" id="compare">
@@ -745,7 +774,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     '2-1':'repeat-fraction','2-2':'repeat-fraction','2-3':'repeat-fraction','2-4':'repeat-fraction','2-5':'repeat-fraction',
     '3-1':'irrational','3-2':'irrational','3-3':'irrational','3-4':'reasoning','3-5':'reasoning',
     '4-1':'roots','4-2':'roots','4-3':'roots','4-4':'roots',
-    '5-1':'estimate','5-2':'estimate','5-3':'estimate','5-4':'estimate',
+    '5-1':'estimate','5-2':'estimate','5-3':'estimate','5-4':'estimate','5-5':'estimate',
     '6-1':'compare','6-2':'compare','6-3':'expr-est','6-5':'expr-est','6-4':'estimate',
     '7-1':'rational-decimal','7-2':'irrational','7-3':'roots','7-4':'estimate','7-5':'compare'
   };
@@ -896,7 +925,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     if(changed){g7save(o);}else if((t.lastPracticed||0)>((c&&c.lastPracticed)||0)){schedulePush();}
     return changed;}
   window.__modSync={mergeCloudTopic:mergeCloudTopic,schedulePush:schedulePush};
-  window.addEventListener('load',function(){syncPull(function(doc){if(mergeCloudTopic(doc))restoreProgress();});});
+  window.addEventListener('load',function(){syncPull(function(doc){if(mergeCloudTopic(doc))restoreProgress();g7plotSync();});});
 
   // ===== answer helpers =====
   function kdec(s){try{return atob(s);}catch(e){return '';}}
@@ -1024,6 +1053,142 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
   }
   window.addEventListener('load',restoreProgress);
 
+  function g7plotNum(el,name,dflt){var v=parseFloat(el.dataset[name]);return isNaN(v)?dflt:v;}
+  function g7plotDraw(box){
+    var inp=box.querySelector('.ans-input'); if(!inp)return;
+    var kind=box.dataset.plot||'line', W=360, sv;
+    if(kind==='line'){
+      var mn=g7plotNum(box,'min',-10), mx=g7plotNum(box,'max',10), st=g7plotNum(box,'step',1);
+      var H=88, x0=26, x1=W-26, y=52;
+      var px=function(v){return x0+(v-mn)/(mx-mn)*(x1-x0);};
+      var parts=['<line class="axis" x1="'+x0+'" y1="'+y+'" x2="'+x1+'" y2="'+y+'"/>'];
+      for(var v=mn; v<=mx+1e-9; v+=st){
+        parts.push('<line class="tick" x1="'+px(v).toFixed(1)+'" y1="'+(y-6)+'" x2="'+px(v).toFixed(1)+'" y2="'+(y+6)+'"/>');
+        parts.push('<text class="tlab" x="'+px(v).toFixed(1)+'" y="'+(y+22)+'" text-anchor="middle">'+(Math.round(v*100)/100)+'</text>');
+        parts.push('<circle class="hint-dot" cx="'+px(v).toFixed(1)+'" cy="'+y+'" r="2"/>');
+      }
+      var cur=parseFloat(inp.value);
+      if(!isNaN(cur)&&cur>=mn&&cur<=mx) parts.push('<circle class="pt" cx="'+px(cur).toFixed(1)+'" cy="'+y+'" r="7"/>');
+      parts.push('<rect class="hit" x="0" y="0" width="'+W+'" height="'+H+'"/>');
+      var _cur=parseFloat(inp.value);
+      sv='<svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" tabindex="0" role="slider" '+
+        'aria-valuemin="'+mn+'" aria-valuemax="'+mx+'" aria-valuenow="'+(isNaN(_cur)?'':_cur)+'" '+
+        'aria-label="Number line from '+mn+' to '+mx+'. Use the arrow keys to move the point, or click.">'+parts.join('')+'</svg>';
+    } else {
+      var xmn=g7plotNum(box,'xmin',0), xmx=g7plotNum(box,'xmax',10), xst=g7plotNum(box,'xstep',1);
+      var ymn=g7plotNum(box,'ymin',0), ymx=g7plotNum(box,'ymax',10), yst=g7plotNum(box,'ystep',1);
+      var H=300, L=44, R=W-16, T=16, B=H-40;
+      var gx=function(v){return L+(v-xmn)/(xmx-xmn)*(R-L);};
+      var gy=function(v){return B-(v-ymn)/(ymx-ymn)*(B-T);};
+      var g=[],i;
+      for(i=xmn;i<=xmx+1e-9;i+=xst){
+        g.push('<line class="gridline" x1="'+gx(i).toFixed(1)+'" y1="'+T+'" x2="'+gx(i).toFixed(1)+'" y2="'+B+'"/>');
+        g.push('<text class="tlab" x="'+gx(i).toFixed(1)+'" y="'+(B+18)+'" text-anchor="middle">'+(Math.round(i*100)/100)+'</text>');
+      }
+      for(i=ymn;i<=ymx+1e-9;i+=yst){
+        g.push('<line class="gridline" x1="'+L+'" y1="'+gy(i).toFixed(1)+'" x2="'+R+'" y2="'+gy(i).toFixed(1)+'"/>');
+        g.push('<text class="tlab" x="'+(L-7)+'" y="'+(gy(i)+4).toFixed(1)+'" text-anchor="end">'+(Math.round(i*100)/100)+'</text>');
+      }
+      g.push('<line class="axis" x1="'+L+'" y1="'+B+'" x2="'+R+'" y2="'+B+'"/>');
+      g.push('<line class="axis" x1="'+L+'" y1="'+T+'" x2="'+L+'" y2="'+B+'"/>');
+      var pr=String(inp.value||'').split(',');
+      if(pr.length===2){
+        var cx=parseFloat(pr[0]), cy=parseFloat(pr[1]);
+        if(!isNaN(cx)&&!isNaN(cy)&&cx>=xmn&&cx<=xmx&&cy>=ymn&&cy<=ymx)
+          g.push('<circle class="pt" cx="'+gx(cx).toFixed(1)+'" cy="'+gy(cy).toFixed(1)+'" r="7"/>');
+      }
+      g.push('<rect class="hit" x="0" y="0" width="'+W+'" height="'+H+'"/>');
+      sv='<svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" tabindex="0" role="application" '+
+        'aria-label="Coordinate grid, x from '+xmn+' to '+xmx+', y from '+ymn+' to '+ymx+'. '+
+        'Use the arrow keys to move the point, or click. Current point: '+(inp.value||'none')+'.">'+g.join('')+'</svg>';
+    }
+    var old=box.querySelector('svg'); if(old)old.parentNode.removeChild(old);
+    box.insertAdjacentHTML('afterbegin',sv);
+    var ro=box.querySelector('.readout');
+    if(!ro){ro=document.createElement('div');ro.className='readout';box.appendChild(ro);}
+    ro.textContent=inp.value?('Placed: '+(box.dataset.plot==='grid'?'('+inp.value+')':inp.value)):'Click to place your point, or focus it and use the arrow keys.';
+    box.classList.toggle('locked',!!inp.disabled);
+  }
+  function g7plotSet(box,evt){
+    var inp=box.querySelector('.ans-input');
+    if(!inp||inp.disabled)return;                       // a locked step must stay locked
+    var svg=box.querySelector('svg'); if(!svg)return;
+    // Read the viewBox ATTRIBUTE rather than svg.viewBox.baseVal: the SVG DOM geometry interfaces
+    // are not universally implemented (jsdom has none), and an attribute parse works everywhere.
+    var r=svg.getBoundingClientRect();
+    var vb=String(svg.getAttribute('viewBox')||'0 0 360 100').split(/[\s,]+/).map(parseFloat);
+    var vw=vb[2]||360, vh=vb[3]||100;
+    var sx=vw/(r.width||vw), sy=vh/(r.height||vh);
+    var px=(evt.clientX-r.left)*sx, py=(evt.clientY-r.top)*sy;
+    var snap=function(v,st,mn,mx){var n=mn+Math.round((v-mn)/st)*st;return Math.min(mx,Math.max(mn,Math.round(n*1e6)/1e6));};
+    if((box.dataset.plot||'line')==='line'){
+      var mn=g7plotNum(box,'min',-10), mx=g7plotNum(box,'max',10), st=g7plotNum(box,'step',1);
+      var x0=26, x1=360-26;
+      var v=mn+(px-x0)/(x1-x0)*(mx-mn);
+      inp.value=String(snap(v,st,mn,mx));
+    } else {
+      var xmn=g7plotNum(box,'xmin',0), xmx=g7plotNum(box,'xmax',10), xst=g7plotNum(box,'xstep',1);
+      var ymn=g7plotNum(box,'ymin',0), ymx=g7plotNum(box,'ymax',10), yst=g7plotNum(box,'ystep',1);
+      var L=44, R=360-16, T=16, B=300-40;
+      var vx=xmn+(px-L)/(R-L)*(xmx-xmn), vy=ymn+(B-py)/(B-T)*(ymx-ymn);
+      inp.value=snap(vx,xst,xmn,xmx)+','+snap(vy,yst,ymn,ymx);
+    }
+    inp.classList.remove('correct','wrong');
+    g7plotDraw(box);
+  }
+  function g7plotSync(){Array.prototype.forEach.call(document.querySelectorAll('.plotbox'),g7plotDraw);}
+  document.addEventListener('click',function(e){
+    var box=e.target.closest&&e.target.closest('.plotbox');
+    if(box&&e.target.classList.contains('hit'))g7plotSet(box,e);
+  });
+
+  /* Keyboard operation. Shipped click-only, which locked keyboard and screen-reader users out of
+     every plot item — including a real released MCAP capstone. Arrow keys step the point; Home/End
+     jump to the ends; the first press on an empty plot starts in the middle rather than doing
+     nothing, so there is always a way in without a pointer. */
+  function g7plotKey(box, e){
+    var inp=box.querySelector('.ans-input');
+    if(!inp||inp.disabled)return;
+    var k=e.key, grid=(box.dataset.plot||'line')==='grid';
+    var mn,mx,st,xmn,xmx,xst,ymn,ymx,yst,vx,vy;
+    var clamp=function(v,a,b){return Math.min(b,Math.max(a,Math.round(v*1e6)/1e6));};
+    if(!grid){
+      mn=g7plotNum(box,'min',-10); mx=g7plotNum(box,'max',10); st=g7plotNum(box,'step',1);
+      var cur=parseFloat(inp.value);
+      if(isNaN(cur)){ if(k.indexOf('Arrow')!==0&&k!=='Home'&&k!=='End')return;
+        cur=clamp(mn+Math.round(((mn+mx)/2-mn)/st)*st,mn,mx); }
+      else if(k==='ArrowLeft'||k==='ArrowDown')cur=clamp(cur-st,mn,mx);
+      else if(k==='ArrowRight'||k==='ArrowUp')cur=clamp(cur+st,mn,mx);
+      else if(k==='Home')cur=mn; else if(k==='End')cur=mx;
+      else return;
+      inp.value=String(cur);
+    } else {
+      xmn=g7plotNum(box,'xmin',0); xmx=g7plotNum(box,'xmax',10); xst=g7plotNum(box,'xstep',1);
+      ymn=g7plotNum(box,'ymin',0); ymx=g7plotNum(box,'ymax',10); yst=g7plotNum(box,'ystep',1);
+      var pr=String(inp.value||'').split(','); vx=parseFloat(pr[0]); vy=parseFloat(pr[1]);
+      if(isNaN(vx)||isNaN(vy)){ if(k.indexOf('Arrow')!==0&&k!=='Home'&&k!=='End')return;
+        vx=clamp(xmn+Math.round(((xmn+xmx)/2-xmn)/xst)*xst,xmn,xmx);
+        vy=clamp(ymn+Math.round(((ymn+ymx)/2-ymn)/yst)*yst,ymn,ymx); }
+      else if(k==='ArrowLeft')vx=clamp(vx-xst,xmn,xmx);
+      else if(k==='ArrowRight')vx=clamp(vx+xst,xmn,xmx);
+      else if(k==='ArrowDown')vy=clamp(vy-yst,ymn,ymx);
+      else if(k==='ArrowUp')vy=clamp(vy+yst,ymn,ymx);
+      else if(k==='Home'){vx=xmn;vy=ymn;} else if(k==='End'){vx=xmx;vy=ymx;}
+      else return;
+      inp.value=vx+','+vy;
+    }
+    e.preventDefault();
+    inp.classList.remove('correct','wrong');
+    g7plotDraw(box);
+    var sv=box.querySelector('svg'); if(sv&&sv.focus)sv.focus();   // redraw replaces the node
+  }
+  document.addEventListener('keydown',function(e){
+    var box=e.target.closest&&e.target.closest('.plotbox');
+    if(box)g7plotKey(box,e);
+  });
+
+  window.__modPlot={sync:g7plotSync,draw:g7plotDraw,key:g7plotKey};
+
   /* ===== spaced review (MR-1) phase-3: in-module retrieval mode, ?review=<skill> ===== */
   // Why this exists: restoreProgress() re-fills a completed item with its own correct answer, so a
   // student sent back by the hub's "Due for review" would have re-read an answer key — the opposite
@@ -1079,6 +1244,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
       var hc=s.querySelector('.hint-content');if(hc)hc.classList.remove('show');
       var hb=s.querySelector('.hint-btn');if(hb)hb.textContent='Hint';
     });
+    if(window.__modPlot)Array.prototype.forEach.call(card.querySelectorAll('.plotbox'),g7plotDraw);
   }
   function g7reviewMode(){
     var sk=g7revParam();if(!sk)return;

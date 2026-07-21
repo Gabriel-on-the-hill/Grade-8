@@ -77,6 +77,14 @@ Header (title · unit · standard · objectives) → hub bar → progress → **
 
 **Choose the format from the standard's verb.** A standard that says *construct*, *graph*, *sketch* or *represent on a number line* is not met by a multiple-choice item that asks the student to pick the right picture — that passes `exam_coverage` while assessing recognition in place of production, which is bar-lowering (§2.4's sibling failure). Standards in this grade whose verb demands the plot: `8.AT.A.1a` (graph proportional relationships), `8.NOS.A.2` (locate on a number line), `8.AT.B.4` (solution set on a number line), `8.AT.D.11` (sketch a graph from a description), `8.DS.B.2` (construct a scatter plot). See `MCCRS_2025_DUAL_CODING.md`.
 
+**Section numbers are allocation ids, frozen at ship — not display order.** A qid keys live student
+progress (`tree`, `sectionTotals`) and is referenced by name in `<student>.plans.json`, so renumbering
+a shipped section silently orphans a student's completed work and breaks published homework. A section
+added later therefore takes **the next free number regardless of where it sits on the page**. This is
+why Expressions & Equations reads `… 6 · Systems, 8 · Linear inequalities, 7 · Module Check`: the check
+shipped as section 7 and keeps it. `renderSecReport()` walks the **DOM**, not the number, so the student
+still sees them in teaching order. Never renumber to tidy this up.
+
 **qid convention (required):** every qcard's `data-qid` is `<section>-<n>` (e.g. `3-2` = section 3, item 2). The number before the first `-` drives `sectionTotals` and the teacher dashboard's per-section bars — never use any other scheme, and never duplicate a qid.
 
 **No access gate (removed 2026-07-17).** The old shared `g8gate`/`g8.gate` password overlay is gone from the hub, every module, and the template — a student lands straight on the student sign-in, which is the only gate (per-student name + PIN, below). `g8.gate` is dead; do not reintroduce a page password.
@@ -195,6 +203,33 @@ Engine v1.2 (v1.1 + the multi-subject hub layer: flat `UNITS` replaced by `SUBJE
   **Two guard failures on first run, both correct and both fixed rather than worked around:** `mcap_provenance` rejected four items claiming `MCAP` before their manifest rows moved up, and `module_integrity` caught a hint on exam capstone `8-3` (§2.4 bans them). `plot_format`'s Part B, written hours earlier, armed itself on the new module unprompted.
   **Verified:** `node --check`; 36 unique qids, all skill-mapped, zero plaintext answers; **all 30 keys recomputed independently** with `fractions.Fraction`; jsdom drive confirming two-part unlocking (fill-in *and* MC), case-insensitive text answers (`Yes`/`NO`), equivalent-fraction acceptance (`0.5` and `2/4` for `1/2`), and preserved option order on the `data-noshuffle` semantic scale. **12 guards green, behavioural 269.** New guard: `tests/module_smoke.test.js` (P5), which also asserts every `available` hub tile points at a file on disk whose `G7_TOPIC_ID` matches its topic id. **Live site is stale until pushed** (§11).
 
+
+- **2026-07-21** — **The two shipped maths modules finished against MCCRS 2025.** Both carried gaps
+  the 2010-coded audit could not see, and both are now closed. **Expressions & Equations** (33 → **41
+  items**, 7 → **8 sections**, 98 steps): a **new section 8, Linear inequalities** (`8.AT.B.4` — new
+  in 2025, no 2010 predecessor, and the word "inequality" had appeared *nowhere* in the repo), plus
+  `8.AT.A.2`'s missing derivation — a teach card deriving why slope is well defined from **equivalent
+  ratios** (the 2025 route), not similar triangles (the 2010 route, whose prerequisite has left the
+  grade), with `3-6`/`3-7` to test it — plus `3-5`, a click-to-plot item for `8.AT.A.1a` *"graph
+  proportional relationships"*. **The Number System** (31 → **32 items**): `5-5`, a two-step number-line
+  placement for `8.NOS.A.2` *"estimate their locations on a number line"*, which `5-4` had only been
+  *naming* the bounding integers for. **Both retrofits exist because the standards' verbs are
+  construction verbs**; assessing them by multiple choice met `exam_coverage` while quietly lowering the
+  bar. **The plot engine had to be ported too** — `plot_format`'s Part B, written the same morning,
+  failed 15 assertions the moment the markup landed: these modules predate the format and had none of
+  the code that paints or reads it. Ported verbatim from `Functions.html` (engine block + CSS + the
+  `g7revReset()` clear + the boot `g7plotSync()`), and the three files are asserted **byte-identical**
+  — one implementation, not three (§2.5). **Mutation testing found the guard weaker than claimed:**
+  removing the `g7revReset()` plot clear — which would let a re-assigned plot item keep its previous
+  placement, an **answer key** — passed, as did a locked-plot click bypass, because Part B tested only
+  structure. Part B now tests both behaviourally; **all four mutations caught**. `8.AT.B.4`'s "represent
+  the solution set on a number line" is deliberately **decomposed** into plot-the-boundary + choose-the-
+  direction, because the plot format places a point and cannot draw a ray — the student still *produces*
+  the boundary rather than picking a picture. **Verified:** all 12 guards green, behavioural **271
+  passed, 0 failed** (+3, incl. one asserting the report card follows DOM order, since section 8 sits
+  before section 7); every new key recomputed independently with `fractions.Fraction`; `node --check`
+  clean; zero plaintext answers.
+
 ## 11. Deployment & publishing rules
 
 ### Outstanding deploys — clear a line only when it is actually pushed
@@ -210,6 +245,11 @@ Engine v1.2 (v1.1 + the multi-subject hub layer: flat `UNITS` replaced by `SUBJE
 - [x] **2026-07-19 — dashboard labels non-enrolment** — pushed in `4feb7ee`; **verified live** (served hub carries the `hidden from <name>` chip).
 
 - [x] **2026-07-21 — Functions unit (`Functions.html`) + hub tile now `available`** — pushed in `7bfaaae`; **verified live by fetching the deployed site**: `Functions.html` returns HTTP 200 and serves `G7_TOPIC_ID='functions'`, `G7_STORE='g8.'`, `G7_SYNC_HUB='grade8'`, 36 qcards, 9 exam items, 4 `MCAP ·` titles and **zero plaintext answers**; the served hub carries `file:'Functions.html',status:'available'`. Topic id and store prefix were checked against the served file specifically — those two are what decide whether a student's work reaches the dashboard.
+
+- [ ] **2026-07-21 — Expressions & Equations + The Number System finished to MCCRS 2025** (new
+      inequalities section, slope derivation, two click-to-plot retrofits, plot engine ported into
+      both) — **not yet verified live**; fetch both modules and confirm each serves `g7plotNum` and
+      its new qids before clearing this line.
 
 *Nothing outstanding as of 21 Jul 2026, through `7bfaaae`. Verified by fetching the deployed site, not by assuming a push shipped — a green `git push` only proves the remote updated, and Pages rebuilds a minute or two later.*
 

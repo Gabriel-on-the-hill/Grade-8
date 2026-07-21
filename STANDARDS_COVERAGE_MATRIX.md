@@ -23,18 +23,19 @@ until somebody looked. It does.
 
 | Domain | CCSS clusters | Status | Where |
 |---|---|---|---|
-| **8.NS** The Number System | 1 | ✅ built | `The_Number_System.html` — 31 items, 10 exam |
-| **8.EE** Expressions & Equations | 3 | ◐ built, **two** gaps | `Expressions_and_Equations.html` — 33 items, 10 exam |
+| **8.NS** The Number System | 1 | ✅ built | `The_Number_System.html` — 32 items, 10 exam |
+| **8.EE** Expressions & Equations | 3 | ✅ built, **both gaps closed** 21 Jul | `Expressions_and_Equations.html` — 41 items, 11 exam, 8 sections |
 | **8.F** Functions | 2 | ✅ **built** 21 Jul 2026 | `Functions.html` — 36 items, 9 exam |
 | **8.G** Geometry | 3 | ❌ **absent** | hub tile: *coming soon* |
 | **8.SP** Statistics & Probability | 1 | ❌ **absent** | hub tile: *coming soon* |
 
 Science (`Matter_and_Its_Interactions.html`, 31 items) is outside this matrix.
 
-**8.EE's second gap is invisible to this table.** MCCRS 2025 adds `8.AT.B.4` — solve linear
-*inequalities* in one variable — with **no 2010 predecessor**, so it has no row below and never
-could. "inequality" appears nowhere in the repo. From SY 2026-27 the Expressions & Equations unit is
-one whole standard short, not just missing a derivation.
+**8.EE's second gap was invisible to this table, and is now closed.** MCCRS 2025 adds `8.AT.B.4` —
+solve linear *inequalities* in one variable — with **no 2010 predecessor**, so it has no row below
+and never could; "inequality" had appeared nowhere in the repo. **Built 21 Jul 2026** as Expressions
+& Equations section 8. Worth keeping in view: a 2010-coded matrix is structurally blind to a 2025
+standard, so **this table can show a domain fully green while a standard is entirely absent.**
 
 ---
 
@@ -43,9 +44,9 @@ one whole standard short, not just missing a derivation.
 | Std | Requirement | Status | Evidence |
 |---|---|---|---|
 | 8.NS.1 | Rational = terminating or eventually repeating decimal; convert a repeating decimal to a fraction | ✅ | §1 decimals, §2 repeating → fractions, §3 irrationals |
-| 8.NS.2 | Approximate irrationals by rationals; locate on a number line; estimate the value of expressions (e.g. `π²`) | ✅ | §5 approximating, §6 comparing, ordering & estimating |
+| 8.NS.2 | Approximate irrationals by rationals; locate on a number line; estimate the value of expressions (e.g. `π²`) | ✅ | §5 approximating, §6 comparing, ordering & estimating — and `5-5` (21 Jul) makes the student **place** `√17` and `π²` on a number line, which `5-4` had only been *naming* the bounding integers for |
 
-## 8.EE — Expressions & Equations ◐
+## 8.EE — Expressions & Equations ✅
 
 | Std | Requirement | Status | Evidence / gap |
 |---|---|---|---|
@@ -53,8 +54,8 @@ one whole standard short, not just missing a derivation.
 | 8.EE.2 | `x² = p`, `x³ = p`; square and cube root symbols; `√2` is irrational | ✅ | NS §4 roots |
 | 8.EE.3 | Numbers as a single digit × an integer power of 10; compare magnitudes | ✅ | §2 scientific notation |
 | 8.EE.4 | Operations in scientific notation, including choosing units | ✅ | §2 |
-| 8.EE.5 | Graph proportional relationships; interpret unit rate as **slope**; compare two in different representations | ✅ | §3 |
-| 8.EE.6 | **Use similar triangles to explain why slope is the same between any two points**; derive `y = mx` and `y = mx + b` | ◐ | §3 states and uses `y = mx` / `y = mx + b`, but the **derivation is absent** — the *equations* are taught; the *reason slope is well defined* is not. Same shape of gap Grade 7's audit found: conclusion present, derivation missing. **Build the 2025 version** (`8.AT.A.2`): proportional reasoning — show the ratios of vertical to horizontal change between points are equivalent. Similar triangles are *not* the 2025 route, and 8.G's similarity standards that would supply them have left the grade. |
+| 8.EE.5 | Graph proportional relationships; interpret unit rate as **slope**; compare two in different representations | ✅ | §3 — and `3-5` now makes the student **plot** two points of a proportional relationship, meeting the *graph* verb in `8.AT.A.1a` rather than only reading one |
+| 8.EE.6 | **Use similar triangles to explain why slope is the same between any two points**; derive `y = mx` and `y = mx + b` | ✅ **21 Jul** | §3 teach card derives it from **equivalent ratios** across three point-pairs on one line — the **2025 route** (`8.AT.A.2`), since similar triangles' own prerequisite left the grade; they get one parenthetical sentence as the classical framing. Tested by `3-6` (compute the second ratio) and `3-7` (say why it must match). |
 | 8.EE.7 | Solve linear equations in one variable; one / none / infinitely many solutions; expand and collect terms | ✅ | §4 solving, §5 one-none-infinite |
 | 8.EE.8 | Systems: graph and interpret intersection, solve algebraically, real-world problems | ✅ | §6 |
 

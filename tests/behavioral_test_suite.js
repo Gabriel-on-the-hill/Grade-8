@@ -567,7 +567,16 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
   ok(m.querySelector('.step').classList.contains('completed'),'EE: exam MC correct completes');
   const t=JSON.parse(w.localStorage.getItem(P+'data')).students.Ayodeji.topics['expressions-equations'];
   ok(t.exam.attempts===1&&t.exam.correct===1,'EE: exam correct counted once');
-  ok(d.getElementById('sec-report').querySelectorAll('.sec-row').length===7,'EE: section report card rows');
+  const secRows=[...d.getElementById('sec-report').querySelectorAll('.sec-row')];
+  ok(secRows.length===8,'EE: section report card rows (8 after linear inequalities shipped)');
+  // not just the count: the NEW section must actually reach the report card. Section numbers are
+  // allocation ids frozen at ship (qids key live student progress), so 8 sits before 7 in the DOM
+  // and a report card that sorted numerically rather than walking the DOM would misorder them.
+  ok(secRows.some(r=>r.querySelector('a')&&r.querySelector('a').getAttribute('href')==='#inequalities'),
+     'EE: the inequalities section appears in the report card');
+  ok(secRows[6].querySelector('a').getAttribute('href')==='#inequalities'&&
+     secRows[7].querySelector('a').getAttribute('href')==='#check',
+     'EE: report card follows DOM order — inequalities before the module check');
   const semantic=[...d.querySelector('[data-qid="5-1"] .mc-group').children].map(e=>e.textContent.trim());
   ok(semantic.join('|')==='One|None|Infinitely many','EE: solution-count options keep semantic order');
 }

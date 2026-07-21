@@ -163,7 +163,14 @@ function place(w, box, clientX, clientY) {
   for (const f of modules) {
     let mw;
     try { mw = await boot(f); } catch (e) { ok(false, f + ' — ' + e.message); continue; }
+    const src = fs.readFileSync(path.join(DIR, f), 'utf8');
     ok(!!mw.__modPlot, f + ': exposes __modPlot (did not hand-roll its own plot)');
+
+    // Structure was all this sweep checked when it first shipped, and two mutations survived it:
+    // deleting the review/homework clear, and letting a locked plot accept a click. Both are
+    // behavioural, so both are now tested behaviourally (or, where the hook is not reachable from
+    // the DOM, against the function that owns the invariant).
+    let lockedSeen = false;
     for (const box of mw.document.querySelectorAll('.plotbox')) {
       const id = f + ' ' + (box.closest('.qcard') || {}).dataset?.qid;
       const svg = box.querySelector('svg');
@@ -173,7 +180,28 @@ function place(w, box, clientX, clientY) {
       ok(svg && svg.getAttribute('tabindex') === '0', id + ': keyboard-focusable');
       const role = svg && svg.getAttribute('role');
       ok(role === 'slider' || role === 'application', id + ': carries a plot role (got "' + role + '")');
+
+      // a locked plot must refuse BOTH pointer and keyboard, in the real module — not just the template
+      if (inp && inp.disabled) {
+        lockedSeen = true;
+        const before = inp.value;
+        place(mw, box, 120, 60);
+        svg && svg.dispatchEvent(new mw.KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+        ok(inp.value === before, id + ': a LOCKED plot ignores click AND keyboard (lock ladder holds)');
+      }
     }
+    if (modules.length && !lockedSeen) {
+      console.log('  note: ' + f + ' has no locked plot step, so the lock arm did not run here.');
+    }
+
+    // The answer-key invariant. g7revReset() re-opens a card for a genuine closed-book attempt —
+    // homework re-assignment (§6) and ?review= (§4) both rely on it. If it does not redraw the
+    // plotboxes, a re-assigned plot item keeps the student's previous placement, which is an answer
+    // key. g7revReset is not reachable from the DOM, so this asserts against the function body.
+    const rr = src.slice(src.indexOf('function g7revReset'));
+    const body = rr.slice(0, rr.indexOf('\n  function ', 10));
+    ok(body.includes('.plotbox'),
+       f + ': g7revReset() clears its plots — a re-assigned plot item cannot keep its old placement');
   }
 
   console.log('\n' + (fail ? 'FAIL ' + fail + ' assertion(s)'

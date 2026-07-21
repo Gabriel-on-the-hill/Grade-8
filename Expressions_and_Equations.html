@@ -108,6 +108,17 @@ table.gtable th{background:var(--pitch-green);color:#fff;font-weight:600} table.
 .sec-row.full .bar>span{background:var(--ok)}
 footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;border-top:1px solid var(--border);margin-top:3rem}
 @media(max-width:640px){main{padding:1rem .75rem 3rem}.qcard,.tcard,.challenge,.guide{padding:.85rem}.qtitle{margin-left:0;width:100%;font-size:.93rem}header.mod h1{font-size:1.25rem}}
+    .plotbox{margin:.45rem 0 .2rem}
+    .plotbox svg{max-width:100%;height:auto;touch-action:manipulation}
+    .plotbox .hit{cursor:pointer;fill:transparent}
+    .plotbox.locked .hit{cursor:not-allowed}
+    .plotbox .pt{fill:#FAC415;stroke:#0F3D22;stroke-width:2}
+    .plotbox .gridline{stroke:#D9E4DC;stroke-width:1}
+    .plotbox .axis{stroke:#0F3D22;stroke-width:1.8}
+    .plotbox .tick{stroke:#0F3D22;stroke-width:1.4}
+    .plotbox .tlab{font-size:11px;fill:#0F172A}
+    .plotbox .hint-dot{fill:#B7CBBE}
+    .plotbox .readout{font-size:.82rem;color:var(--muted);margin-top:.2rem}
 /* MR-1 phase-3: retrieval-practice review mode (?review=<skill>) — the due skill's own
    authored items, cleared for a fresh attempt. Everything else is hidden so the session is
    a retrieval, not a re-read; nothing is removed from the DOM, so the step totals stay honest. */
@@ -139,6 +150,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
   <a href="#solve" class="navlink">4 · Linear equations</a>
   <a href="#solutions" class="navlink">5 · # of solutions</a>
   <a href="#systems" class="navlink">6 · Systems</a>
+  <a href="#inequalities" class="navlink">8 · Inequalities</a>
   <a href="#check" class="navlink">7 · Module Check</a>
 </nav>
 
@@ -416,6 +428,55 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
       <div class="mc-feedback"><span class="math">6 &divide; 3 = 2</span> dollars per pound &mdash; this is the slope of the line <span class="math">y = 2x</span>.</div>
     </div></div>
   </div>
+
+  <div class="tcard">
+    <h3>Why one number describes the whole line</h3>
+<p>Pick <em>any</em> two points on a non-vertical line and work out <span class="math">(vertical change) &divide; (horizontal change)</span>. You get the <strong>same ratio every time</strong>. That is why a single number &mdash; the slope &mdash; can describe the whole line, and it is what makes <span class="math">y = mx</span> and <span class="math">y = mx + b</span> work at all.</p>
+    <div class="worked"><div class="wl">Worked example</div><p>The line through <span class="math">(0, 0)</span>, <span class="math">(2, 3)</span>, <span class="math">(6, 9)</span> and <span class="math">(10, 15)</span>:</p><p>From <span class="math">(0, 0)</span> to <span class="math">(2, 3)</span> &rarr; <span class="math">3 &divide; 2</span>.<br>From <span class="math">(2, 3)</span> to <span class="math">(6, 9)</span> &rarr; <span class="math">6 &divide; 4</span>, and <span class="math">6 &divide; 4 = 3 &divide; 2</span>.<br>From <span class="math">(6, 9)</span> to <span class="math">(10, 15)</span> &rarr; <span class="math">6 &divide; 4 = 3 &divide; 2</span> again.</p><p>Three different pairs of points, one ratio. The slope is <span class="math">3/2</span>.</p></div>
+    <div class="keyfact"><strong>Use whichever two points are easiest to read.</strong> Because the ratio never changes, you are free to pick the pair that lands on grid corners. <span class="muted-note">(Older texts derive this with <em>similar triangles</em>; MCCRS 2025 asks for the equivalent-ratios argument above.)</span></div>
+  </div>
+
+  <div class="qcard" data-qid="3-5">
+    <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Graph a proportional relationship</span></div>
+    <div class="qbody">
+      <p class="muted-note" style="font-size:.86rem">Fuel costs $2.50 per litre, so the cost of <span class="math">n</span> litres is <span class="math">c = 2.5n</span>.</p>
+      <div class="step">
+        <div class="step-label">Step 1 &middot; Plot the point showing the cost of 4 litres.</div>
+        <div class="plotbox" data-plot="grid" data-xmin="0" data-xmax="8" data-xstep="1" data-ymin="0" data-ymax="20" data-ystep="5"><input type="hidden" class="ans-input" data-type="text" data-answer="k1:NCwxMA=="/></div>
+        <button class="check-btn">Check</button>
+      </div>
+      <div class="step locked">
+        <div class="step-label">Step 2 &middot; Plot the point showing the cost of 6 litres.</div>
+        <div class="plotbox" data-plot="grid" data-xmin="0" data-xmax="8" data-xstep="1" data-ymin="0" data-ymax="20" data-ystep="5"><input type="hidden" class="ans-input" data-type="text" data-answer="k1:NiwxNQ=="/></div>
+        <button class="check-btn">Check</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="3-6">
+    <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">The same ratio, a different pair</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Q6 &middot; On the line above, between <span class="math">(2, 3)</span> and <span class="math">(6, 9)</span> the vertical change is 6 and the horizontal change is 4. Write that ratio in lowest terms.</div>
+        <div class="input-row"><input type="text" class="ans-input" data-type="text" data-answer="k1:My8y"/><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+        <button class="hint-btn">Hint</button>
+        <div class="hint-content">Both 6 and 4 divide by 2. Compare what you get with the ratio from <span class="math">(0, 0)</span> to <span class="math">(2, 3)</span>.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="3-7">
+    <div class="qhead"><span class="qtag apply">Apply</span><span class="qtitle">Why the slope does not depend on the points</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Q7 &middot; Why does a non-vertical line have just one slope, whichever two of its points you use?</div>
+        <div class="mc-group"><button class="mc-option" data-k="k1:MjAwfDE=">Because the ratio of vertical change to horizontal change is equivalent for every pair of points on the line</button><button class="mc-option" data-k="k1:MjAxfDA=">Because every straight line passes through the origin</button><button class="mc-option" data-k="k1:MjAyfDA=">Because any two points on a line are the same distance apart</button><button class="mc-option" data-k="k1:MjAzfDA=">Because the vertical change always equals the horizontal change</button></div>
+        <div class="mc-feedback">Equivalent ratios are the whole reason. If two pairs of points gave different ratios the graph would bend, so it would not be a straight line. (Note that the second option is false anyway &mdash; <span class="math">y = mx + b</span> misses the origin whenever <span class="math">b</span> is not 0.)</div>
+      </div>
+    </div>
+  </div>
+
   </section>
 
   <section class="topic" id="solve">
@@ -611,6 +672,89 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
   </div>
   </section>
 
+  <section class="topic" id="inequalities">
+  <h2>8 &middot; Linear inequalities</h2>
+  <p class="intro">Solving is almost identical to an equation &mdash; but the answer is a <em>range</em>, and one move flips the sign.</p>
+  <p class="objective"><strong>By the end:</strong> you can solve a linear inequality, show its solution set on a number line, and say what the range means in context.</p>
+
+  <div class="tcard">
+    <h3>A range of answers, not one answer</h3>
+<p>An equation usually has a single solution; an <strong>inequality</strong> usually has a whole range of them. Solve it exactly as you solve an equation &mdash; undo the operations in reverse &mdash; with <strong>one extra rule</strong>: if you multiply or divide both sides by a <em>negative</em> number, the inequality sign turns round.</p>
+    <div class="worked"><div class="wl">Worked example</div><p><span class="math">3x + 5 &gt; 20</span><br>Subtract 5 from both sides &rarr; <span class="math">3x &gt; 15</span><br>Divide both sides by 3 &rarr; <span class="math">x &gt; 5</span></p><p>Every number above 5 is a solution: 5.1, 6, 100. The number 5 itself is <em>not</em>, because <span class="math">3(5) + 5 = 20</span>, and 20 is not greater than 20.</p></div>
+    <div class="keyfact"><strong>On a number line:</strong> an <strong>open</strong> circle for <span class="math">&lt;</span> or <span class="math">&gt;</span> (the boundary is excluded), a <strong>closed</strong> circle for <span class="math">&le;</span> or <span class="math">&ge;</span> (it is included). Then shade the side that satisfies the inequality.</div>
+  </div>
+
+  <div class="qcard" data-qid="8-1">
+    <div class="qhead"><span class="qtag guided">Guided</span><span class="qtitle">Solve a two-step inequality</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Q1 &middot; Solve <span class="math">4x &minus; 7 &le; 17</span>.</div>
+        <div class="mc-group"><button class="mc-option" data-k="k1:MjEwfDE="><span class="math">x &le; 6</span></button><button class="mc-option" data-k="k1:MjExfDA="><span class="math">x &ge; 6</span></button><button class="mc-option" data-k="k1:MjEyfDA="><span class="math">x &le; 2.5</span></button><button class="mc-option" data-k="k1:MjEzfDA="><span class="math">x &lt; 6</span></button></div>
+        <div class="mc-feedback">Add 7 to both sides &rarr; <span class="math">4x &le; 24</span>, then divide by 4 &rarr; <span class="math">x &le; 6</span>. Dividing by <em>positive</em> 4 leaves the sign alone, and <span class="math">&le;</span> stays <span class="math">&le;</span>.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="8-2">
+    <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Expand first, then solve</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Q2 &middot; Solve <span class="math">5(x + 3) &gt; 45</span>. What is the smallest <strong>whole number</strong> that satisfies it?</div>
+        <div class="input-row"><input type="number" class="ans-input" data-answer="k1:Nw==" data-tol="0"/><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+        <button class="hint-btn">Hint</button>
+        <div class="hint-content">Expand the bracket first, then undo. Once you have the range, remember the boundary itself is excluded by <span class="math">&gt;</span> &mdash; so step up to the next whole number.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="8-3">
+    <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Show the solution set</span></div>
+    <div class="qbody">
+      <p class="muted-note" style="font-size:.86rem">Solve <span class="math">2x + 1 &ge; 9</span>, then represent the solution set on the number line.</p>
+      <div class="step">
+        <div class="step-label">Step 1 &middot; Plot the boundary value of the solution set.</div>
+        <div class="plotbox" data-plot="line" data-min="-10" data-max="10" data-step="1"><input type="hidden" class="ans-input" data-type="text" data-answer="k1:NA=="/></div>
+        <button class="check-btn">Check</button>
+      </div>
+      <div class="step locked">
+        <div class="step-label">Step 2 &middot; Which completes the picture of the solution set?</div>
+        <div class="mc-group"><button class="mc-option" data-k="k1:MjIwfDE=">A <strong>closed</strong> circle at 4, shaded to the <strong>right</strong> &mdash; 4 is a solution</button><button class="mc-option" data-k="k1:MjIxfDA=">An <strong>open</strong> circle at 4, shaded to the right &mdash; 4 is not a solution</button><button class="mc-option" data-k="k1:MjIyfDA=">A closed circle at 4, shaded to the <strong>left</strong></button><button class="mc-option" data-k="k1:MjIzfDA=">An open circle at 4, shaded to the left</button></div>
+        <div class="mc-feedback"><span class="math">2x + 1 &ge; 9</span> gives <span class="math">x &ge; 4</span>. The sign is <span class="math">&ge;</span>, so 4 itself is included &mdash; a closed circle &mdash; and every number above 4 works, so the shading goes right.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="8-4">
+    <div class="qhead"><span class="qtag apply">Apply</span><span class="qtitle">A range that has to make sense</span></div>
+    <div class="qbody">
+      <p class="muted-note" style="font-size:.86rem">A goods lift carries at most 550&nbsp;kg. The operator weighs 70&nbsp;kg and rides with the load. Each box weighs 24&nbsp;kg.</p>
+      <div class="step">
+        <div class="step-label">Part A &middot; What is the greatest number of boxes the operator can take in one trip?</div>
+        <div class="input-row"><input type="number" class="ans-input" data-answer="k1:MjA=" data-tol="0"/><span class="lbl">boxes</span><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+      </div>
+      <div class="step locked">
+        <div class="step-label">Part B &middot; The boxes are repacked and now weigh 25&nbsp;kg each. What is the greatest number now?</div>
+        <div class="input-row"><input type="number" class="ans-input" data-answer="k1:MTk=" data-tol="0"/><span class="lbl">boxes</span><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="8-5" data-exam="1">
+    <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">Exam-style &middot; 8.AT.B.4 &mdash; the sign turns round</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Solve <span class="math">&minus;2x + 3 &ge; 11</span>.</div>
+        <div class="mc-group"><button class="mc-option" data-k="k1:MjMwfDE="><span class="math">x &le; &minus;4</span></button><button class="mc-option" data-k="k1:MjMxfDA="><span class="math">x &ge; &minus;4</span></button><button class="mc-option" data-k="k1:MjMyfDA="><span class="math">x &le; 4</span></button><button class="mc-option" data-k="k1:MjMzfDA="><span class="math">x &ge; 4</span></button></div>
+        <div class="mc-feedback">Subtract 3 &rarr; <span class="math">&minus;2x &ge; 8</span>. Now divide both sides by <span class="math">&minus;2</span> &mdash; a <em>negative</em> &mdash; so the sign turns round: <span class="math">x &le; &minus;4</span>. Check with <span class="math">x = &minus;5</span>: <span class="math">&minus;2(&minus;5) + 3 = 13</span>, and <span class="math">13 &ge; 11</span>. &#10003;</div>
+      </div>
+    </div>
+  </div>
+
+  </section>
+
   <section class="topic" id="check">
   <h2>7 &middot; Module Check &mdash; Show What You Know</h2>
   <p class="intro">A mixed check across the whole unit. These count toward your exam-readiness.</p>
@@ -684,11 +828,12 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
   const G7_SKILLS={
     '1-1':'exponents','1-2':'exponents','1-3':'exponents','1-4':'exponents','1-5':'exponents',
     '2-1':'sci-notation','2-2':'sci-notation','2-3':'sci-notation','2-4':'sci-notation','2-5':'sci-notation','2-6':'sci-notation','2-7':'reasoning',
-    '3-1':'slope','3-2':'slope','3-3':'slope','3-4':'slope',
+    '3-1':'slope','3-2':'slope','3-3':'slope','3-4':'slope','3-5':'slope','3-6':'slope','3-7':'slope',
     '4-1':'linear-eq','4-2':'linear-eq','4-3':'linear-eq','4-4':'linear-eq',
     '5-1':'solutions','5-2':'solutions','5-3':'solutions','5-4':'reasoning','5-5':'reasoning',
     '6-1':'systems','6-2':'systems','6-3':'systems',
-    '7-1':'exponents','7-2':'sci-notation','7-3':'slope','7-4':'linear-eq','7-5':'solutions'
+    '7-1':'exponents','7-2':'sci-notation','7-3':'slope','7-4':'linear-eq','7-5':'solutions',
+    '8-1':'inequalities','8-2':'inequalities','8-3':'inequalities','8-4':'inequalities','8-5':'inequalities'
   };
   const G7_SKILL_LABELS={
     'exponents':'Properties of integer exponents',
@@ -697,6 +842,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     'linear-eq':'Solving linear equations',
     'solutions':'One, none, or infinitely many solutions',
     'systems':'Systems of linear equations',
+    'inequalities':'Linear inequalities & solution sets',
     'realworld':'Real-world multi-step problems',
     'reasoning':'Reasoning & error analysis'};
 
@@ -837,7 +983,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     if(changed){g7save(o);}else if((t.lastPracticed||0)>((c&&c.lastPracticed)||0)){schedulePush();}
     return changed;}
   window.__modSync={mergeCloudTopic:mergeCloudTopic,schedulePush:schedulePush};
-  window.addEventListener('load',function(){syncPull(function(doc){if(mergeCloudTopic(doc))restoreProgress();});});
+  window.addEventListener('load',function(){syncPull(function(doc){if(mergeCloudTopic(doc))restoreProgress();g7plotSync();});});
 
   // ===== answer helpers =====
   function kdec(s){try{return atob(s);}catch(e){return '';}}
@@ -965,6 +1111,142 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
   }
   window.addEventListener('load',restoreProgress);
 
+  function g7plotNum(el,name,dflt){var v=parseFloat(el.dataset[name]);return isNaN(v)?dflt:v;}
+  function g7plotDraw(box){
+    var inp=box.querySelector('.ans-input'); if(!inp)return;
+    var kind=box.dataset.plot||'line', W=360, sv;
+    if(kind==='line'){
+      var mn=g7plotNum(box,'min',-10), mx=g7plotNum(box,'max',10), st=g7plotNum(box,'step',1);
+      var H=88, x0=26, x1=W-26, y=52;
+      var px=function(v){return x0+(v-mn)/(mx-mn)*(x1-x0);};
+      var parts=['<line class="axis" x1="'+x0+'" y1="'+y+'" x2="'+x1+'" y2="'+y+'"/>'];
+      for(var v=mn; v<=mx+1e-9; v+=st){
+        parts.push('<line class="tick" x1="'+px(v).toFixed(1)+'" y1="'+(y-6)+'" x2="'+px(v).toFixed(1)+'" y2="'+(y+6)+'"/>');
+        parts.push('<text class="tlab" x="'+px(v).toFixed(1)+'" y="'+(y+22)+'" text-anchor="middle">'+(Math.round(v*100)/100)+'</text>');
+        parts.push('<circle class="hint-dot" cx="'+px(v).toFixed(1)+'" cy="'+y+'" r="2"/>');
+      }
+      var cur=parseFloat(inp.value);
+      if(!isNaN(cur)&&cur>=mn&&cur<=mx) parts.push('<circle class="pt" cx="'+px(cur).toFixed(1)+'" cy="'+y+'" r="7"/>');
+      parts.push('<rect class="hit" x="0" y="0" width="'+W+'" height="'+H+'"/>');
+      var _cur=parseFloat(inp.value);
+      sv='<svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" tabindex="0" role="slider" '+
+        'aria-valuemin="'+mn+'" aria-valuemax="'+mx+'" aria-valuenow="'+(isNaN(_cur)?'':_cur)+'" '+
+        'aria-label="Number line from '+mn+' to '+mx+'. Use the arrow keys to move the point, or click.">'+parts.join('')+'</svg>';
+    } else {
+      var xmn=g7plotNum(box,'xmin',0), xmx=g7plotNum(box,'xmax',10), xst=g7plotNum(box,'xstep',1);
+      var ymn=g7plotNum(box,'ymin',0), ymx=g7plotNum(box,'ymax',10), yst=g7plotNum(box,'ystep',1);
+      var H=300, L=44, R=W-16, T=16, B=H-40;
+      var gx=function(v){return L+(v-xmn)/(xmx-xmn)*(R-L);};
+      var gy=function(v){return B-(v-ymn)/(ymx-ymn)*(B-T);};
+      var g=[],i;
+      for(i=xmn;i<=xmx+1e-9;i+=xst){
+        g.push('<line class="gridline" x1="'+gx(i).toFixed(1)+'" y1="'+T+'" x2="'+gx(i).toFixed(1)+'" y2="'+B+'"/>');
+        g.push('<text class="tlab" x="'+gx(i).toFixed(1)+'" y="'+(B+18)+'" text-anchor="middle">'+(Math.round(i*100)/100)+'</text>');
+      }
+      for(i=ymn;i<=ymx+1e-9;i+=yst){
+        g.push('<line class="gridline" x1="'+L+'" y1="'+gy(i).toFixed(1)+'" x2="'+R+'" y2="'+gy(i).toFixed(1)+'"/>');
+        g.push('<text class="tlab" x="'+(L-7)+'" y="'+(gy(i)+4).toFixed(1)+'" text-anchor="end">'+(Math.round(i*100)/100)+'</text>');
+      }
+      g.push('<line class="axis" x1="'+L+'" y1="'+B+'" x2="'+R+'" y2="'+B+'"/>');
+      g.push('<line class="axis" x1="'+L+'" y1="'+T+'" x2="'+L+'" y2="'+B+'"/>');
+      var pr=String(inp.value||'').split(',');
+      if(pr.length===2){
+        var cx=parseFloat(pr[0]), cy=parseFloat(pr[1]);
+        if(!isNaN(cx)&&!isNaN(cy)&&cx>=xmn&&cx<=xmx&&cy>=ymn&&cy<=ymx)
+          g.push('<circle class="pt" cx="'+gx(cx).toFixed(1)+'" cy="'+gy(cy).toFixed(1)+'" r="7"/>');
+      }
+      g.push('<rect class="hit" x="0" y="0" width="'+W+'" height="'+H+'"/>');
+      sv='<svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" tabindex="0" role="application" '+
+        'aria-label="Coordinate grid, x from '+xmn+' to '+xmx+', y from '+ymn+' to '+ymx+'. '+
+        'Use the arrow keys to move the point, or click. Current point: '+(inp.value||'none')+'.">'+g.join('')+'</svg>';
+    }
+    var old=box.querySelector('svg'); if(old)old.parentNode.removeChild(old);
+    box.insertAdjacentHTML('afterbegin',sv);
+    var ro=box.querySelector('.readout');
+    if(!ro){ro=document.createElement('div');ro.className='readout';box.appendChild(ro);}
+    ro.textContent=inp.value?('Placed: '+(box.dataset.plot==='grid'?'('+inp.value+')':inp.value)):'Click to place your point, or focus it and use the arrow keys.';
+    box.classList.toggle('locked',!!inp.disabled);
+  }
+  function g7plotSet(box,evt){
+    var inp=box.querySelector('.ans-input');
+    if(!inp||inp.disabled)return;                       // a locked step must stay locked
+    var svg=box.querySelector('svg'); if(!svg)return;
+    // Read the viewBox ATTRIBUTE rather than svg.viewBox.baseVal: the SVG DOM geometry interfaces
+    // are not universally implemented (jsdom has none), and an attribute parse works everywhere.
+    var r=svg.getBoundingClientRect();
+    var vb=String(svg.getAttribute('viewBox')||'0 0 360 100').split(/[\s,]+/).map(parseFloat);
+    var vw=vb[2]||360, vh=vb[3]||100;
+    var sx=vw/(r.width||vw), sy=vh/(r.height||vh);
+    var px=(evt.clientX-r.left)*sx, py=(evt.clientY-r.top)*sy;
+    var snap=function(v,st,mn,mx){var n=mn+Math.round((v-mn)/st)*st;return Math.min(mx,Math.max(mn,Math.round(n*1e6)/1e6));};
+    if((box.dataset.plot||'line')==='line'){
+      var mn=g7plotNum(box,'min',-10), mx=g7plotNum(box,'max',10), st=g7plotNum(box,'step',1);
+      var x0=26, x1=360-26;
+      var v=mn+(px-x0)/(x1-x0)*(mx-mn);
+      inp.value=String(snap(v,st,mn,mx));
+    } else {
+      var xmn=g7plotNum(box,'xmin',0), xmx=g7plotNum(box,'xmax',10), xst=g7plotNum(box,'xstep',1);
+      var ymn=g7plotNum(box,'ymin',0), ymx=g7plotNum(box,'ymax',10), yst=g7plotNum(box,'ystep',1);
+      var L=44, R=360-16, T=16, B=300-40;
+      var vx=xmn+(px-L)/(R-L)*(xmx-xmn), vy=ymn+(B-py)/(B-T)*(ymx-ymn);
+      inp.value=snap(vx,xst,xmn,xmx)+','+snap(vy,yst,ymn,ymx);
+    }
+    inp.classList.remove('correct','wrong');
+    g7plotDraw(box);
+  }
+  function g7plotSync(){Array.prototype.forEach.call(document.querySelectorAll('.plotbox'),g7plotDraw);}
+  document.addEventListener('click',function(e){
+    var box=e.target.closest&&e.target.closest('.plotbox');
+    if(box&&e.target.classList.contains('hit'))g7plotSet(box,e);
+  });
+
+  /* Keyboard operation. Shipped click-only, which locked keyboard and screen-reader users out of
+     every plot item — including a real released MCAP capstone. Arrow keys step the point; Home/End
+     jump to the ends; the first press on an empty plot starts in the middle rather than doing
+     nothing, so there is always a way in without a pointer. */
+  function g7plotKey(box, e){
+    var inp=box.querySelector('.ans-input');
+    if(!inp||inp.disabled)return;
+    var k=e.key, grid=(box.dataset.plot||'line')==='grid';
+    var mn,mx,st,xmn,xmx,xst,ymn,ymx,yst,vx,vy;
+    var clamp=function(v,a,b){return Math.min(b,Math.max(a,Math.round(v*1e6)/1e6));};
+    if(!grid){
+      mn=g7plotNum(box,'min',-10); mx=g7plotNum(box,'max',10); st=g7plotNum(box,'step',1);
+      var cur=parseFloat(inp.value);
+      if(isNaN(cur)){ if(k.indexOf('Arrow')!==0&&k!=='Home'&&k!=='End')return;
+        cur=clamp(mn+Math.round(((mn+mx)/2-mn)/st)*st,mn,mx); }
+      else if(k==='ArrowLeft'||k==='ArrowDown')cur=clamp(cur-st,mn,mx);
+      else if(k==='ArrowRight'||k==='ArrowUp')cur=clamp(cur+st,mn,mx);
+      else if(k==='Home')cur=mn; else if(k==='End')cur=mx;
+      else return;
+      inp.value=String(cur);
+    } else {
+      xmn=g7plotNum(box,'xmin',0); xmx=g7plotNum(box,'xmax',10); xst=g7plotNum(box,'xstep',1);
+      ymn=g7plotNum(box,'ymin',0); ymx=g7plotNum(box,'ymax',10); yst=g7plotNum(box,'ystep',1);
+      var pr=String(inp.value||'').split(','); vx=parseFloat(pr[0]); vy=parseFloat(pr[1]);
+      if(isNaN(vx)||isNaN(vy)){ if(k.indexOf('Arrow')!==0&&k!=='Home'&&k!=='End')return;
+        vx=clamp(xmn+Math.round(((xmn+xmx)/2-xmn)/xst)*xst,xmn,xmx);
+        vy=clamp(ymn+Math.round(((ymn+ymx)/2-ymn)/yst)*yst,ymn,ymx); }
+      else if(k==='ArrowLeft')vx=clamp(vx-xst,xmn,xmx);
+      else if(k==='ArrowRight')vx=clamp(vx+xst,xmn,xmx);
+      else if(k==='ArrowDown')vy=clamp(vy-yst,ymn,ymx);
+      else if(k==='ArrowUp')vy=clamp(vy+yst,ymn,ymx);
+      else if(k==='Home'){vx=xmn;vy=ymn;} else if(k==='End'){vx=xmx;vy=ymx;}
+      else return;
+      inp.value=vx+','+vy;
+    }
+    e.preventDefault();
+    inp.classList.remove('correct','wrong');
+    g7plotDraw(box);
+    var sv=box.querySelector('svg'); if(sv&&sv.focus)sv.focus();   // redraw replaces the node
+  }
+  document.addEventListener('keydown',function(e){
+    var box=e.target.closest&&e.target.closest('.plotbox');
+    if(box)g7plotKey(box,e);
+  });
+
+  window.__modPlot={sync:g7plotSync,draw:g7plotDraw,key:g7plotKey};
+
   /* ===== spaced review (MR-1) phase-3: in-module retrieval mode, ?review=<skill> ===== */
   // Why this exists: restoreProgress() re-fills a completed item with its own correct answer, so a
   // student sent back by the hub's "Due for review" would have re-read an answer key — the opposite
@@ -1020,6 +1302,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
       var hc=s.querySelector('.hint-content');if(hc)hc.classList.remove('show');
       var hb=s.querySelector('.hint-btn');if(hb)hb.textContent='Hint';
     });
+    if(window.__modPlot)Array.prototype.forEach.call(card.querySelectorAll('.plotbox'),g7plotDraw);
   }
   function g7reviewMode(){
     var sk=g7revParam();if(!sk)return;
