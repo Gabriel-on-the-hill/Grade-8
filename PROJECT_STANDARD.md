@@ -45,7 +45,7 @@ A Grade 8 Mathematics **study & practice hub** for a teacher with one or more st
 
 ## 3. Files
 - `Grade_8_Math_Hub.html` — the home hub (renamed from `Hub_Template.html`). Multi-subject: edit the `SUBJECTS` array + title only. Hosts Mathematics (built) and Science (first unit built — Matter & Its Interactions); one sign-in, one roster, one teacher dashboard across all subjects.
-- `Module_Template.html` — canonical module engine + showcase of all 5 formats. **Stamp every unit from this.**
+- `Starter_Kit/Module_Template.html` — canonical module engine + showcase of all **6** formats. **Stamp every unit from this.** *(Path corrected 21 Jul 2026: this file has never been at the repo root, though §3 and `CLAUDE.md` both said `Module_Template.html`.)*
 - `The_Number_System.html` — first built unit (8.NS).
 - One HTML module per remaining unit (built from the template).
 - `Starter_Kit/HUB_Google_Sheet_Setup.md` — optional cloud activity log (not yet connected).
@@ -68,7 +68,11 @@ Header (title · unit · standard · objectives) → hub bar → progress → **
 
 **Phase tags (only chip vocabulary):** Learn / Guided / Practice / Apply / Exam / Stretch.
 
-**Five item formats (all in the template):** fill-in (accepts equivalent fractions), single multiple-choice, multi-select, two-part (A unlocks B), constructed-response. Mark exam-grade items with `data-exam="1"`.
+**Six item formats (all in the template):** fill-in (accepts equivalent fractions), single multiple-choice, multi-select, two-part (A unlocks B), constructed-response, and **click-to-plot** (`data-plot="line"` number line / `data-plot="grid"` coordinate grid). Mark exam-grade items with `data-exam="1"`.
+
+**The plot is the 6th format, and it is currently used by nothing** (ported 21 Jul 2026 in `478816d`; corrected here the same day — §5 said "Five" and §3 pointed at the wrong path). It is a pointer/keyboard UI painted over a hidden `.ans-input`, so the ordinary engine still does the grading, locking, restore and review-reset — which is exactly why it must not be hand-rolled per module (§7.2). **Until `tests/plot_format.test.js` is ported it is unguarded**, and the invariant most worth guarding is that a click on a *locked* step writes nothing: the plot is a second input surface over the step-lock ladder.
+
+**Choose the format from the standard's verb.** A standard that says *construct*, *graph*, *sketch* or *represent on a number line* is not met by a multiple-choice item that asks the student to pick the right picture — that passes `exam_coverage` while assessing recognition in place of production, which is bar-lowering (§2.4's sibling failure). Standards in this grade whose verb demands the plot: `8.AT.A.1a` (graph proportional relationships), `8.NOS.A.2` (locate on a number line), `8.AT.B.4` (solution set on a number line), `8.AT.D.11` (sketch a graph from a description), `8.DS.B.2` (construct a scatter plot). See `MCCRS_2025_DUAL_CODING.md`.
 
 **qid convention (required):** every qcard's `data-qid` is `<section>-<n>` (e.g. `3-2` = section 3, item 2). The number before the first `-` drives `sectionTotals` and the teacher dashboard's per-section bars — never use any other scheme, and never duplicate a qid.
 
@@ -112,6 +116,12 @@ Sets are authored **tutor-side as a JSON file** and published via **Teacher → 
 4. **Behavioral verification (required for hub or engine changes):** run the standing jsdom suite `tests/behavioral_test_suite.js` (76 assertions: gate, seeded roster, sign-in → PIN → app, device binding, teacher modal + gated Settings, Escape, passcode takeover, homework decay/done, CR review, module wrong → retry → correct with cooldown, shuffle + noshuffle, copy-block, exam first-attempt-only, fraction equivalence, locked steps, persistence, section report card, hint integrity). Usage: `npm install jsdom` once, then `node tests/behavioral_test_suite.js <folder with the HTML files>`. Extend the suite whenever engine behavior changes. A page that parses can still be dead on arrival (v1.3 found a null-binding crash that blanked the whole hub) — only a behavioral test catches that.
 5. **Large HTML files (>~35KB): do NOT use editor Write/Edit tools** — an after-save reformat can truncate the file mid-`<script>`. Regenerate via a bash `python3` heredoc doing string `.replace()` on the intact file, then re-verify (step 3–4). Assert each replacement matched exactly once.
 6. Keep this standard updated; log every build in §10.
+7. **Sourcing fidelity — when you lift a released or textbook item** (codified 21 Jul 2026 from `TODO.md` P2; every rule was learned expensively, mostly in Grade 7):
+   1. **`pdftotext` is an index, never the evidence.** It drops figures, collapses drop-downs, merges table rows and silently omits text. **Render the page and read it** before lifting an item *or un-lifting one* — a negative search is not proof of absence. Rendering is `python3 -c "import fitz; …get_pixmap(dpi=140).save(…)"` (PyMuPDF is installed; `pdftoppm` is not). This has now bitten four times, most recently on the MCCRS crosswalk, where extraction merged two standards and would have mis-assigned a deletion.
+   2. **Reproduce the stem verbatim** and rebuild the figure to its stated dimensions. If a figure cannot be read off with certainty, the item is **blocked, not approximated**.
+   3. **Recompute every key independently** (`fractions.Fraction`, never floats) *before* checking it against any published key. Two independent derivations must agree.
+   4. **An adapted item loses the label.** Change the numbers or the response format and it is no longer that released item — retitle it `Exam-style ·` and record it. Copying the *format* of a real item, label included, is the exact pressure that produced 19 falsely-labelled capstones in Grade 7; see `MCAP_PROVENANCE.md`.
+   5. **Record the lift.** Released items go in `MCAP_PROVENANCE.md` with their citation, checked by `tests/mcap_provenance.test.js`. **Textbook** lifts carry no exam label — a wrong attribution there cannot mislead a student about what they are sitting — but they are still recorded, so a future editor can tell what is the book's and what is ours.
 
 ## 8. Engine versioning (anti-dilution)
 Engine: **Engine v1.5** (v1.4.3 + the shared cloud-sync layer, 2026-07-04). Additional invariants:

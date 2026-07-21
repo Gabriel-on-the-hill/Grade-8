@@ -5,6 +5,14 @@ a student to *do*. Built 21 Jul 2026 (scrutiny item **S6** in `../Grade 7/HANDOF
 CCSS text in `../Grade 7/Math_Standards.pdf` (Grade 8 overview, p. 53) and the module markup — not
 from impression, and not from question counts.
 
+> **This matrix audits against the 2010 standards.** That is deliberate — 2010 is what the modules
+> cite and what the MCAP blueprint we hold (Sept 2022) still uses. But Maryland re-cut the grade
+> effective **SY 2026-27**, and a 2010-coded audit is structurally blind to it: **two of the new
+> Grade 8 standards have no 2010 predecessor at all**, so there is no row here they could ever
+> appear in. Read [MCCRS_2025_DUAL_CODING.md](MCCRS_2025_DUAL_CODING.md) alongside this file —
+> it changes the scope of 8.G, adds a gap inside 8.EE, and changes what 8.EE.6 and 8.SP should
+> teach. Per-domain notes below flag where.
+
 **Why it exists.** Grade 8 passes every ported guard, and the guards are all *structural*: they check
 that an item has a key, a skill, a phase and an honest label. **None of them can tell that a whole
 domain is missing.** Grade 7's equivalent audit turned up a domain with zero worked examples and a
@@ -16,12 +24,17 @@ until somebody looked. It does.
 | Domain | CCSS clusters | Status | Where |
 |---|---|---|---|
 | **8.NS** The Number System | 1 | ✅ built | `The_Number_System.html` — 31 items, 10 exam |
-| **8.EE** Expressions & Equations | 3 | ◐ built, one gap | `Expressions_and_Equations.html` — 33 items, 10 exam |
+| **8.EE** Expressions & Equations | 3 | ◐ built, **two** gaps | `Expressions_and_Equations.html` — 33 items, 10 exam |
 | **8.F** Functions | 2 | ❌ **absent** | hub tile: *coming soon* |
 | **8.G** Geometry | 3 | ❌ **absent** | hub tile: *coming soon* |
 | **8.SP** Statistics & Probability | 1 | ❌ **absent** | hub tile: *coming soon* |
 
 Science (`Matter_and_Its_Interactions.html`, 31 items) is outside this matrix.
+
+**8.EE's second gap is invisible to this table.** MCCRS 2025 adds `8.AT.B.4` — solve linear
+*inequalities* in one variable — with **no 2010 predecessor**, so it has no row below and never
+could. "inequality" appears nowhere in the repo. From SY 2026-27 the Expressions & Equations unit is
+one whole standard short, not just missing a derivation.
 
 ---
 
@@ -41,7 +54,7 @@ Science (`Matter_and_Its_Interactions.html`, 31 items) is outside this matrix.
 | 8.EE.3 | Numbers as a single digit × an integer power of 10; compare magnitudes | ✅ | §2 scientific notation |
 | 8.EE.4 | Operations in scientific notation, including choosing units | ✅ | §2 |
 | 8.EE.5 | Graph proportional relationships; interpret unit rate as **slope**; compare two in different representations | ✅ | §3 |
-| 8.EE.6 | **Use similar triangles to explain why slope is the same between any two points**; derive `y = mx` and `y = mx + b` | ◐ | §3 states and uses `y = mx` / `y = mx + b`, but the **similar-triangles explanation is absent** — "similar triangle" appears nowhere in the repo. The *equations* are taught; the *reason slope is well defined* is not. This is the same shape of gap Grade 7's audit found: the conclusion present, the derivation missing. |
+| 8.EE.6 | **Use similar triangles to explain why slope is the same between any two points**; derive `y = mx` and `y = mx + b` | ◐ | §3 states and uses `y = mx` / `y = mx + b`, but the **derivation is absent** — the *equations* are taught; the *reason slope is well defined* is not. Same shape of gap Grade 7's audit found: conclusion present, derivation missing. **Build the 2025 version** (`8.AT.A.2`): proportional reasoning — show the ratios of vertical to horizontal change between points are equivalent. Similar triangles are *not* the 2025 route, and 8.G's similarity standards that would supply them have left the grade. |
 | 8.EE.7 | Solve linear equations in one variable; one / none / infinitely many solutions; expand and collect terms | ✅ | §4 solving, §5 one-none-infinite |
 | 8.EE.8 | Systems: graph and interpret intersection, solve algebraically, real-world problems | ✅ | §6 |
 
@@ -59,19 +72,30 @@ Science (`Matter_and_Its_Interactions.html`, 31 items) is outside this matrix.
 
 | Std | Requirement | Status |
 |---|---|---|
-| 8.G.1–3 | Transformations: rotations, reflections, translations; congruence; coordinate effects; dilations | ❌ |
-| 8.G.4–5 | Similarity via transformations; angle-sum, exterior angle, parallel-lines-and-transversal, AA similarity | ❌ |
-| 8.G.6–8 | **Pythagorean Theorem** — explain a proof, apply in 2-D and 3-D, distance between two points | ❌ |
-| 8.G.9 | Volume of **cylinders, cones and spheres** | ❌ |
+| 8.G.1–3 | Transformations: rotations, reflections, translations; congruence; coordinate effects; dilations | ❌ — **do not build; → Integrated Algebra 1/2 in 2025** |
+| 8.G.4–5 | Similarity via transformations; angle-sum, exterior angle, parallel-lines-and-transversal, AA similarity | ◐ **split in 2025**: angle sum + exterior angle stay (`8.GR.A.3`); similarity and parallel-lines-and-transversal leave |
+| 8.G.6–8 | **Pythagorean Theorem** — explain a proof, apply in 2-D and 3-D, distance between two points | ❌ — **stays** (`8.GR.B.4–5`), and gains acute/obtuse via Pythagorean inequalities |
+| 8.G.9 | Volume of **cylinders, cones and spheres** | ❌ — **do not build; → Math 7 in 2025** |
+
+**Under MCCRS 2025 this domain is 5 standards, not 9**, and only 4 of the blueprint's 23 content
+items. Two of the five arrive from Grade 7 (below); one is triangle angle sum; two are Pythagoras.
+Four of the nine listed above leave the grade entirely. Building them anyway would be four standards
+of off-grade load for no exam return, against `PROJECT_STANDARD.md` §2.8.
 
 ## 8.SP — Statistics & Probability ❌ absent
 
 | Std | Requirement | Status |
 |---|---|---|
 | 8.SP.1 | Scatter plots for bivariate measurement data; clustering, outliers, association, linear/non-linear | ❌ |
-| 8.SP.2 | Straight line fit; informally assess the fit | ❌ |
-| 8.SP.3 | Use the equation of a linear model; interpret slope and intercept in context | ❌ |
+| 8.SP.2 | Straight line fit; informally assess the fit | ❌ — **2025 restates it** (`8.DS.B.3`): compare the fit of *different given* linear models, rather than fitting one |
+| 8.SP.3 | Use the equation of a linear model; interpret slope and intercept in context | ❌ — **2025 restates it** (`8.DS.B.4`): use a ***provided*** model |
 | 8.SP.4 | Bivariate **categorical** data in a two-way table; relative frequencies; association | ❌ |
+
+**2025 makes this a 6-standard domain and changes its verb.** It adds a new cluster head
+`8.DS.A.1` — evaluate whether a conclusion drawn from bivariate data is justified, and identify bias
+or limitations in the collection — with no 2010 predecessor. Together with the two restatements
+above, the cluster tilts from *constructing* models to *critiquing* them. It also receives compound
+events from Grade 7 (`8.DS.C.6`). A module authored off the 2010 text would drill the wrong verb.
 
 ---
 

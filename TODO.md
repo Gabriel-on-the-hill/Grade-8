@@ -1,10 +1,15 @@
 # Grade 8 — open issues
 
 **Raised 21 Jul 2026** from the Grade 7 session (scrutiny item **S6** in `../Grade 7/HANDOFF.md`),
-which had never been done for this app. **P1 has since been worked and closed**; everything else is a
-finding, not yet acted on. Coverage detail is in
+which had never been done for this app. **P1 is closed, and P2's dual-coding is done**; everything
+else is a finding, not yet acted on. Coverage detail is in
 [STANDARDS_COVERAGE_MATRIX.md](STANDARDS_COVERAGE_MATRIX.md); provenance working is in
-[MCAP_PROVENANCE.md](MCAP_PROVENANCE.md).
+[MCAP_PROVENANCE.md](MCAP_PROVENANCE.md); the MCCRS 2025 map is in
+[MCCRS_2025_DUAL_CODING.md](MCCRS_2025_DUAL_CODING.md).
+
+> **Read the dual-coding before building any new unit.** It revised P3 and P4 on 21 Jul 2026: 8.G is
+> a 5-standard build rather than 9, two new standards have no 2010 predecessor (so no 2010-coded
+> audit can see them), and two clusters changed what the student is asked to *do*.
 
 Ordered by *what could mislead a student*, then *what is missing*, then *what could regress*.
 
@@ -35,7 +40,7 @@ keys and reasoning: [MCAP_PROVENANCE.md](MCAP_PROVENANCE.md).
       release's rather than the label dropped.
 - [x] **The guard exists.** `tests/mcap_provenance.test.js` ported and extended to two label
       families, mutation-checked on four paths (unbacked claim, stale row, cross-table sourcing,
-      renamed headings). **11 guards green, behavioural 269.**
+      renamed headings). **10 guards green, behavioural 269.**
 
 **Nothing was relabelled *up* to compensate**, and the demoted items are not bad items — they are
 ours, and now say so.
@@ -56,54 +61,112 @@ authors nearly everything and has richer sources sitting unopened than Grade 7 e
       can tell what is the book's and what is ours. Textbook material carries **no exam label**, so a
       wrong attribution cannot mislead a student about what they are sitting — but it still gets
       recorded.
-- [ ] **Keep fidelity rules when lifting a released item.** All four were learned expensively:
+- [x] **Fidelity rules codified 21 Jul 2026 — `PROJECT_STANDARD.md` §7.7.** They were sitting in this
+      TODO, which nobody reads before building; they now sit in the standard, which `CLAUDE.md`
+      requires be read first. All four were learned expensively, and a fifth was added (*record the
+      lift*):
       1. `pdftotext` is an **index, never the evidence** — it drops figures, collapses drop-downs, and
-         silently omits text. Render the page and read it before lifting *or un-lifting*.
+         silently omits text. Render the page and read it before lifting *or un-lifting*. **Rendering
+         in this repo is PyMuPDF** (`import fitz` → `get_pixmap(dpi=140)`); `pdftoppm` is not
+         installed, which is worth knowing before losing time to it.
       2. Reproduce the stem **verbatim** and rebuild the figure to its stated dimensions. If a figure
          cannot be read off with certainty, the item is **blocked**, not approximated.
       3. **Recompute every key independently** (`fractions.Fraction`, never floats) *before* checking
          it against any published key — two independent derivations must agree.
       4. **An adapted item loses the label.** Change the numbers or the response format and it is no
          longer that released item.
-- [ ] **Dual-code to MCCRS 2025.** `Curriculum/grade-8-mccrs-math-crosswalk-a.pdf` is present, so
-      Grade 8 can get the same treatment Grade 7 had on 21 Jul. Worth doing early: it will say
-      authoritatively **where the three inbound Grade 7 clusters land** (P4 below assumes 8.G / 8.SP
-      from the Grade 7 side of the crosswalk — the Grade 8 document can confirm it).
+- [x] **Dual-code to MCCRS 2025 — done 21 Jul 2026.** All 14 crosswalk pages rendered and read; full
+      map in [MCCRS_2025_DUAL_CODING.md](MCCRS_2025_DUAL_CODING.md). It was worth doing early — it
+      **cut against the plan below**. Headlines: the four domains are renamed and re-cut (Functions
+      dissolves into **Algebraic Thinking**, exponents/roots move to **Number and Operation Sense**);
+      **7 requirements leave Grade 8** (4 of the 9 old 8.G standards go up to Integrated Algebra,
+      volume goes down to Math 7, `8.EE.A.4` is deleted); **3 are new**, one of them inside a module
+      already called built; and all three inbound Grade 7 clusters are **confirmed and named** (P4).
+      Caveat: the MCAP blueprint we hold is **Sept 2022 and 2010-coded**, so this governs *what to
+      teach*, not how a released item is labelled.
 
 ## P3 · Coverage — 3 of 5 maths domains do not exist
 
 Every one of these is a hub tile a student sees as *coming soon*. See the matrix for the per-standard
-breakdown.
+breakdown. **Revised 21 Jul 2026 against the MCCRS 2025 crosswalk** — the dual-coding changed the
+scope of two of these items and added a third. 2025 codes in brackets.
 
-- [ ] **8.F Functions — absent.** 5 standards. Build first: it is the spine of Grade 8 algebra,
-      `8.EE.5`/`8.EE.6` already lean on it, and `8.SP.3` needs it.
-- [ ] **8.G Geometry — absent.** 9 standards, the largest domain, and it carries the **Pythagorean
-      Theorem** (`8.G.6–8`) and volume of cylinders/cones/spheres (`8.G.9`).
-- [ ] **8.SP Statistics & Probability — absent.** 4 standards — scatter plots, line of fit, two-way
-      tables. Depends on 8.F for the linear-model work, so build it after.
-- [ ] **`8.EE.6` is partial.** The module states and uses `y = mx` and `y = mx + b`, but the
-      **similar-triangles explanation of why slope is well defined is missing** — "similar triangle"
-      appears nowhere in the repo. The conclusion is taught, the derivation is not. Small; can ride
-      any Expressions edit.
+> **Dependency the order below does not remove: three of these need the plot format** (P5), which is
+> ported into the Starter Kit template but used by no module and guarded by no test. `8.AT.D.11`
+> *sketch a graph from a narrative*, `8.AT.B.4` *represent the solution set on a number line*, and
+> `8.DS.B.2` *construct a scatter plot* all have **construction verbs**. Assessing them with
+> multiple-choice would meet the letter of `exam_coverage` and quietly lower the bar — the standard's
+> verb *is* the bar. **Port `plot_format.test.js` and use the format before, or with, item 1.**
 
-## P4 · The MCCRS 2026-27 handoff lands nowhere
+- [ ] **8.F Functions — absent.** 5 standards `[8.AT.C.6–8, 8.AT.D.10–11]`, **+1 new**
+      `[8.AT.D.9 — interpret the graph of y=mx+b]`. **Still build first, and now on better evidence:**
+      it is the **highest-weight unbuilt domain on the blueprint (5 of 23 content items)**, one of
+      only three domains carrying a Reasoning statement, and under 2025 it **completes 8.AT**
+      alongside the built Expressions & Equations. Author `8.AT.D.9` in from the start.
+- [ ] **`8.AT.B.4` linear inequalities — absent, and new.** Solve linear inequalities in one
+      variable; represent the solution set on a number line. **No 2010 predecessor**, so no audit
+      built on 2010 codes could see it: "inequality" appears **nowhere in the repo**. It sits inside
+      Expressions & Equations, which the matrix calls *built, one gap* — from SY 2026-27 that is
+      **two** gaps, and this is the larger one.
+- [ ] **8.SP Statistics & Probability — absent.** 4 standards `[8.DS.B.2–4, 8.DS.C.5]`, **+1 new**
+      `[8.DS.A.1 — evaluate predictions and conclusions; bias and generalisation]`, **+1 inbound**
+      `[8.DS.C.6 compound events, from 7.SP.C.8]` = **6**. Depends on 8.F for the linear-model work.
+      **Author to the 2025 verbs:** `8.DS.B.3`/`B.4` now ask the student to *compare given* fits and
+      use a *provided* model, not to fit a line themselves — the cluster tilts from construction to
+      critique. A module written off the 2010 text would drill the wrong verb.
+- [ ] **8.G Geometry — absent, and much smaller than it looked.** **Not 9 standards — 5**
+      `[8.GR.A.1–3, 8.GR.B.4–5]`, and only 4 of 23 blueprint items. It is **angle work plus
+      Pythagoras**: two of the five are the inbound Grade 7 clusters (P4), one is triangle angle
+      sum/exterior angle, two are Pythagoras + distance. **Do not build** transformations,
+      congruence, dilations or similarity (`8.G.A.1–4` → Integrated Algebra 1/2) or volume
+      (`8.G.C.9` → Math 7) — that is four standards of off-grade load for no exam return, against
+      `PROJECT_STANDARD.md` §2.8. Handle the transformations block as a prerequisite note.
+      **The hub tile currently promises three topics that will not be in it** — correct its `desc`
+      when the unit ships.
+- [ ] **`8.EE.6` is partial — build the 2025 derivation, not the 2010 one** `[8.AT.A.2]`. The module
+      states and uses `y = mx` and `y = mx + b` but never says *why slope is well defined*. 2010 said
+      *use similar triangles*; **2025 says use proportional reasoning — show the ratios of vertical to
+      horizontal change between points are equivalent.** Build the ratio-equivalence argument;
+      similar triangles are worth a sentence as the classical framing but **must not be the primary
+      route**, because 8.G's similarity standards — which would supply that prerequisite — have left
+      the grade. Small; can ride the same Expressions edit as `8.AT.B.4`.
+
+## P4 · The MCCRS 2026-27 handoff lands nowhere — **both sides now agree**
 
 - [ ] Maryland's 2025 crosswalk moves **three Grade 7 clusters into Math 8**, printing *"Not
       applicable — In Math 8"*: `7.G.A.2` (construct triangles), `7.G.B.5` (angle relationships →
-      equations), `7.SP.C.8` (compound events). **All three land in 8.G / 8.SP, neither of which is
-      built.**
+      equations), `7.SP.C.8` (compound events). **Confirmed 21 Jul 2026 from the Grade 8 side**, which
+      names the receiving standards: `7.G.B.5` → **`8.GR.A.1`**, `7.G.A.2` → **`8.GR.A.2`**,
+      `7.SP.C.8` → **`8.DS.C.6`**. Both documents agree, which is the point of checking both.
+      **All three receiving standards are real, named, and unbuilt.**
       This is why Grade 7 **kept** those eleven items (`../Grade 7/HANDOFF.md` **D10**). If Grade 7
-      ever drops them to match Maryland's boundary before 8.G and 8.SP exist, a student crossing the
-      two apps meets that material **nowhere at all**. Revisit only once 8.G and 8.SP ship.
+      ever drops them to match Maryland's boundary before 8.GR and 8.DS exist, a student crossing the
+      two apps meets that material **nowhere at all**. Revisit only once they ship — and the gate is
+      **lower than it looked**, since 8.GR is a 5-standard build, not 9 (P3).
 
 ## P5 · Guards this app does not have
 
-Grade 7 runs 13; Grade 8 runs **11** (3 of which arrived on 21 Jul). Still missing:
+Grade 7 runs 13 `.test.js`; Grade 8 runs **10** (3 of which arrived on 21 Jul). *(Corrected 21 Jul —
+this line and P1 both said 11. The four missing below, less `homework_backend.test.js` which Grade 7
+does not have, is exactly the 13 → 10 difference.)* Still missing:
 
 - [x] `mcap_provenance.test.js` — **done 21 Jul 2026**, covering both MCAP and MISA (see P1).
 - [ ] `module_smoke.test.js` — catches a module that loads but does not work.
-- [ ] `plot_format.test.js` — only needed once Grade 8 uses the click-to-plot input (8.F and 8.SP will
-      want it; `a11y.test.js` already guards its keyboard affordances *if* it appears).
+- [ ] `plot_format.test.js` — **re-scoped 21 Jul 2026; the old entry was wrong in both directions.**
+      It said the guard is "only needed once Grade 8 uses the click-to-plot input". But
+      `Starter_Kit/Module_Template.html` **already carries the plot format** — ported in `478816d`,
+      shipping both the number-line and grid variants as the documented *6th* format. So Grade 8 has
+      an **unexercised, unguarded response format**: no module uses it, and nothing checks it still
+      works when one does. Grade 7's guard proves the five invariants that matter (a click writes a
+      value · a click on a **locked** step writes nothing · wrong placement doesn't advance · correct
+      placement grades through the normal `.check-btn` path · snapping is exact). Port it now rather
+      than at first use — it is the lock-ladder bypass that makes this urgent, not the drawing.
+      - **Two live standards are under-assessed today** because built modules don't use it:
+        `8.AT.A.1a` *"**Graph** proportional relationships"* — E&E §3 is four read-off/compute items
+        (`Find the slope`, `Write the equation`, `read m and b`, `Unit rate as slope`), none placing
+        anything; and `8.NOS.A.2` *"estimate their **locations on a number line**"* — NS `5-4`
+        *"Locate between integers"* names the two integers rather than placing the point.
+      - **`PROJECT_STANDARD.md` §5 still says "Five item formats"** — it is six. Fix with the port.
 - [ ] `starter_kit.test.js` — **Grade 8 does carry its own kit** (`Starter_Kit/Hub_Template.html`
       and `Starter_Kit/Module_Template.html`), and it is **half-fixed**. Checked 21 Jul 2026:
       neither template hardcodes a `gN.` storage literal ✅ and both ship the namespace as
