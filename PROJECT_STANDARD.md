@@ -280,11 +280,14 @@ Engine v1.2 (v1.1 + the multi-subject hub layer: flat `UNITS` replaced by `SUBJE
       hooks were checked individually because markup without them is the exact failure this change
       started from — a plot that renders nothing, or one that keeps its answer on re-assignment.
 
-- [ ] **2026-07-21 — completion audit** (13 hub skill labels, Functions `7-6`, Science audited) —
-      **not yet verified live**; fetch the hub and confirm it serves the new labels, and Functions
-      for `7-6`, before clearing this line.
+- [x] **2026-07-21 — completion audit** (13 hub skill labels, Functions `7-6`, Science audited) —
+      pushed in `8d7b0bf`; **verified live**: the served hub carries all **13/13** new
+      `MATH_SKILLS` entries and the `__hubSkills` export, and no longer carries the orphaned
+      `realworld`; served `Functions.html` has `7-6`, 37 qcards, 7 plotboxes and zero plaintext
+      answers. The label fix was checked on the **served** hub because its failure mode is a
+      blank concept on a real student's struggle line, which no page-status check would show.
 
-*Nothing outstanding as of 21 Jul 2026, through `0684401`. Verified by fetching the deployed site, not by assuming a push shipped — a green `git push` only proves the remote updated, and Pages rebuilds a minute or two later.*
+*Nothing outstanding as of 21 Jul 2026, through `8d7b0bf`. Verified by fetching the deployed site, not by assuming a push shipped — a green `git push` only proves the remote updated, and Pages rebuilds a minute or two later.*
 
 - Repo: **https://github.com/Gabriel-on-the-hill/Grade-8** → GitHub Pages at **https://gabriel-on-the-hill.github.io/Grade-8/** (branch `main`, root). `index.html` redirects to `Grade_8_Math_Hub.html`.
 - **Publish only** the original web app + docs: `index.html`, the hub, the module HTML files, `README.md`, this standard, `Starter_Kit/`.
