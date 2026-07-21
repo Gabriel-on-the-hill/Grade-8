@@ -246,12 +246,15 @@ Engine v1.2 (v1.1 + the multi-subject hub layer: flat `UNITS` replaced by `SUBJE
 
 - [x] **2026-07-21 — Functions unit (`Functions.html`) + hub tile now `available`** — pushed in `7bfaaae`; **verified live by fetching the deployed site**: `Functions.html` returns HTTP 200 and serves `G7_TOPIC_ID='functions'`, `G7_STORE='g8.'`, `G7_SYNC_HUB='grade8'`, 36 qcards, 9 exam items, 4 `MCAP ·` titles and **zero plaintext answers**; the served hub carries `file:'Functions.html',status:'available'`. Topic id and store prefix were checked against the served file specifically — those two are what decide whether a student's work reaches the dashboard.
 
-- [ ] **2026-07-21 — Expressions & Equations + The Number System finished to MCCRS 2025** (new
-      inequalities section, slope derivation, two click-to-plot retrofits, plot engine ported into
-      both) — **not yet verified live**; fetch both modules and confirm each serves `g7plotNum` and
-      its new qids before clearing this line.
+- [x] **2026-07-21 — Expressions & Equations + The Number System finished to MCCRS 2025** — pushed
+      in `0684401`; **verified live by fetching both served modules**: E&E serves 41 qcards, the
+      `id="inequalities"` section and all 8 new qids (`3-5`-`3-7`, `8-1`-`8-5`); NS serves 32
+      qcards and `5-5`. Both serve the plot engine (`g7plotNum`), the boot `g7plotSync()` and the
+      `g7revReset()` plot clear, both on `G7_STORE='g8.'`, **zero plaintext answers**. The three
+      hooks were checked individually because markup without them is the exact failure this change
+      started from — a plot that renders nothing, or one that keeps its answer on re-assignment.
 
-*Nothing outstanding as of 21 Jul 2026, through `7bfaaae`. Verified by fetching the deployed site, not by assuming a push shipped — a green `git push` only proves the remote updated, and Pages rebuilds a minute or two later.*
+*Nothing outstanding as of 21 Jul 2026, through `0684401`. Verified by fetching the deployed site, not by assuming a push shipped — a green `git push` only proves the remote updated, and Pages rebuilds a minute or two later.*
 
 - Repo: **https://github.com/Gabriel-on-the-hill/Grade-8** → GitHub Pages at **https://gabriel-on-the-hill.github.io/Grade-8/** (branch `main`, root). `index.html` redirects to `Grade_8_Math_Hub.html`.
 - **Publish only** the original web app + docs: `index.html`, the hub, the module HTML files, `README.md`, this standard, `Starter_Kit/`.
