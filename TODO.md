@@ -1,11 +1,15 @@
 # Grade 8 — open issues
 
 **Raised 21 Jul 2026** from the Grade 7 session (scrutiny item **S6** in `../Grade 7/HANDOFF.md`),
-which had never been done for this app. **P1 is closed, and P2's dual-coding is done**; everything
-else is a finding, not yet acted on. Coverage detail is in
-[STANDARDS_COVERAGE_MATRIX.md](STANDARDS_COVERAGE_MATRIX.md); provenance working is in
-[MCAP_PROVENANCE.md](MCAP_PROVENANCE.md); the MCCRS 2025 map is in
-[MCCRS_2025_DUAL_CODING.md](MCCRS_2025_DUAL_CODING.md).
+which had never been done for this app. **P1 and P2 are closed**; P3–P6 are findings, not yet acted
+on. Coverage detail is in [STANDARDS_COVERAGE_MATRIX.md](STANDARDS_COVERAGE_MATRIX.md); exam
+provenance is in [MCAP_PROVENANCE.md](MCAP_PROVENANCE.md); the MCCRS 2025 map is in
+[MCCRS_2025_DUAL_CODING.md](MCCRS_2025_DUAL_CODING.md); the textbook survey and lift register are in
+[TEXTBOOK_SOURCES.md](TEXTBOOK_SOURCES.md).
+
+**P3.1 — the 8.F/Functions build — is next, and it is now fully scoped**: 6 standards, sources
+mapped lesson-for-lesson, one standard (`8.AT.D.9`) known to need authoring, and one blocker
+(`plot_format`, P5).
 
 > **Read the dual-coding before building any new unit.** It revised P3 and P4 on 21 Jul 2026: 8.G is
 > a 5-standard build rather than 9, two new standards have no 2010 predecessor (so no 2010-coded
@@ -45,22 +49,37 @@ keys and reasoning: [MCAP_PROVENANCE.md](MCAP_PROVENANCE.md).
 **Nothing was relabelled *up* to compensate**, and the demoted items are not bad items — they are
 ours, and now say so.
 
-## P2 · Adopt Grade 7's sourcing practice
+## P2 · Adopt Grade 7's sourcing practice — **DONE 21 Jul 2026**
 
 Grade 7 treats **copying real questions and textbook exposition as preferred, not a fallback**
 (`../Grade 7/PROJECT_STANDARD.md` §11) — only the source PDFs stay unpublished. Authoring our own is
 the last resort, because a released item carries a difficulty and a phrasing we cannot invent. Grade 8
 authors nearly everything and has richer sources sitting unopened than Grade 7 ever had.
 
-- [ ] **Open the textbooks.** `Textbooks/` holds **Connected Mathematics 2 (Grade 8)**, **enVision
-      2021 Student Edition**, its **Teacher's Edition Vol. 1**, the **National Additional Practice**
-      workbook, and `Grade 8 TEXTBOOK.pdf`. The Additional Practice book in particular is a ready
-      supply of exercises for the three unbuilt domains. **Render pages — do not trust OCR**; Grade 7
-      lost time to garbled enVision extraction and the fix was always to render the page and read it.
-- [ ] **Record textbook lifts.** Grade 7's manifest has a *Textbook lifts* table so a future editor
-      can tell what is the book's and what is ours. Textbook material carries **no exam label**, so a
-      wrong attribution cannot mislead a student about what they are sitting — but it still gets
-      recorded.
+All four bullets are closed. The practice now lives where a builder will actually meet it:
+`PROJECT_STANDARD.md` **§7.7** (the five fidelity rules), [TEXTBOOK_SOURCES.md](TEXTBOOK_SOURCES.md)
+(what each book holds + the lift register), and
+[MCCRS_2025_DUAL_CODING.md](MCCRS_2025_DUAL_CODING.md) (which grade a standard belongs to now).
+**The sources were richer than assumed in one direction and thinner in another** — the Additional
+Practice workbook covers Functions lesson-for-lesson, while the Student Edition turned out to hold
+none of what it was credited with.
+
+- [x] **Textbooks opened and surveyed — done 21 Jul 2026.** Full map in
+      [TEXTBOOK_SOURCES.md](TEXTBOOK_SOURCES.md). The Additional Practice workbook is confirmed as
+      the best supply: **Topics 1–8 complete**, and its Topic 3 covers **5 of the 6 Functions
+      standards lesson-for-lesson** (PDF pp. 45–56). Illustrative Mathematics Unit 5 is
+      digital-native and clean — **IM for the teach cards, enVision for the climb.**
+      **Two corrections to `PROJECT_STANDARD.md`'s source list fell out of it:** the Student Edition
+      holds **Topics 5–8 only** and contains none of the "slope, functions, scientific notation" the
+      standard credited it with (Topics 1–4 are simply not in the file), and `Grade 8 TEXTBOOK.pdf`
+      is inside `Textbooks/`, not at the root. Under MCCRS 2025 three of the Student Edition's four
+      topics are off-grade, so its remaining value here is **Pythagoras**.
+      - **`8.AT.D.9` cannot be sourced** — it is new in 2025 and these books are 2019–2021. Author
+        it, or adapt Additional Practice lesson 2-7; either way it gets a register row.
+- [x] **Textbook-lift register created — `TEXTBOOK_SOURCES.md`.** Empty, and correctly so: nothing
+      has been lifted yet. Kept **separate from `MCAP_PROVENANCE.md`** on purpose — textbook material
+      carries **no exam label**, so a wrong attribution cannot mislead a student about what they are
+      sitting, and it must never acquire one. Rules live in `PROJECT_STANDARD.md` §7.7.
 - [x] **Fidelity rules codified 21 Jul 2026 — `PROJECT_STANDARD.md` §7.7.** They were sitting in this
       TODO, which nobody reads before building; they now sit in the standard, which `CLAUDE.md`
       requires be read first. All four were learned expensively, and a fifth was added (*record the

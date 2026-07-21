@@ -13,13 +13,14 @@
 >   - **Geometry (8.G)** — rigid transformations & congruence; dilations & similarity; angle relationships; Pythagorean Theorem & its converse; distance; volume of cylinders, cones & spheres. *(coming soon)*
 >   - **Statistics & Probability (8.SP)** — scatter plots & bivariate data; lines of best fit; two-way tables & association. *(coming soon)*
 > - **Textbooks / source materials in folder (consult every unit):**
->   - `Grade 8 TEXTBOOK.pdf` — Illustrative Mathematics Grade 8 Student Edition, **Units 4–6 only** (Linear Equations, Functions & Volume, Data). Scanned; render pages to images to read. Does NOT cover the Number System.
->   - `Textbooks/` (added 2026-06-22 — **grade-verified by title + content**):
+>   - `Textbooks/` (added 2026-06-22 — **grade-verified by title + content**; **contents re-surveyed page-by-page 21 Jul 2026 — see [TEXTBOOK_SOURCES.md](TEXTBOOK_SOURCES.md), which corrected two entries below**):
+>     - ✅ `Textbooks/Grade 8 TEXTBOOK.pdf` — Illustrative Mathematics Grade 8 Student Edition, **Units 4–6 only** (Linear Equations, **Functions & Volume**, Data). **Digital-native and clean** — the activity/discovery exposition source; functions from PDF p114. Does NOT cover the Number System. *(Path corrected 21 Jul 2026: it is inside `Textbooks/`, not at the repo root as this list said.)*
 >     - ✅ `enVision … Teacher's Edition GRADE 8 VOLUME 1` — Grade 8; primary textbook source for the Number System / exponents (irrational & rational numbers, square & cube roots, scientific notation).
->     - ✅ `Envision … Student Edition … Grade 8 Volume 2` (Scott Foresman, 228 pp) — Grade 8 (slope, functions, scientific notation, geometry).
->     - ✅ `Envision … National Additional Practice Grade 8` — Grade 8 practice items.
+>     - ⚠️ `Envision … Student Edition … Grade 8 Volume 2` (Scott Foresman, 228 pp) — **contains Topics 5–8 ONLY: Systems · Congruence & Similarity · Pythagoras · Surface Area & Volume.** *(Corrected 21 Jul 2026 — this line said "slope, functions, scientific notation, geometry" and **none of the first three is in the file**; Topics 1–4 are absent.)* Under MCCRS 2025 three of its four topics are off-grade, so **its remaining value here is Topic 7, Pythagoras.**
+>     - ✅ `Envision … National Additional Practice Grade 8` — **Topics 1–8 complete**, two practice pages per lesson. **The best supply in the folder for the unbuilt domains**; Functions is Topic 3, PDF pp. 45–56.
 >     - ✅ `Connected Mathematics 2 : grade 8` (Lappan) — Grade 8 (scanned; OCR weak — render to images).
 >     - ❌ `ENVISION … "GRADE" … Berry … isbn 9780768567779` — **actually Grade 7 Volume 2** (filename is misleading). DO NOT use as a Grade 8 source.
+>     - **Page offsets differ per book and citing the wrong one misdirects the next editor:** Additional Practice printed = PDF − 6; Illustrative Mathematics printed = PDF − 4.
 >   - `MCAP MATHS/` — MSDE public-release item sets by domain (The Number System, Functions, Geometry, Modeling, Reasoning, Statistics and Probability).
 >   - `MD1126620_Gr8Mth_PT.pdf` — Grade 8 Paper Practice Test (real items).
 >   - `MCAP_2025-26_PT-Answer-Key_Math_Grade-8_Paper_FINAL.pdf` — answer key + standards alignment.
