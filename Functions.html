@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Functions &mdash; Grade 8 Math Hub</title>
+<style>
+:root{
+  --pitch-green:#14532D; --gold:#FAC415; --navy:#0F172A; --bg:#F5F4EE; --card:#FFFFFF; --muted:#64748B;
+  --green-light:#E7F0EA; --gold-light:#FEF3C7; --border:#E5E7EB; --teach-bg:#F0F7F3; --teach-accent:#0F3D22;
+  --ok:#15803D; --ok-bg:#DCFCE7; --bad:#DC2626; --bad-bg:#FEE2E2; --blue:#1D4ED8; --orange:#B45309; --purple:#6D28D9;
+}
+.fig{display:block;margin:.6rem auto;max-width:100%;height:auto;background:#fff;border:1px solid var(--border);border-radius:8px}
+.math{font-family:"Cambria Math","Times New Roman",Georgia,serif;font-style:italic;white-space:nowrap}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--navy);line-height:1.55}
+header.mod{background:var(--pitch-green);color:#fff;padding:1.3rem 1.5rem;border-bottom:5px solid var(--gold)}
+header.mod h1{margin:0 0 .2rem;font-size:1.5rem;font-weight:600;letter-spacing:-.01em}
+header.mod p{margin:0;opacity:.85;font-size:.92rem}
+#g7bar{background:#fff;border-bottom:1px solid var(--border);padding:.5rem 1rem;font-size:.86rem;color:var(--muted);display:flex;align-items:center;gap:.6rem}
+#g7bar a{color:var(--pitch-green);text-decoration:none;font-weight:600}
+nav.topics{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--border);padding:.55rem 1rem;z-index:50;box-shadow:0 1px 3px rgba(0,0,0,.04);overflow-x:auto;white-space:nowrap}
+nav.topics a{display:inline-block;padding:.35rem .8rem;margin-right:.3rem;color:var(--pitch-green);text-decoration:none;border-radius:6px;font-weight:500;font-size:.86rem;border:1px solid transparent}
+nav.topics a:hover{background:var(--green-light)} nav.topics a.active{background:var(--pitch-green);color:#fff}
+main{max-width:1000px;margin:0 auto;padding:1.3rem 1rem 4rem}
+section.topic{margin-top:2.2rem;scroll-margin-top:80px}
+section.topic > h2{color:var(--pitch-green);font-size:1.45rem;margin:0 0 .3rem;padding-bottom:.35rem;border-bottom:3px solid var(--gold);display:inline-block;padding-right:1rem}
+section.topic > p.intro{margin:.4rem 0 .5rem;color:var(--muted);font-size:.95rem}
+.objective{margin:.1rem 0 1.1rem;font-size:.88rem;color:var(--teach-accent);background:var(--teach-bg);border-left:3px solid var(--pitch-green);padding:.45rem .7rem;border-radius:5px}
+.tcard{background:var(--teach-bg);border:1px solid #C5D8CB;border-left:5px solid var(--pitch-green);border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem}
+.tcard h3{margin:0 0 .55rem;color:var(--teach-accent);font-size:1.04rem}
+.tcard p{margin:.45rem 0} .tcard ul,.tcard ol{margin:.4rem 0;padding-left:1.4rem}
+.worked{background:#fff;border:1px dashed #B7CBBE;border-radius:8px;padding:.6rem .8rem;margin:.5rem 0;font-size:.9rem}
+.worked .wl{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--pitch-green)}
+.qcard{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem;border-left:5px solid var(--gold);box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.qhead{display:flex;align-items:center;flex-wrap:wrap;gap:.5rem;margin-bottom:.55rem}
+.qtag{color:#fff;font-size:.7rem;font-weight:600;padding:.18rem .55rem;border-radius:4px;letter-spacing:.02em;background:var(--pitch-green)}
+.qtag.learn{background:#14532D}.qtag.guided{background:#0F766E}.qtag.practice{background:#1D4ED8}.qtag.apply{background:#15803D}.qtag.exam{background:#B45309}.qtag.stretch{background:#6D28D9}
+.qtitle{font-weight:600;color:var(--pitch-green);font-size:1rem;margin-left:auto}
+.qbody{font-size:.95rem} .qbody p{margin:.45rem 0}
+.step{margin:.65rem 0;padding:.65rem .85rem;background:#FBFBF7;border:1px solid #E8E4D2;border-radius:6px;transition:.3s}
+.step.locked{opacity:.35;pointer-events:none;background:#F5F4EE}
+.step.completed{background:#F0FAF3;border-color:#A7D8B6}
+.step .step-label{font-size:.76rem;font-weight:600;color:var(--pitch-green);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.25rem}
+.step p{margin:.3rem 0}
+.input-row{display:inline-flex;align-items:center;gap:.4rem;margin:.2rem .8rem .2rem 0}
+.input-row .lbl{font-size:.92rem}
+.ans-input{border:2px solid var(--border);padding:.3rem .5rem;border-radius:5px;font-size:.92rem;width:96px;font-family:inherit;background:#fff;transition:.2s}
+.ans-input.wide{width:170px}
+.ans-input:focus{outline:none;border-color:var(--pitch-green)}
+.ans-input.correct{border-color:var(--ok);background:var(--ok-bg)} .ans-input.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.feedback{display:inline-block;font-size:.95rem;font-weight:700;min-width:16px}
+.feedback.correct{color:var(--ok)} .feedback.wrong{color:var(--bad)}
+.check-btn{background:var(--pitch-green);color:#fff;border:none;padding:.38rem .85rem;border-radius:6px;cursor:pointer;font-size:.84rem;font-weight:500;margin-top:.5rem;font-family:inherit;transition:.15s}
+.check-btn:hover{background:#0F3D22} .check-btn.done{background:var(--ok)} .check-btn.done::before{content:'\2713 '}
+.hint-btn{background:transparent;color:var(--muted);border:1px solid var(--border);padding:.28rem .7rem;border-radius:6px;cursor:pointer;font-size:.78rem;margin-left:.4rem;font-family:inherit}
+.hint-btn:hover{color:var(--pitch-green);border-color:var(--pitch-green)}
+.hint-content{display:none;font-size:.85rem;color:var(--muted);font-style:italic;margin-top:.4rem;padding:.4rem .6rem;background:#fff;border-left:3px solid #94A3B8;border-radius:3px}
+.hint-content.show{display:block}
+.mc-group{display:flex;flex-wrap:wrap;gap:.45rem;margin:.4rem 0}
+.mc-option{background:#fff;border:2px solid var(--border);padding:.45rem .9rem;border-radius:6px;cursor:pointer;font-size:.88rem;font-family:inherit;transition:.2s;text-align:left}
+.mc-option:hover{border-color:var(--pitch-green);background:var(--green-light)}
+.mc-option.correct{background:var(--ok-bg);border-color:var(--ok);color:var(--ok);font-weight:600}
+.mc-option.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad);font-weight:600}
+.mc-option.disabled{pointer-events:none;opacity:.55} .mc-option.disabled.correct,.mc-option.disabled.wrong{opacity:1}
+.mc-feedback{margin-top:.4rem;font-size:.86rem;font-weight:500;min-height:1.1em}
+.mc-feedback.correct{color:var(--ok)} .mc-feedback.wrong{color:var(--bad)}
+.ms-group{display:flex;flex-direction:column;gap:.4rem;margin:.4rem 0}
+.ms-option{display:flex;align-items:center;gap:.55rem;background:#fff;border:2px solid var(--border);padding:.45rem .8rem;border-radius:7px;cursor:pointer;font-size:.9rem;font-family:inherit;text-align:left}
+.ms-option .box{width:18px;height:18px;border:2px solid #9aa5b1;border-radius:4px;flex:none;display:grid;place-items:center;font-size:.78rem;color:#fff;font-weight:700}
+.ms-option.sel{border-color:var(--pitch-green);background:var(--green-light)}
+.ms-option.sel .box{background:var(--pitch-green);border-color:var(--pitch-green)} .ms-option.sel .box::after{content:'\2713'}
+.ms-option.correct{border-color:var(--ok);background:var(--ok-bg)} .ms-option.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.ms-option.disabled{pointer-events:none;opacity:.8}
+.cr-area{width:100%;min-height:84px;border:2px solid var(--border);border-radius:8px;padding:.55rem;font:inherit;font-size:.92rem;resize:vertical;background:#fff}
+.cr-area:focus{outline:none;border-color:var(--pitch-green)}
+.cr-saved{color:var(--ok);font-size:.84rem;font-weight:600;margin-top:.3rem}
+table.gtable{border-collapse:collapse;margin:.65rem 0;font-size:.88rem}
+table.gtable th,table.gtable td{border:1px solid #B5C5BB;padding:.35rem .65rem;text-align:center}
+table.gtable th{background:var(--pitch-green);color:#fff;font-weight:600} table.gtable td.label{background:var(--green-light);font-weight:600;text-align:left}
+.keyfact{background:var(--gold-light);border-left:4px solid var(--gold);padding:.5rem .8rem;margin:.55rem 0;border-radius:4px;font-size:.92rem}
+.keyfact strong{color:#7C5E11}
+.guide{background:#Eef4ff;border:1px solid #C7D7F5;border-left:5px solid var(--blue);border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem;font-size:.9rem}
+.guide h3{margin:0 0 .5rem;color:var(--blue);font-size:1rem}
+.guide code{background:#fff;border:1px solid #d6e0f5;border-radius:4px;padding:.05rem .3rem;font-size:.85rem}
+.overall-progress{background:#fff;border:1px solid var(--border);border-radius:10px;padding:.85rem 1rem;margin-bottom:1.2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.7rem}
+.op-counts{display:flex;gap:1rem;flex-wrap:wrap} .op-stat{text-align:center}
+.op-stat .num{font-size:1.45rem;font-weight:700;line-height:1} .op-stat .lbl{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.op-stat.done .num{color:var(--ok)} .op-stat.total .num{color:var(--navy)} .op-stat.pct .num{color:var(--pitch-green)}
+.btn-export{background:var(--pitch-green);color:#fff;border:none;padding:.4rem .85rem;border-radius:6px;cursor:pointer;font-size:.83rem;font-weight:500;font-family:inherit}
+.btn-reset-all{background:#fff;color:var(--muted);border:1px solid var(--border);padding:.4rem .85rem;border-radius:6px;cursor:pointer;font-size:.83rem;font-family:inherit}
+.challenge{background:#F3EEFB;border:1px solid #D6C9F0;border-left:5px solid var(--purple);border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem}
+.challenge h3{margin:0 0 .5rem;color:var(--purple);font-size:1.04rem}
+.legend{font-size:.86rem;color:var(--muted);margin:.5rem 0 1rem} .legend strong{color:var(--pitch-green)}
+footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;border-top:1px solid var(--border);margin-top:3rem}
+@media(max-width:640px){main{padding:1rem .75rem 3rem}.qcard,.tcard,.challenge,.guide{padding:.85rem}.qtitle{margin-left:0;width:100%;font-size:.93rem}header.mod h1{font-size:1.25rem}}
+
+    /* ===== plot input (6th format): click-to-place on a number line or grid ===== */
+    .plotbox{margin:.45rem 0 .2rem}
+    .plotbox svg{max-width:100%;height:auto;touch-action:manipulation}
+    .plotbox .hit{cursor:pointer;fill:transparent}
+    .plotbox.locked .hit{cursor:not-allowed}
+    .plotbox .pt{fill:#FAC415;stroke:#0F3D22;stroke-width:2}
+    .plotbox .gridline{stroke:#D9E4DC;stroke-width:1}
+    .plotbox .axis{stroke:#0F3D22;stroke-width:1.8}
+    .plotbox .tick{stroke:#0F3D22;stroke-width:1.4}
+    .plotbox .tlab{font-size:11px;fill:#0F172A}
+    .plotbox .hint-dot{fill:#B7CBBE}
+    .plotbox .readout{font-size:.82rem;color:var(--muted);margin-top:.2rem}
+  </style>
+<style>
+/* v1.4 engine deltas: gate MC feedback until answered + MC cooldown + locked-step dimming */
+.mc-feedback{display:none;margin-top:.4rem;font-size:.86rem;font-weight:500;min-height:0}
+.mc-feedback.correct,.mc-feedback.wrong{display:block}
+.mc-feedback.correct{color:var(--ok)} .mc-feedback.wrong{color:var(--bad)}
+.mc-option.cooldown{pointer-events:none;opacity:.7}
+.step.locked .ans-input,.step.locked button,.step.locked .mc-option,.step.locked .ms-option{opacity:.5}
+/* v1.4.2 anti-cheat: question text not selectable/copyable (typing areas stay editable) */
+.qcard{-webkit-user-select:none;-moz-user-select:none;user-select:none}
+.qcard input,.qcard textarea{-webkit-user-select:text;-moz-user-select:text;user-select:text}
+/* v1.4.3 section report card (student-facing per-section progress) */
+.sec-report{background:#fff;border:1px solid var(--border);border-radius:10px;padding:.85rem 1rem;margin-bottom:1.2rem}
+.sec-report h3{margin:0 0 .5rem;font-size:.95rem;color:var(--pitch-green)}
+.sec-row{display:flex;align-items:center;gap:.6rem;margin:.3rem 0;font-size:.85rem}
+.sec-row a{flex:none;width:220px;max-width:44%;color:var(--navy);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sec-row a:hover{color:var(--pitch-green)}
+.sec-row .bar{flex:1;height:7px;background:#EDEBE2;border-radius:99px;overflow:hidden}
+.sec-row .bar>span{display:block;height:100%;background:var(--gold);border-radius:99px}
+.sec-row.full .bar>span{background:var(--ok)}
+.sec-row .val{flex:none;width:96px;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+/* MR-1 phase-3: retrieval-practice review mode (?review=<skill>) — the due skill's own
+   authored items, cleared for a fresh attempt. Everything else is hidden so the session is
+   a retrieval, not a re-read; nothing is removed from the DOM, so the step totals stay honest. */
+.g7-review-mode section.topic,.g7-review-mode .overall-progress,.g7-review-mode #sec-report,.g7-review-mode .toc{display:none}
+.rev-panel{background:#fff;border:1px solid var(--border);border-left:4px solid var(--gold);border-radius:10px;padding:1rem 1.1rem;margin-bottom:1.2rem}
+.rev-panel h2{margin:0 0 .35rem;font-size:1.15rem;color:var(--pitch-green)}
+.rev-sub{margin:0 0 1rem;font-size:.88rem;color:var(--muted);line-height:1.5}
+.rev-done{margin-top:1rem;display:flex;gap:.6rem;flex-wrap:wrap}
+.rev-done .btn{display:inline-block;background:var(--pitch-green);color:#fff;border:none;border-radius:8px;padding:.55rem 1rem;font-size:.88rem;font-weight:600;text-decoration:none;cursor:pointer}
+.rev-done .btn.ghost{background:transparent;color:var(--navy);border:1px solid var(--border)}
+</style>
+</head>
+<body>
+
+
+<header class="mod">
+  <h1>Functions</h1>
+  <p>Grade 8 Mathematics &middot; Algebraic Thinking &middot; Standards 8.F.A&ndash;B (MCCRS 2025: 8.AT.C&ndash;D) &middot; Defining, comparing, building, reading and sketching functions</p>
+</header>
+
+<div id="g7bar">
+  <a href="Grade_8_Math_Hub.html">&#8592; Back to Hub</a>
+  <span style="margin-left:auto">Student: <strong id="g7name" style="color:var(--pitch-green)">Guest</strong></span>
+</div>
+
+<nav class="topics" id="topnav">
+  <a href="#define" class="navlink">1 &middot; What is a function?</a>
+  <a href="#represent" class="navlink">2 &middot; Four ways</a>
+  <a href="#linearity" class="navlink">3 &middot; Linear or not</a>
+  <a href="#graphread" class="navlink">4 &middot; Read a graph</a>
+  <a href="#build" class="navlink">5 &middot; Build a function</a>
+  <a href="#compare" class="navlink">6 &middot; Compare</a>
+  <a href="#qualitative" class="navlink">7 &middot; Describe &amp; sketch</a>
+  <a href="#check" class="navlink">8 &middot; Module Check</a>
+</nav>
+
+<main>
+  <p class="legend"><strong>How to use:</strong> work top to bottom. Type answers and press <em>Check</em> or Enter. Green = correct, red = retry. Steps unlock as you go. Progress saves automatically.</p>
+
+  <div class="overall-progress">
+    <div class="op-counts">
+      <div class="op-stat done"><div class="num" id="op-done">0</div><div class="lbl">Steps done</div></div>
+      <div class="op-stat total"><div class="num" id="op-total">0</div><div class="lbl">Total</div></div>
+      <div class="op-stat pct"><div class="num" id="op-pct">0%</div><div class="lbl">Mastery</div></div>
+    </div>
+    <div style="display:flex;gap:.5rem">
+      <button class="btn-export" id="btn-export">Export progress</button>
+      <button class="btn-reset-all" id="btn-reset-all">Reset all</button>
+    </div>
+  </div>
+
+  <section class="topic" id="define">
+  <h2>1 &middot; What is a function?</h2>
+  <p class="intro">Everything in this unit rests on one idea, so it comes first.</p>
+  <p class="objective"><strong>By the end:</strong> you can decide whether a set of pairs, a table or a graph is a function, and say why.</p>
+
+  <div class="tcard">
+    <h3>One input, one output</h3>
+<p>A <strong>function</strong> is a rule that gives <strong>exactly one output for every input</strong>. Two different inputs are allowed to share an output &mdash; what is never allowed is one input with <em>two</em> outputs.</p>
+    <div class="worked"><div class="wl">Worked example</div><p><span class="math">{(1,2), (2,3), (2,5)}</span> is <strong>not</strong> a function: the input <span class="math">2</span> is paired with both <span class="math">3</span> and <span class="math">5</span>.<br><span class="math">{(1,4), (2,4), (3,4)}</span> <strong>is</strong> a function: each input appears once. The repeated <em>output</em> <span class="math">4</span> is fine.</p></div>
+    <div class="keyfact"><strong>Vertical line test:</strong> on a graph, if any vertical line meets the curve more than once, one input has two outputs &mdash; not a function.</div>
+  </div>
+
+  <div class="qcard" data-qid="1-1">
+    <div class="qhead"><span class="qtag guided">Guided</span><span class="qtitle">Which relation is a function?</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Q1 &middot; Select the relation that <strong>is</strong> a function.</div>
+        <div class="mc-group"><button class="mc-option" data-k="k1:MHwx"><span class="math">{(0,1), (1,2), (2,3)}</span></button><button class="mc-option" data-k="k1:MXww"><span class="math">{(0,1), (0,2), (1,3)}</span></button><button class="mc-option" data-k="k1:Mnww"><span class="math">{(5,1), (5,2), (5,3)}</span></button><button class="mc-option" data-k="k1:M3ww"><span class="math">{(2,7), (3,7), (2,9)}</span></button></div>
+        <div class="mc-feedback">Look for a repeated <em>input</em>. In the first set the inputs are 0, 1, 2 &mdash; all different, so each has exactly one output.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="1-2">
+    <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Make it a function</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Q2 &middot; A relation contains <span class="math">(6,1)</span>, <span class="math">(7,4)</span> and <span class="math">(6,k)</span>. For the relation to be a function, <span class="math">k</span> must equal</div>
+        <div class="input-row"><input type="number" class="ans-input" data-answer="k1:MQ==" data-tol="0"/><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+        <button class="hint-btn">Hint</button>
+        <div class="hint-content">The input 6 already has an output. A function cannot give that same input a second, different output.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="1-3">
+    <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Vertical line test</span></div>
+    <div class="qbody">
+<svg class="fig" viewBox="0 0 300 240" width="270" role="img" aria-label="A curve opening to the right. A dashed vertical line crosses it at two points."><line x1="26.0" y1="10" x2="26.0" y2="214" stroke="#E5E7EB" stroke-width="1"/><line x1="55.3" y1="10" x2="55.3" y2="214" stroke="#E5E7EB" stroke-width="1"/><line x1="84.7" y1="10" x2="84.7" y2="214" stroke="#E5E7EB" stroke-width="1"/><line x1="114.0" y1="10" x2="114.0" y2="214" stroke="#E5E7EB" stroke-width="1"/><line x1="143.3" y1="10" x2="143.3" y2="214" stroke="#E5E7EB" stroke-width="1"/><line x1="172.7" y1="10" x2="172.7" y2="214" stroke="#E5E7EB" stroke-width="1"/><line x1="202.0" y1="10" x2="202.0" y2="214" stroke="#E5E7EB" stroke-width="1"/><line x1="231.3" y1="10" x2="231.3" y2="214" stroke="#E5E7EB" stroke-width="1"/><line x1="260.7" y1="10" x2="260.7" y2="214" stroke="#E5E7EB" stroke-width="1"/><line x1="290.0" y1="10" x2="290.0" y2="214" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="214.0" x2="290" y2="214.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="188.5" x2="290" y2="188.5" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="163.0" x2="290" y2="163.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="137.5" x2="290" y2="137.5" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="112.0" x2="290" y2="112.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="86.5" x2="290" y2="86.5" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="61.0" x2="290" y2="61.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="35.5" x2="290" y2="35.5" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="10.0" x2="290" y2="10.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="112.0" x2="290" y2="112.0" stroke="#0F172A" stroke-width="1.6"/><line x1="55.3" y1="10" x2="55.3" y2="214" stroke="#0F172A" stroke-width="1.6"/><text x="114.0" y="125.0" font-size="10" fill="#64748B" text-anchor="middle">2</text><text x="172.7" y="125.0" font-size="10" fill="#64748B" text-anchor="middle">4</text><text x="231.3" y="125.0" font-size="10" fill="#64748B" text-anchor="middle">6</text><text x="290.0" y="125.0" font-size="10" fill="#64748B" text-anchor="middle">8</text><text x="50.3" y="217.5" font-size="10" fill="#64748B" text-anchor="end">-4</text><text x="50.3" y="166.5" font-size="10" fill="#64748B" text-anchor="end">-2</text><text x="50.3" y="64.5" font-size="10" fill="#64748B" text-anchor="end">2</text><text x="50.3" y="13.5" font-size="10" fill="#64748B" text-anchor="end">4</text><path d="M319.3 188.5 L277.2 182.1 L238.7 175.8 L203.8 169.4 L172.7 163.0 L145.2 156.6 L121.3 150.2 L101.2 143.9 L84.7 137.5 L71.8 131.1 L62.7 124.8 L57.2 118.4 L55.3 112.0 L57.2 105.6 L62.7 99.2 L71.8 92.9 L84.7 86.5 L101.2 80.1 L121.3 73.8 L145.2 67.4 L172.7 61.0 L203.8 54.6 L238.7 48.2 L277.2 41.9 L319.3 35.5" fill="none" stroke="#14532D" stroke-width="2.6"/><line x1="172.7" y1="214.0" x2="172.7" y2="10.0" stroke="#DC2626" stroke-width="1.8" stroke-dasharray="5 4"/></svg>
+      <div class="step">
+        <div class="step-label">Q3 &middot; Does this graph represent a function?</div>
+        <div class="mc-group"><button class="mc-option" data-k="k1:MTB8MQ==">No &mdash; a vertical line meets it twice, so one input has two outputs</button><button class="mc-option" data-k="k1:MTF8MA==">Yes &mdash; every point on it has an <span class="math">x</span> and a <span class="math">y</span></button><button class="mc-option" data-k="k1:MTJ8MA==">No &mdash; it is not a straight line</button><button class="mc-option" data-k="k1:MTN8MA==">Yes &mdash; it passes the horizontal line test</button></div>
+        <div class="mc-feedback">The dashed vertical line crosses the curve at two points, so that one input has two different outputs. Being curved is not itself a problem &mdash; plenty of functions are curved.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="1-4">
+    <div class="qhead"><span class="qtag apply">Apply</span><span class="qtitle">Repeated outputs are allowed</span></div>
+    <div class="qbody">
+      <p class="muted-note" style="font-size:.86rem"><span class="math">x</span>: 1, 2, 3, 4 &nbsp;&rarr;&nbsp; <span class="math">y</span>: 5, 5, 7, 9</p>
+      <div class="step">
+        <div class="step-label">Part A &middot; Which output value appears for both <span class="math">x = 1</span> and <span class="math">x = 2</span>?</div>
+        <div class="input-row"><input type="number" class="ans-input" data-answer="k1:NQ==" data-tol="0"/><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+      </div>
+      <div class="step locked">
+        <div class="step-label">Part B &middot; Is this table a function? Type <em>yes</em> or <em>no</em>.</div>
+        <div class="input-row"><input type="text" class="ans-input" data-type="text" data-answer="k1:eWVz"/><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="1-5" data-exam="1">
+    <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">MCAP &middot; 8.F.A.1</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Which sets of ordered pairs represent functions?<br><strong>Select all that apply.</strong></div>
+        <div class="ms-group" data-noshuffle="1"><button class="ms-option" data-k="k1:MjB8MQ=="><span class="box"></span><span class="math">{(1,2), (2,3), (3,4)}</span></button><button class="ms-option" data-k="k1:MjF8MA=="><span class="box"></span><span class="math">{(2,1), (2,3), (4,1)}</span></button><button class="ms-option" data-k="k1:MjJ8MQ=="><span class="box"></span><span class="math">{(3,1), (4,2), (5,3)}</span></button><button class="ms-option" data-k="k1:MjN8MA=="><span class="box"></span><span class="math">{(6,1), (6,2), (6,3)}</span></button><button class="ms-option" data-k="k1:MjR8MQ=="><span class="box"></span><span class="math">{(7,1), (8,3), (9,3)}</span></button></div>
+        <button class="check-btn ms-check">Check</button>
+      </div>
+    </div>
+  </div>
+
+  </section>
+
+  <section class="topic" id="represent">
+  <h2>2 &middot; Showing a function four ways</h2>
+  <p class="intro">Before comparing functions, you need to read them in whatever form they arrive.</p>
+  <p class="objective"><strong>By the end:</strong> you can move between a table, an equation and a description of the same function.</p>
+
+  <div class="tcard">
+    <h3>The same function, four ways</h3>
+<p>A function can be shown as a <strong>table</strong>, a <strong>graph</strong>, an <strong>equation</strong>, or a <strong>description in words</strong>. They are four views of one rule.</p>
+    <div class="worked"><div class="wl">Worked example</div><p><span class="math">y = 3x + 1</span> &rarr; when <span class="math">x = 0, 1, 2</span> the outputs are <span class="math">1, 4, 7</span>. In words: <em>start at 1 and add 3 each step</em>.</p></div>
+  </div>
+
+  <div class="qcard" data-qid="2-1">
+    <div class="qhead"><span class="qtag guided">Guided</span><span class="qtitle">Evaluate an equation</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Q1 &middot; For <span class="math">y = 4x &minus; 3</span>, find <span class="math">y</span> when <span class="math">x = 5</span>.</div>
+        <div class="input-row"><input type="number" class="ans-input" data-answer="k1:MTc=" data-tol="0"/><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="2-2">
+    <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Continue a table</span></div>
+    <div class="qbody">
+      <p class="muted-note" style="font-size:.86rem"><span class="math">x</span>: 0, 1, 2 &nbsp;&rarr;&nbsp; <span class="math">y</span>: 6, 10, 14</p>
+      <div class="step">
+        <div class="step-label">Q2 &middot; What is the output when <span class="math">x = 3</span>?</div>
+        <div class="input-row"><input type="number" class="ans-input" data-answer="k1:MTg=" data-tol="0"/><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+        <button class="hint-btn">Hint</button>
+        <div class="hint-content">Look at what the output does for each step of 1 in the input, then take one more step.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="2-3">
+    <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Table &rarr; equation</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Q3 &middot; Which equation matches the table above?</div>
+        <div class="mc-group"><button class="mc-option" data-k="k1:MzB8MQ=="><span class="math">y = 4x + 6</span></button><button class="mc-option" data-k="k1:MzF8MA=="><span class="math">y = 6x + 4</span></button><button class="mc-option" data-k="k1:MzJ8MA=="><span class="math">y = 4x</span></button><button class="mc-option" data-k="k1:MzN8MA=="><span class="math">y = 10x</span></button></div>
+        <div class="mc-feedback">The output rises by 4 for each step of 1, so the coefficient of <span class="math">x</span> is 4. At <span class="math">x = 0</span> the output is 6, so the constant is 6.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="2-4">
+    <div class="qhead"><span class="qtag apply">Apply</span><span class="qtitle">Words &rarr; equation &rarr; answer</span></div>
+    <div class="qbody">
+      <p class="muted-note" style="font-size:.86rem">A taxi charges $3 to start, plus $2 for every mile.</p>
+      <div class="step">
+        <div class="step-label">Part A &middot; What does a 7-mile ride cost?</div>
+        <div class="input-row"><span class="lbl">$</span><input type="number" class="ans-input" data-answer="k1:MTc=" data-tol="0"/><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+      </div>
+      <div class="step locked">
+        <div class="step-label">Part B &middot; How many miles cost exactly $25?</div>
+        <div class="input-row"><input type="number" class="ans-input" data-answer="k1:MTE=" data-tol="0"/><span class="lbl">miles</span><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+      </div>
+    </div>
+  </div>
+
+  </section>
+
+  <section class="topic" id="linearity">
+  <h2>3 &middot; Linear or non-linear?</h2>
+  <p class="intro">One test settles it, and it is the same test whether you are given a table, a graph or an equation.</p>
+  <p class="objective"><strong>By the end:</strong> you can judge whether a function is linear from any representation, and justify it by rate of change.</p>
+
+  <div class="tcard">
+    <h3>Constant rate of change</h3>
+<p>A function is <strong>linear</strong> when the output changes by the <em>same amount</em> for every equal step in the input. Its graph is a straight line and it can be written <span class="math">y = mx + b</span>. If the rate of change varies, the function is <strong>non-linear</strong>.</p>
+    <div class="worked"><div class="wl">Worked example</div><p><span class="math">x</span>: 1, 2, 3 &rarr; <span class="math">y</span>: 4, 7, 10. Each step of 1 in <span class="math">x</span> adds 3 to <span class="math">y</span>, every time &mdash; so it is linear with rate of change 3.</p></div>
+    <div class="keyfact"><strong>Watch the input steps.</strong> If the inputs do not go up in equal jumps, compare <span class="math">(change in y) &divide; (change in x)</span>, not the output differences alone.</div>
+  </div>
+
+  <div class="qcard" data-qid="3-1">
+    <div class="qhead"><span class="qtag guided">Guided</span><span class="qtitle">Spot the non-linear one</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Q1 &middot; Which of these is <strong>not</strong> a linear function?</div>
+        <div class="mc-group"><button class="mc-option" data-k="k1:NDB8MQ=="><span class="math">y = x&sup2;</span></button><button class="mc-option" data-k="k1:NDF8MA=="><span class="math">y = 2x + 1</span></button><button class="mc-option" data-k="k1:NDJ8MA=="><span class="math">y = &minus;5x</span></button><button class="mc-option" data-k="k1:NDN8MA=="><span class="math">y = &frac12;x &minus; 4</span></button></div>
+        <div class="mc-feedback">Squaring makes the rate of change grow: from <span class="math">x = 1</span> to <span class="math">2</span> the output rises by 3, but from <span class="math">2</span> to <span class="math">3</span> it rises by 5.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="3-2">
+    <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Which tables are non-linear?</span></div>
+    <div class="qbody">
+      <p class="muted-note" style="font-size:.86rem"><strong>Table I</strong> &mdash; in: 3, 6, 9, 12, 15 &rarr; out: 1, 4, 9, 16, 25<br><strong>Table II</strong> &mdash; in: 2, 4, 6, 8, 10 &rarr; out: 19, 9, &minus;1, &minus;11, &minus;21<br><strong>Table III</strong> &mdash; in: 6, 3, 0, &minus;3, &minus;6 &rarr; out: 216, 27, 0, &minus;27, &minus;216</p>
+      <div class="step">
+        <div class="step-label">Q2 &middot; Select every table that represents a <strong>non-linear</strong> function.</div>
+        <div class="ms-group"><button class="ms-option" data-k="k1:NTB8MQ=="><span class="box"></span>Table I</button><button class="ms-option" data-k="k1:NTF8MA=="><span class="box"></span>Table II</button><button class="ms-option" data-k="k1:NTJ8MQ=="><span class="box"></span>Table III</button></div>
+        <button class="check-btn ms-check">Check</button>
+        <button class="hint-btn">Hint</button>
+        <div class="hint-content">For each table divide the change in the output by the change in the input, twice. A linear function gives the same value both times.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="3-3">
+    <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Find the rate of change</span></div>
+    <div class="qbody">
+      <p class="muted-note" style="font-size:.86rem"><span class="math">x</span>: 2, 5, 8 &nbsp;&rarr;&nbsp; <span class="math">y</span>: 7, 16, 25</p>
+      <div class="step">
+        <div class="step-label">Q3 &middot; What is the rate of change?</div>
+        <div class="input-row"><input type="number" class="ans-input" data-answer="k1:Mw==" data-tol="0"/><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+        <button class="hint-btn">Hint</button>
+        <div class="hint-content">The input jumps by 3 each time, not by 1. Divide the change in output by the change in input.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="3-4">
+    <div class="qhead"><span class="qtag apply">Apply</span><span class="qtitle">Area of a square</span></div>
+    <div class="qbody">
+      <p class="muted-note" style="font-size:.86rem">The area of a square is <span class="math">A = s&sup2;</span>, where <span class="math">s</span> is the side length.</p>
+      <div class="step">
+        <div class="step-label">Part A &middot; Find <span class="math">A</span> when <span class="math">s = 7</span>.</div>
+        <div class="input-row"><input type="number" class="ans-input" data-answer="k1:NDk=" data-tol="0"/><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+      </div>
+      <div class="step locked">
+        <div class="step-label">Part B &middot; Is <span class="math">A</span> a linear function of <span class="math">s</span>? Type <em>yes</em> or <em>no</em>.</div>
+        <div class="input-row"><input type="text" class="ans-input" data-type="text" data-answer="k1:bm8="/><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="3-5" data-exam="1">
+    <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">Exam-style &middot; 8.AT.C.8 &mdash; error analysis</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">A student says <span class="math">y = 5/x</span> is a linear function &ldquo;because there is no exponent&rdquo;. What is wrong with that reasoning?</div>
+        <div class="mc-group"><button class="mc-option" data-k="k1:NjB8MQ==">The rate of change is not constant &mdash; doubling <span class="math">x</span> halves <span class="math">y</span>, so the graph is not a straight line</button><button class="mc-option" data-k="k1:NjF8MA==">Nothing &mdash; the student is right, it is linear</button><button class="mc-option" data-k="k1:NjJ8MA==">It is non-linear only because 5 is an odd number</button><button class="mc-option" data-k="k1:NjN8MA==">It is linear, because it can be written as <span class="math">y = 5x&#8315;&sup1;</span></button></div>
+        <div class="mc-feedback">Linearity is about a <em>constant rate of change</em>, not about whether an exponent is written down. Check: <span class="math">x = 1 &rarr; 5</span>, <span class="math">x = 2 &rarr; 2.5</span>, <span class="math">x = 4 &rarr; 1.25</span> &mdash; the drops are 2.5 then 1.25, so the rate changes.</div>
+      </div>
+    </div>
+  </div>
+
+  </section>
+
+  <section class="topic" id="graphread">
+  <h2>4 &middot; Reading <span class="math">y = mx + b</span> from a graph</h2>
+  <p class="intro">A graph is not just a picture of a function &mdash; both numbers in its equation can be read straight off it.</p>
+  <p class="objective"><strong>By the end:</strong> you can identify the slope and y-intercept from a graph, and match a graph to its equation.</p>
+
+  <div class="tcard">
+    <h3>Reading a line off its graph</h3>
+<p>Every straight-line graph tells you both numbers in <span class="math">y = mx + b</span> directly:</p><ul><li><span class="math">b</span> &mdash; the <strong>y-intercept</strong>: where the line crosses the vertical axis.</li><li><span class="math">m</span> &mdash; the <strong>slope</strong>: pick two points where the line crosses corners of the grid, then <span class="math">rise &divide; run</span>.</li></ul>
+    <div class="worked"><div class="wl">Worked example</div><p>A line through <span class="math">(0, 2)</span> and <span class="math">(3, 8)</span>: it crosses the vertical axis at 2, so <span class="math">b = 2</span>. From <span class="math">(0,2)</span> to <span class="math">(3,8)</span> the rise is 6 and the run is 3, so <span class="math">m = 6 &divide; 3 = 2</span>. The equation is <span class="math">y = 2x + 2</span>.</p></div>
+    <div class="keyfact"><strong>Sign check:</strong> a line going <em>down</em> left-to-right has a negative slope. Read it before you compute it.</div>
+  </div>
+
+  <div class="qcard" data-qid="4-1">
+    <div class="qhead"><span class="qtag guided">Guided</span><span class="qtitle">Read the y-intercept</span></div>
+    <div class="qbody">
+<svg class="fig" viewBox="0 0 300 300" width="270" role="img" aria-label="A straight line crossing the vertical axis at negative 3 and passing through the points (0, negative 3), (1, negative 1) and (3, 3)."><line x1="26.0" y1="10" x2="26.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="48.0" y1="10" x2="48.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="70.0" y1="10" x2="70.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="92.0" y1="10" x2="92.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="114.0" y1="10" x2="114.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="136.0" y1="10" x2="136.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="158.0" y1="10" x2="158.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="180.0" y1="10" x2="180.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="202.0" y1="10" x2="202.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="224.0" y1="10" x2="224.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="246.0" y1="10" x2="246.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="268.0" y1="10" x2="268.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="290.0" y1="10" x2="290.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="274.0" x2="290" y2="274.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="252.0" x2="290" y2="252.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="230.0" x2="290" y2="230.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="208.0" x2="290" y2="208.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="186.0" x2="290" y2="186.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="164.0" x2="290" y2="164.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="142.0" x2="290" y2="142.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="120.0" x2="290" y2="120.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="98.0" x2="290" y2="98.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="76.0" x2="290" y2="76.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="54.0" x2="290" y2="54.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="32.0" x2="290" y2="32.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="10.0" x2="290" y2="10.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="142.0" x2="290" y2="142.0" stroke="#0F172A" stroke-width="1.6"/><line x1="158.0" y1="10" x2="158.0" y2="274" stroke="#0F172A" stroke-width="1.6"/><text x="26.0" y="155.0" font-size="10" fill="#64748B" text-anchor="middle">-6</text><text x="70.0" y="155.0" font-size="10" fill="#64748B" text-anchor="middle">-4</text><text x="114.0" y="155.0" font-size="10" fill="#64748B" text-anchor="middle">-2</text><text x="202.0" y="155.0" font-size="10" fill="#64748B" text-anchor="middle">2</text><text x="246.0" y="155.0" font-size="10" fill="#64748B" text-anchor="middle">4</text><text x="290.0" y="155.0" font-size="10" fill="#64748B" text-anchor="middle">6</text><text x="153.0" y="277.5" font-size="10" fill="#64748B" text-anchor="end">-6</text><text x="153.0" y="233.5" font-size="10" fill="#64748B" text-anchor="end">-4</text><text x="153.0" y="189.5" font-size="10" fill="#64748B" text-anchor="end">-2</text><text x="153.0" y="101.5" font-size="10" fill="#64748B" text-anchor="end">2</text><text x="153.0" y="57.5" font-size="10" fill="#64748B" text-anchor="end">4</text><text x="153.0" y="13.5" font-size="10" fill="#64748B" text-anchor="end">6</text><line x1="125.0" y1="274.0" x2="257.0" y2="10.0" stroke="#14532D" stroke-width="2.6"/><circle cx="158.0" cy="208.0" r="4.2" fill="#14532D"/><circle cx="224.0" cy="76.0" r="4.2" fill="#14532D"/></svg>
+      <div class="step">
+        <div class="step-label">Q1 &middot; What is the <span class="math">y</span>-intercept of this line?</div>
+        <div class="input-row"><input type="number" class="ans-input" data-answer="k1:LTM=" data-tol="0"/><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="4-2">
+    <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Read the slope</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Q2 &middot; For the same line, what is the slope?</div>
+        <div class="input-row"><input type="number" class="ans-input" data-answer="k1:Mg==" data-tol="0"/><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+        <button class="hint-btn">Hint</button>
+        <div class="hint-content">Use the two marked points. Count how far up the line goes, then how far across, and divide.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="4-3">
+    <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Match the equation to the graph</span></div>
+    <div class="qbody">
+<svg class="fig" viewBox="0 0 300 300" width="270" role="img" aria-label="A straight line falling from left to right, crossing the vertical axis at 4 and the horizontal axis at 2."><line x1="26.0" y1="10" x2="26.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="48.0" y1="10" x2="48.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="70.0" y1="10" x2="70.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="92.0" y1="10" x2="92.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="114.0" y1="10" x2="114.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="136.0" y1="10" x2="136.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="158.0" y1="10" x2="158.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="180.0" y1="10" x2="180.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="202.0" y1="10" x2="202.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="224.0" y1="10" x2="224.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="246.0" y1="10" x2="246.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="268.0" y1="10" x2="268.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="290.0" y1="10" x2="290.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="274.0" x2="290" y2="274.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="252.0" x2="290" y2="252.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="230.0" x2="290" y2="230.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="208.0" x2="290" y2="208.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="186.0" x2="290" y2="186.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="164.0" x2="290" y2="164.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="142.0" x2="290" y2="142.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="120.0" x2="290" y2="120.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="98.0" x2="290" y2="98.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="76.0" x2="290" y2="76.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="54.0" x2="290" y2="54.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="32.0" x2="290" y2="32.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="10.0" x2="290" y2="10.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="142.0" x2="290" y2="142.0" stroke="#0F172A" stroke-width="1.6"/><line x1="158.0" y1="10" x2="158.0" y2="274" stroke="#0F172A" stroke-width="1.6"/><text x="26.0" y="155.0" font-size="10" fill="#64748B" text-anchor="middle">-6</text><text x="70.0" y="155.0" font-size="10" fill="#64748B" text-anchor="middle">-4</text><text x="114.0" y="155.0" font-size="10" fill="#64748B" text-anchor="middle">-2</text><text x="202.0" y="155.0" font-size="10" fill="#64748B" text-anchor="middle">2</text><text x="246.0" y="155.0" font-size="10" fill="#64748B" text-anchor="middle">4</text><text x="290.0" y="155.0" font-size="10" fill="#64748B" text-anchor="middle">6</text><text x="153.0" y="277.5" font-size="10" fill="#64748B" text-anchor="end">-6</text><text x="153.0" y="233.5" font-size="10" fill="#64748B" text-anchor="end">-4</text><text x="153.0" y="189.5" font-size="10" fill="#64748B" text-anchor="end">-2</text><text x="153.0" y="101.5" font-size="10" fill="#64748B" text-anchor="end">2</text><text x="153.0" y="57.5" font-size="10" fill="#64748B" text-anchor="end">4</text><text x="153.0" y="13.5" font-size="10" fill="#64748B" text-anchor="end">6</text><line x1="136.0" y1="10.0" x2="268.0" y2="274.0" stroke="#14532D" stroke-width="2.6"/><circle cx="158.0" cy="54.0" r="4.2" fill="#14532D"/><circle cx="202.0" cy="142.0" r="4.2" fill="#14532D"/></svg>
+      <div class="step">
+        <div class="step-label">Q3 &middot; Which equation matches this graph?</div>
+        <div class="mc-group"><button class="mc-option" data-k="k1:NzB8MQ=="><span class="math">y = &minus;2x + 4</span></button><button class="mc-option" data-k="k1:NzF8MA=="><span class="math">y = 2x + 4</span></button><button class="mc-option" data-k="k1:NzJ8MA=="><span class="math">y = &minus;2x &minus; 4</span></button><button class="mc-option" data-k="k1:NzN8MA=="><span class="math">y = &minus;&frac12;x + 4</span></button></div>
+        <div class="mc-feedback">It crosses the vertical axis at 4, so <span class="math">b = 4</span>. From <span class="math">(0,4)</span> to <span class="math">(2,0)</span> the line falls 4 over a run of 2, so <span class="math">m = &minus;2</span>.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="4-4">
+    <div class="qhead"><span class="qtag apply">Apply</span><span class="qtitle">Both numbers from one graph</span></div>
+    <div class="qbody">
+<svg class="fig" viewBox="0 0 300 300" width="270" role="img" aria-label="A straight line rising gently from left to right, crossing the vertical axis at 1 and passing through the point (4, 3)."><line x1="26.0" y1="10" x2="26.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="48.0" y1="10" x2="48.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="70.0" y1="10" x2="70.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="92.0" y1="10" x2="92.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="114.0" y1="10" x2="114.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="136.0" y1="10" x2="136.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="158.0" y1="10" x2="158.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="180.0" y1="10" x2="180.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="202.0" y1="10" x2="202.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="224.0" y1="10" x2="224.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="246.0" y1="10" x2="246.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="268.0" y1="10" x2="268.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="290.0" y1="10" x2="290.0" y2="274" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="274.0" x2="290" y2="274.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="252.0" x2="290" y2="252.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="230.0" x2="290" y2="230.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="208.0" x2="290" y2="208.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="186.0" x2="290" y2="186.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="164.0" x2="290" y2="164.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="142.0" x2="290" y2="142.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="120.0" x2="290" y2="120.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="98.0" x2="290" y2="98.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="76.0" x2="290" y2="76.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="54.0" x2="290" y2="54.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="32.0" x2="290" y2="32.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="10.0" x2="290" y2="10.0" stroke="#E5E7EB" stroke-width="1"/><line x1="26" y1="142.0" x2="290" y2="142.0" stroke="#0F172A" stroke-width="1.6"/><line x1="158.0" y1="10" x2="158.0" y2="274" stroke="#0F172A" stroke-width="1.6"/><text x="26.0" y="155.0" font-size="10" fill="#64748B" text-anchor="middle">-6</text><text x="70.0" y="155.0" font-size="10" fill="#64748B" text-anchor="middle">-4</text><text x="114.0" y="155.0" font-size="10" fill="#64748B" text-anchor="middle">-2</text><text x="202.0" y="155.0" font-size="10" fill="#64748B" text-anchor="middle">2</text><text x="246.0" y="155.0" font-size="10" fill="#64748B" text-anchor="middle">4</text><text x="290.0" y="155.0" font-size="10" fill="#64748B" text-anchor="middle">6</text><text x="153.0" y="277.5" font-size="10" fill="#64748B" text-anchor="end">-6</text><text x="153.0" y="233.5" font-size="10" fill="#64748B" text-anchor="end">-4</text><text x="153.0" y="189.5" font-size="10" fill="#64748B" text-anchor="end">-2</text><text x="153.0" y="101.5" font-size="10" fill="#64748B" text-anchor="end">2</text><text x="153.0" y="57.5" font-size="10" fill="#64748B" text-anchor="end">4</text><text x="153.0" y="13.5" font-size="10" fill="#64748B" text-anchor="end">6</text><line x1="26.0" y1="186.0" x2="290.0" y2="54.0" stroke="#14532D" stroke-width="2.6"/><circle cx="158.0" cy="120.0" r="4.2" fill="#14532D"/><circle cx="246.0" cy="76.0" r="4.2" fill="#14532D"/></svg>
+      <div class="step">
+        <div class="step-label">Part A &middot; What is the <span class="math">y</span>-intercept?</div>
+        <div class="input-row"><input type="number" class="ans-input" data-answer="k1:MQ==" data-tol="0"/><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+      </div>
+      <div class="step locked">
+        <div class="step-label">Part B &middot; What is the slope? (a fraction is fine)</div>
+        <div class="input-row"><input type="text" class="ans-input" data-type="text" data-answer="k1:MS8y"/><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="4-5" data-exam="1">
+    <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">Exam-style &middot; 8.AT.D.9</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">A line passes through <span class="math">(0, &minus;1)</span> and <span class="math">(4, &minus;9)</span>. Which statement about its graph is true?</div>
+        <div class="mc-group"><button class="mc-option" data-k="k1:ODB8MQ==">It crosses the <span class="math">y</span>-axis at <span class="math">&minus;1</span> and falls 2 units for every 1 unit right</button><button class="mc-option" data-k="k1:ODF8MA==">It crosses the <span class="math">y</span>-axis at <span class="math">&minus;9</span> and falls 2 units for every 1 unit right</button><button class="mc-option" data-k="k1:ODJ8MA==">It crosses the <span class="math">y</span>-axis at <span class="math">&minus;1</span> and rises 2 units for every 1 unit right</button><button class="mc-option" data-k="k1:ODN8MA==">It crosses the <span class="math">y</span>-axis at <span class="math">&minus;1</span> and falls 8 units for every 1 unit right</button></div>
+        <div class="mc-feedback">The point with <span class="math">x = 0</span> is the intercept, so <span class="math">b = &minus;1</span>. The slope is <span class="math">(&minus;9 &minus; (&minus;1)) &divide; (4 &minus; 0) = &minus;8 &divide; 4 = &minus;2</span> &mdash; down 2 for each 1 across.</div>
+      </div>
+    </div>
+  </div>
+
+  </section>
+
+  <section class="topic" id="build">
+  <h2>5 &middot; Building a linear function</h2>
+  <p class="intro">Given two points, a table or a story, you can write the function it describes.</p>
+  <p class="objective"><strong>By the end:</strong> you can find the rate of change and initial value from any description, and write <span class="math">y = mx + b</span>.</p>
+
+  <div class="tcard">
+    <h3>Rate of change and initial value</h3>
+<p>To build <span class="math">y = mx + b</span> from information rather than a picture:</p><ul><li><strong>Rate of change</strong> <span class="math">m = (change in y) &divide; (change in x)</span>.</li><li><strong>Initial value</strong> <span class="math">b</span> is the output when <span class="math">x = 0</span>. If <span class="math">0</span> is not in your data, work back from a point you do have.</li></ul>
+    <div class="worked"><div class="wl">Worked example</div><p>Given <span class="math">(2, 11)</span> and <span class="math">(5, 20)</span>: <span class="math">m = (20 &minus; 11) &divide; (5 &minus; 2) = 9 &divide; 3 = 3</span>. Then <span class="math">11 = 3(2) + b</span>, so <span class="math">b = 5</span> and the function is <span class="math">y = 3x + 5</span>.</p></div>
+  </div>
+
+  <div class="qcard" data-qid="5-1">
+    <div class="qhead"><span class="qtag guided">Guided</span><span class="qtitle">Rate of change from two points</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Q1 &middot; A linear function passes through <span class="math">(0, 7)</span> and <span class="math">(4, 19)</span>. What is its rate of change?</div>
+        <div class="input-row"><input type="number" class="ans-input" data-answer="k1:Mw==" data-tol="0"/><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="5-2">
+    <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Initial value</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Q2 &middot; For the same function, what is the initial value?</div>
+        <div class="input-row"><input type="number" class="ans-input" data-answer="k1:Nw==" data-tol="0"/><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+        <button class="hint-btn">Hint</button>
+        <div class="hint-content">The initial value is the output when the input is 0 &mdash; one of the two points already gives you that.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="5-3">
+    <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">From a situation</span></div>
+    <div class="qbody">
+      <p class="muted-note" style="font-size:.86rem">A pool holds 500 litres and is filled at a steady 25 litres per minute.</p>
+      <div class="step">
+        <div class="step-label">Part A &middot; How much water is in the pool after 12 minutes?</div>
+        <div class="input-row"><input type="number" class="ans-input" data-answer="k1:ODAw" data-tol="0"/><span class="lbl">L</span><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+      </div>
+      <div class="step locked">
+        <div class="step-label">Part B &middot; After how many minutes does it hold 1000 litres?</div>
+        <div class="input-row"><input type="number" class="ans-input" data-answer="k1:MjA=" data-tol="0"/><span class="lbl">min</span><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="5-4">
+    <div class="qhead"><span class="qtag apply">Apply</span><span class="qtitle">When the table skips zero</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Q4 &middot; A linear function passes through <span class="math">(3, 14)</span> and <span class="math">(7, 26)</span>. What is its initial value?</div>
+        <div class="input-row"><input type="number" class="ans-input" data-answer="k1:NQ==" data-tol="0"/><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+        <button class="hint-btn">Hint</button>
+        <div class="hint-content">Find the rate of change first, then step back from <span class="math">(3, 14)</span> to <span class="math">x = 0</span>.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="5-5" data-exam="1">
+    <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">MCAP &middot; 8.F.B.4</span></div>
+    <div class="qbody">
+      <p class="muted-note" style="font-size:.86rem">Anton has some money saved for school. To increase the amount he has saved, he got a job and added all the money earned to the amount already saved.</p>
+      <ul class="muted-note" style="font-size:.86rem"><li>Anton was paid a constant rate in dollars per hour at his job.</li><li>After working 10 hours, the amount he had saved was $450.</li><li>After working 20 hours, the amount he had saved was $600.</li><li>Anton did not save any other money or spend any of the money he had saved.</li></ul>
+      <div class="step">
+        <div class="step-label">Which equation represents <span class="math">y</span>, the amount of money in dollars Anton would have saved after working <span class="math">x</span> hours?</div>
+        <div class="mc-group" data-noshuffle="1"><button class="mc-option" data-k="k1:OTB8MA=="><span class="math">y = 10x + 150</span></button><button class="mc-option" data-k="k1:OTF8MA=="><span class="math">y = 15x + 100</span></button><button class="mc-option" data-k="k1:OTJ8MQ=="><span class="math">y = 15x + 300</span></button><button class="mc-option" data-k="k1:OTN8MA=="><span class="math">y = 30x + 150</span></button></div>
+        <div class="mc-feedback">The rate is <span class="math">(600 &minus; 450) &divide; (20 &minus; 10) = 15</span> dollars per hour. Working back, <span class="math">450 = 15(10) + b</span> gives <span class="math">b = 300</span> &mdash; the money he had saved before the job.</div>
+      </div>
+    </div>
+  </div>
+
+  </section>
+
+  <section class="topic" id="compare">
+  <h2>6 &middot; Comparing two functions</h2>
+  <p class="intro">The exam almost always gives you the two functions in different forms on purpose.</p>
+  <p class="objective"><strong>By the end:</strong> you can compare the rate of change and initial value of two functions given in different forms.</p>
+
+  <div class="tcard">
+    <h3>Compare like with like</h3>
+<p>Two functions rarely arrive in the same form. Put both into the same terms &mdash; find each <strong>rate of change</strong> and each <strong>initial value</strong> &mdash; then compare those numbers.</p>
+    <div class="worked"><div class="wl">Worked example</div><p>Function A from a table <span class="math">(0,3), (1,5)</span> has <span class="math">m = 2, b = 3</span>. Function B is <span class="math">y = 4x + 1</span>, so <span class="math">m = 4, b = 1</span>. B grows faster; A starts higher.</p></div>
+  </div>
+
+  <div class="qcard" data-qid="6-1">
+    <div class="qhead"><span class="qtag guided">Guided</span><span class="qtitle">Which grows faster?</span></div>
+    <div class="qbody">
+      <p class="muted-note" style="font-size:.86rem">Function <span class="math">P</span>: <span class="math">y = 6x + 2</span><br>Function <span class="math">Q</span>: the table <span class="math">x</span>: 0, 2 &rarr; <span class="math">y</span>: 5, 13</p>
+      <div class="step">
+        <div class="step-label">Q1 &middot; Which function has the greater rate of change? Type <em>P</em> or <em>Q</em>.</div>
+        <div class="input-row"><input type="text" class="ans-input" data-type="text" data-answer="k1:UA=="/><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="6-2">
+    <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Which starts higher?</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Q2 &middot; For the same pair, which has the greater initial value? Type <em>P</em> or <em>Q</em>.</div>
+        <div class="input-row"><input type="text" class="ans-input" data-type="text" data-answer="k1:UQ=="/><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+        <button class="hint-btn">Hint</button>
+        <div class="hint-content">The initial value is the output at <span class="math">x = 0</span>. Both are readable without any calculation.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="6-3">
+    <div class="qhead"><span class="qtag apply">Apply</span><span class="qtitle">Two descriptions</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Q3 &middot; Function <span class="math">R</span> starts at 12 and decreases by 3 at each step. Function <span class="math">S</span> is <span class="math">y = &minus;5x + 12</span>. Which statement is true?</div>
+        <div class="mc-group"><button class="mc-option" data-k="k1:MTAwfDE="><span class="math">S</span> decreases faster, and they have the same initial value</button><button class="mc-option" data-k="k1:MTAxfDA="><span class="math">R</span> decreases faster, and they have the same initial value</button><button class="mc-option" data-k="k1:MTAyfDA=">They decrease at the same rate</button><button class="mc-option" data-k="k1:MTAzfDA="><span class="math">R</span> has the greater initial value</button></div>
+        <div class="mc-feedback">Both start at 12. <span class="math">R</span> falls 3 per step and <span class="math">S</span> falls 5 per step, so <span class="math">S</span> falls faster. A more negative slope is a steeper fall.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="6-4" data-exam="1">
+    <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">MCAP &middot; 8.F.A.2</span></div>
+    <div class="qbody">
+      <p class="muted-note" style="font-size:.86rem">Certain values of linear function <span class="math">J</span> are shown in the following table, where <span class="math">x</span> is the input variable and <span class="math">y</span> is the output variable.</p>
+      <p class="muted-note" style="font-size:.86rem"><span class="math">x</span>: 0, 1, 2 &nbsp;&rarr;&nbsp; <span class="math">y</span>: 2, 7, 12<br>Linear function <span class="math">K</span> is represented by the equation <span class="math">y = 3x + 8</span>.</p>
+      <div class="step">
+        <div class="step-label">Part A &middot; The slope of the graph of function <span class="math">J</span> is &hellip; the slope of the graph of function <span class="math">K</span>.</div>
+        <div class="mc-group" data-noshuffle="1"><button class="mc-option" data-k="k1:MTEwfDE=">greater than</button><button class="mc-option" data-k="k1:MTExfDA=">less than</button><button class="mc-option" data-k="k1:MTEyfDA=">equal to</button></div>
+        <div class="mc-feedback"><span class="math">J</span> rises 5 for each step of 1, so its slope is 5. <span class="math">K</span> has slope 3, and <span class="math">5 &gt; 3</span>.</div>
+      </div>
+      <div class="step locked">
+        <div class="step-label">Part B &middot; The <span class="math">y</span>-intercept of the graph of function <span class="math">J</span> is &hellip; the <span class="math">y</span>-intercept of the graph of function <span class="math">K</span>.</div>
+        <div class="mc-group" data-noshuffle="1"><button class="mc-option" data-k="k1:MTIwfDA=">greater than</button><button class="mc-option" data-k="k1:MTIxfDE=">less than</button><button class="mc-option" data-k="k1:MTIyfDA=">equal to</button></div>
+        <div class="mc-feedback"><span class="math">J</span> has <span class="math">y</span>-intercept 2 (its output at <span class="math">x = 0</span>); <span class="math">K</span> has 8, and <span class="math">2 &lt; 8</span>.</div>
+      </div>
+    </div>
+  </div>
+
+  </section>
+
+  <section class="topic" id="qualitative">
+  <h2>7 &middot; Describing and sketching graphs</h2>
+  <p class="intro">Not every question wants a number. Some want the shape, and the reason for it.</p>
+  <p class="objective"><strong>By the end:</strong> you can describe a graph qualitatively and sketch one from a description in words.</p>
+
+  <div class="tcard">
+    <h3>Describing a graph in words</h3>
+<p>To describe a graph, work left to right and say, for each stretch, whether it is <strong>increasing</strong>, <strong>decreasing</strong> or <strong>constant</strong>, and whether it is <strong>linear</strong> (straight) or <strong>non-linear</strong> (curved). A sketch does not need numbers &mdash; it needs the right <em>shape</em>.</p>
+    <div class="worked"><div class="wl">Worked example</div><p>A cyclist speeds up, then holds a steady speed, then stops to rest. Distance against time: a curve getting steeper, then a straight slanted stretch, then a flat stretch.</p></div>
+    <div class="keyfact"><strong>Flat means constant, not stopped-in-place on the axis.</strong> A horizontal stretch says the output is not changing.</div>
+  </div>
+
+  <div class="qcard" data-qid="7-1">
+    <div class="qhead"><span class="qtag guided">Guided</span><span class="qtitle">Match the story to the shape</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Q1 &middot; A tank is filled quickly at first, then more and more slowly, and is never emptied. Which describes the graph of volume against time?</div>
+        <div class="mc-group"><button class="mc-option" data-k="k1:MTMwfDE=">Increasing throughout, but getting less steep &mdash; non-linear</button><button class="mc-option" data-k="k1:MTMxfDA=">Increasing throughout at a steady steepness &mdash; linear</button><button class="mc-option" data-k="k1:MTMyfDA=">Increasing, then decreasing</button><button class="mc-option" data-k="k1:MTMzfDA=">Constant throughout</button></div>
+        <div class="mc-feedback">The volume never falls, so the graph never goes down. &ldquo;More and more slowly&rdquo; means the steepness keeps changing, so it is a curve, not a straight line.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="7-2">
+    <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Plot two points on the model</span></div>
+    <div class="qbody">
+      <p class="muted-note" style="font-size:.86rem">A candle is 12&nbsp;cm tall and burns down 2&nbsp;cm every hour.</p>
+      <div class="step">
+        <div class="step-label">Step 1 &middot; Plot the point showing the candle&rsquo;s height after 4 hours.</div>
+        <div class="plotbox" data-plot="grid" data-xmin="0" data-xmax="6" data-xstep="1" data-ymin="0" data-ymax="12" data-ystep="2"><input type="hidden" class="ans-input" data-type="text" data-answer="k1:NCw0"/></div>
+        <button class="check-btn">Check</button>
+      </div>
+      <div class="step locked">
+        <div class="step-label">Step 2 &middot; Plot the point at which the candle has burnt out.</div>
+        <div class="plotbox" data-plot="grid" data-xmin="0" data-xmax="6" data-xstep="1" data-ymin="0" data-ymax="12" data-ystep="2"><input type="hidden" class="ans-input" data-type="text" data-answer="k1:Niww"/></div>
+        <button class="check-btn">Check</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="7-3">
+    <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Increasing, decreasing, constant</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Q3 &middot; A graph rises steeply, then rises gently, then is horizontal. Which is true of its rate of change?</div>
+        <div class="mc-group"><button class="mc-option" data-k="k1:MTQwfDE=">Positive and large, then positive and small, then zero</button><button class="mc-option" data-k="k1:MTQxfDA=">Positive throughout, and always the same</button><button class="mc-option" data-k="k1:MTQyfDA=">Positive, then negative, then zero</button><button class="mc-option" data-k="k1:MTQzfDA=">Zero, then positive, then negative</button></div>
+        <div class="mc-feedback">Rising means a positive rate of change; steeper means larger. A horizontal stretch means the output is not changing at all, so the rate is zero &mdash; not negative.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="7-4">
+    <div class="qhead"><span class="qtag stretch">Reasoning</span><span class="qtitle">Describe the graph you would draw</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Q4 &middot; A company reviews its sales for one year. Sales rose steadily for the first two months, then declined steadily over the next four, stayed constant for three, and rose steadily for the last three. Describe the graph you would sketch of sales against time: name each stretch as increasing, decreasing or constant, and say whether each is linear or non-linear. Then suggest one thing that might explain the shape.</div>
+        <textarea class="cr-area" placeholder="Type your reasoning..."></textarea>
+        <button class="check-btn cr-save">Save response</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="7-5" data-exam="1">
+    <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">MCAP &middot; 8.F.B.5</span></div>
+    <div class="qbody">
+      <p class="muted-note" style="font-size:.86rem">The graph of a function is shown in the following coordinate plane.</p>
+      <svg class="fig" viewBox="0 0 320 230" width="300" role="img" aria-label="A graph starting at P on the horizontal axis, rising in a straight line to Q, curving down to a low point R, curving steeply up through S to a peak, then falling to T on the horizontal axis."><line x1="30" y1="200" x2="300" y2="200" stroke="#0F172A" stroke-width="1.6"/><line x1="30" y1="200" x2="30" y2="20" stroke="#0F172A" stroke-width="1.6"/><path d="M 32 198 L 95 120" fill="none" stroke="#0F172A" stroke-width="2.4"/><path d="M 95 120 C 120 152, 140 166, 165 166" fill="none" stroke="#0F172A" stroke-width="2.4"/><path d="M 165 166 C 195 166, 196 60, 228 44" fill="none" stroke="#0F172A" stroke-width="2.4"/><path d="M 228 44 C 252 32, 258 150, 264 198" fill="none" stroke="#0F172A" stroke-width="2.4"/><circle cx="32" cy="198" r="3.6"/><text x="20" y="192" font-size="13" font-style="italic">P</text><circle cx="95" cy="120" r="3.6"/><text x="82" y="113" font-size="13" font-style="italic">Q</text><circle cx="165" cy="166" r="3.6"/><text x="158" y="184" font-size="13" font-style="italic">R</text><circle cx="196" cy="93" r="3.6"/><text x="180" y="90" font-size="13" font-style="italic">S</text><circle cx="264" cy="198" r="3.6"/><text x="270" y="192" font-size="13" font-style="italic">T</text></svg>
+      <div class="step">
+        <div class="step-label">Over which interval does the graph show a constant rate of change?</div>
+        <div class="mc-group" data-noshuffle="1"><button class="mc-option" data-k="k1:MTUwfDE=">From <span class="math">P</span> to <span class="math">Q</span></button><button class="mc-option" data-k="k1:MTUxfDA=">From <span class="math">Q</span> to <span class="math">R</span></button><button class="mc-option" data-k="k1:MTUyfDA=">From <span class="math">R</span> to <span class="math">S</span></button><button class="mc-option" data-k="k1:MTUzfDA=">From <span class="math">S</span> to <span class="math">T</span></button></div>
+        <div class="mc-feedback">A constant rate of change is a <em>straight</em> stretch. Only <span class="math">P</span> to <span class="math">Q</span> is a straight segment; the other three are curved, so their steepness keeps changing.</div>
+      </div>
+    </div>
+  </div>
+
+  </section>
+
+  <section class="topic" id="check">
+  <h2>8 &middot; Module Check &mdash; Show What You Know</h2>
+  <p class="intro">A short mixed check across the whole unit, with nothing telling you which skill to use.</p>
+  <p class="objective"><strong>By the end:</strong> you can choose the right idea yourself and apply it without prompting.</p>
+
+  <div class="qcard" data-qid="8-1" data-exam="1">
+    <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">Exam-style &middot; build and use a function</span></div>
+    <div class="qbody">
+      <p class="muted-note" style="font-size:.86rem">A gym charges a $40 joining fee plus $18 per month.</p>
+      <div class="step">
+        <div class="step-label">Part A &middot; What is the total cost after 9 months?</div>
+        <div class="input-row"><span class="lbl">$</span><input type="number" class="ans-input" data-answer="k1:MjAy" data-tol="0"/><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+      </div>
+      <div class="step locked">
+        <div class="step-label">Part B &middot; After how many months does the total reach $328?</div>
+        <div class="input-row"><input type="number" class="ans-input" data-answer="k1:MTY=" data-tol="0"/><span class="lbl">months</span><span class="feedback"></span></div>
+        <button class="check-btn">Check</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="8-2" data-exam="1">
+    <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">Exam-style &middot; reasoning</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Two students describe the same table &mdash; <span class="math">x</span>: 0, 3, 6 &rarr; <span class="math">y</span>: 10, 4, &minus;2. Ada says the rate of change is <span class="math">&minus;6</span>; Ben says it is <span class="math">&minus;2</span>. Who is right, and why?</div>
+        <div class="mc-group"><button class="mc-option" data-k="k1:MTYwfDE=">Ben &mdash; the output falls 6 for every step of <strong>3</strong> in the input, so the rate is <span class="math">&minus;6 &divide; 3 = &minus;2</span></button><button class="mc-option" data-k="k1:MTYxfDA=">Ada &mdash; the outputs go down by 6 each time, so the rate is <span class="math">&minus;6</span></button><button class="mc-option" data-k="k1:MTYyfDA=">Ada &mdash; rate of change is always the difference between consecutive outputs</button><button class="mc-option" data-k="k1:MTYzfDA=">Neither &mdash; the function is not linear</button></div>
+        <div class="mc-feedback">Rate of change is <span class="math">(change in y) &divide; (change in x)</span>. Ada compared the outputs but forgot that the inputs jump by 3, not 1. The function <em>is</em> linear &mdash; both steps give <span class="math">&minus;2</span>.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="qcard" data-qid="8-3" data-exam="1">
+    <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">Exam-style &middot; across the unit</span></div>
+    <div class="qbody">
+      <div class="step">
+        <div class="step-label">Select every statement that is true of the function <span class="math">y = &minus;4x + 9</span>.</div>
+        <div class="ms-group"><button class="ms-option" data-k="k1:MTcwfDE="><span class="box"></span>Its graph crosses the <span class="math">y</span>-axis at 9</button><button class="ms-option" data-k="k1:MTcxfDE="><span class="box"></span>It is a linear function</button><button class="ms-option" data-k="k1:MTcyfDE="><span class="box"></span>Its output decreases as its input increases</button><button class="ms-option" data-k="k1:MTczfDA="><span class="box"></span>Its rate of change is 9</button><button class="ms-option" data-k="k1:MTc0fDA="><span class="box"></span>Its graph is a curve</button></div>
+        <button class="check-btn ms-check">Check</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="challenge">
+    <h3>Make your own</h3>
+    <p>Invent a situation of your own that a linear function describes &mdash; a cost, a distance, a height that falls. Write its equation, make a table of three values, sketch its graph, and say what the rate of change and the initial value <em>mean</em> in your situation. Bring it to your next session.</p>
+  </div>
+
+  </section>
+
+  <footer>Functions &middot; Grade 8 Mathematics Hub &middot; Aligned to MCCRS 8.F / 8.AT and MCAP. Items lifted from a real released MCAP question are titled <strong>MCAP</strong> and cited in the project manifest; everything else is ours and is titled <strong>Exam-style</strong>.</footer>
+</main>
+<script>
+  // ===== Per-module identity (change these per unit) =====
+  const G7_TOPIC_ID='functions';
+  const G7_TOPIC_TITLE='Functions';
+  var G7_SYNC_HUB='grade8'; // shared-cloud namespace for this deployment (must match the hub's SYNC_HUB_ID)
+  const G7_SKILLS={'1-1':'func-def','1-2':'func-def','1-3':'func-def','1-4':'func-def','1-5':'func-def','2-1':'func-rep','2-2':'func-rep','2-3':'func-rep','2-4':'func-rep','3-1':'linearity','3-2':'linearity','3-3':'linearity','3-4':'linearity','3-5':'linearity','4-1':'graph-read','4-2':'graph-read','4-3':'graph-read','4-4':'graph-read','4-5':'graph-read','5-1':'func-build','5-2':'func-build','5-3':'func-build','5-4':'func-build','5-5':'func-build','6-1':'func-rep','6-2':'func-rep','6-3':'func-rep','6-4':'func-rep','7-1':'qualitative','7-2':'qualitative','7-3':'qualitative','7-4':'qualitative','7-5':'qualitative','8-1':'func-build','8-2':'reasoning','8-3':'linearity'};
+  const G7_SKILL_LABELS={'func-def':'What a function is (one output per input)','func-rep':'Representing & comparing functions','linearity':'Linear vs non-linear','graph-read':'Slope & y-intercept from a graph','func-build':'Building a linear function','qualitative':'Describing & sketching graphs','reasoning':'Reasoning & error analysis'};
+
+  // ===== Shared [GRADE] Hub store =====
+  var G7_STORE='g8.';   /* storage namespace — one place, edit per deployment */
+  function K(s){return G7_STORE+s;}
+
+  /* Storage namespace — EDIT THIS ONCE per deployment, before first run.
+     A new grade or subject that leaves it as CHANGEME would otherwise write into whichever
+     deployment it was copied from. That failure is silent, so this makes it loud. */
+  (function(){
+    if(String(G7_STORE).indexOf('CHANGEME')<0)return;
+    function shout(){
+      var b=document.createElement('div');
+      b.setAttribute('role','alert');
+      b.style.cssText='position:fixed;inset:0 0 auto 0;z-index:99999;background:#B91C1C;color:#fff;'+
+        'font:600 15px/1.45 system-ui,sans-serif;padding:.9rem 1.1rem;text-align:left';
+      b.innerHTML='<strong>Starter Kit not configured.</strong> Set <code>G7_STORE</code> (and '+
+        '<code>G7_SYNC_HUB</code>) in this file before use — otherwise this module shares storage with '+
+        'the deployment it was copied from, and will overwrite another student&rsquo;s work. '+
+        'Nothing is being saved until you do.';
+      (document.body||document.documentElement).appendChild(b);
+    }
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',shout);else shout();
+  })();
+
+  function g7current(){return localStorage.getItem(K('current'))||'Guest';}
+  function g7all(){try{return JSON.parse(localStorage.getItem(K('data')))||{students:{}};}catch(e){return{students:{}};}}
+  function g7save(o){localStorage.setItem(K('data'),JSON.stringify(o));}
+  function g7topic(o){o.students=o.students||{};var s=g7current();o.students[s]=o.students[s]||{topics:{}};var T=o.students[s].topics;T[G7_TOPIC_ID]=T[G7_TOPIC_ID]||{title:G7_TOPIC_TITLE,tree:{},totalSteps:0,sectionTotals:{},lastPracticed:0,attempts:0,correct:0,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[]};return T[G7_TOPIC_ID];}
+  function g7sectionTotals(){var m={};document.querySelectorAll('.qcard[data-qid]').forEach(function(c){var sec=(c.dataset.qid||'').split('-')[0];m[sec]=(m[sec]||0)+c.querySelectorAll('.step').length;});return m;}
+  function loadData(){return g7topic(g7all()).tree;}
+  function saveData(tree){var o=g7all();var t=g7topic(o);t.tree=tree;t.totalSteps=document.querySelectorAll('.qcard .step').length;t.sectionTotals=g7sectionTotals();t.lastPracticed=Date.now();g7save(o);schedulePush();}
+  function g7sheet(event,question,detail){var url=localStorage.getItem(K('sheetURL'));if(!url)return;try{fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({hub:G7_SYNC_HUB||'default',student:g7current(),topic:G7_TOPIC_TITLE,question:question||'',event:event,detail:detail||'',ts:Date.now()})});}catch(e){}}
+  // AS-4 (automatic): the lesson's own Learn->Stretch ladder IS the difficulty gradient, so the level is
+  // read from the phase tag every stamped module already carries — no per-item tagging, no extra items,
+  // and any new module built from this template gets this for free. Untagged cards default to Target.
+  function g7level(qid){
+    var c=document.querySelector('.qcard[data-qid="'+String(qid).replace(/"/g,'')+'"]');
+    if(!c)return 2;
+    var tag=c.querySelector('.qtag'),cls=(tag&&tag.className)||'';
+    if(/(^|\s)stretch(\s|$)/.test(cls))return 4;                    // 4 = beyond the standard (bonus, never a pass/fail signal)
+    if(c.dataset.exam==='1'||/(^|\s)exam(\s|$)/.test(cls))return 3; // 3 = the assessed MCAP bar (the expectation)
+    if(/(^|\s)(learn|guided)(\s|$)/.test(cls))return 1;             // 1 = foundational (supported)
+    return 2;                                                       // 2 = target (independent, grade level)
+  }
+  /* ===== homework tagging =====
+   * The hub passes hw=<setId>&subj=<subjectId> on the link. When those are present the student is
+   * doing HOMEWORK, not free practice, so each attempt is also posted to the Homework tab. Without
+   * this the Sheet cannot tell the two apart: the topic record and the activity Log look identical
+   * either way, and the Homework tab only ever saw a row once a whole set was finished. */
+  function g7hwCtx(){try{var p=new URLSearchParams(location.search);var s=p.get('hw');
+    return s?{set:s,subj:p.get('subj')||''}:null;}catch(e){return null;}}
+  /* Mark this item done AS HOMEWORK, locally and in the cloud. Completion must not be inferred from
+   * the module tree: that records any past practice, so a set could show progress — or even auto-
+   * complete and post a score — for work never done as homework. Keyed by topic|qid because the
+   * same qid exists in more than one module. */
+  function g7hwMark(qid,wrong){
+    var c=g7hwCtx();if(!c)return;
+    try{
+      var o=g7all(),s=g7current();
+      o.students=o.students||{};o.students[s]=o.students[s]||{topics:{}};
+      var hs=o.students[s].hwstate=o.students[s].hwstate||{};
+      var rec=hs[c.subj]=hs[c.subj]||{sets:{},items:{},ts:0};
+      rec.items=rec.items||{};
+      var m=rec.items[c.set]=rec.items[c.set]||{};
+      m[G7_TOPIC_ID+'|'+qid]={ts:Date.now(),wrong:!!wrong};
+      rec.ts=Date.now();g7save(o);
+      syncPush('hwstate',s,c.subj,rec);
+    }catch(e){}
+  }
+  function g7hwPost(qid,wrong){
+    var c=g7hwCtx();if(!c)return;
+    var url=localStorage.getItem(K('sheetURL'));if(!url)return;
+    try{fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({op:'hw',hub:G7_SYNC_HUB||'default',name:g7current(),pin:g7pin(),
+        subject:c.subj,set:c.set,item:qid,outcome:wrong?'incorrect':'correct',ts:Date.now(),
+        payload:{topic:G7_TOPIC_ID,title:G7_TOPIC_TITLE}})}).catch(function(){});}catch(e){}
+  }
+  function g7log(qid,wrong,label,your,exam){var o=g7all();var t=g7topic(o);var sk=G7_SKILLS[qid]||'reasoning';t.skillStats[sk]=t.skillStats[sk]||{attempts:0,misses:0};t.skillStats[sk].attempts++;t.skillStats[sk].last=Date.now();t.attempts=(t.attempts||0)+1;if(wrong){t.skillStats[sk].misses++;t.struggles.push({qid:qid,label:(label||qid).trim(),skill:sk,skillLabel:G7_SKILL_LABELS[sk],your:your||'',ts:Date.now()});if(t.struggles.length>120)t.struggles=t.struggles.slice(-120);}else{t.correct=(t.correct||0)+1;}if(exam){t.exam=t.exam||{attempts:0,correct:0};t.exam.attempts++;if(!wrong)t.exam.correct++;}var _lv=g7level(qid);t.levelStats=t.levelStats||{};t.levelStats[_lv]=t.levelStats[_lv]||{attempts:0,misses:0};t.levelStats[_lv].attempts++;if(wrong)t.levelStats[_lv].misses++;t.lastPracticed=Date.now();g7save(o);g7sheet(wrong?'struggle':'step_complete',(label||qid).trim(),wrong?('typed "'+(your||'')+'"'):'');g7hwPost(qid,wrong);g7hwMark(qid,wrong);schedulePush();}
+
+  /* ===== spaced review (MR-1) phase-2: stored consecutive-session streak ===== */
+  // A "review session" = one module visit. We count only FIRST-attempt graded items;
+  // a visit with >=3 of them advances the streak one rung (>=80% first-attempt) or resets
+  // it to 0, at most once per calendar day (later same-day visits don't move it). The hub
+  // reads t.reviewStreak when present, else falls back to the phase-1 inferred proxy.
+  var _revFirst=0,_revCorrect=0,_revCommitted=false,_revBase=0,_revWasDue=false;
+  var _revSkill={};   // phase-3: per-skill session tally, keyed by skill
+  var REVIEW_RUNGS=[1,3,7,21,42];
+  function g7streakOf(t){return (typeof t.reviewStreak==='number')?t.reviewStreak:g7revProxy(t);}
+  function g7wasDue(t){var last=(t&&t.lastPracticed)||0;if(!last||((t&&t.attempts)||0)<=0)return false;return Date.now()>=last+REVIEW_RUNGS[g7streakOf(t)]*86400000;}
+  function g7revProxy(t){var a=(t&&t.attempts)||0,c=(t&&t.correct)||0;if(a<=0)return 0;var acc=c/a;var base=acc>=0.95?4:acc>=0.85?3:acc>=0.70?2:acc>=0.50?1:0;var cap=a>=12?4:a>=8?3:a>=4?2:a>=2?1:0;var s=Math.min(base,cap);var st=(t&&t.skillStats)||{},sh=false;Object.keys(st).forEach(function(k){var m=st[k].misses||0;if(m>=2&&m/Math.max(st[k].attempts||0,1)>=0.25)sh=true;});return sh?Math.max(0,s-1):s;}
+  // Snapshot the pre-session streak AND whether the topic was due, at load, before this visit's answers.
+  function g7reviewInit(){try{if(!g7current())return;var o=g7all(),t=g7topic(o);_revBase=(typeof t.reviewStreak==='number')?t.reviewStreak:g7revProxy(t);_revWasDue=g7wasDue(t);}catch(e){}}
+  window.addEventListener('load',g7reviewInit);
+  // phase-3: the same ladder, one level down — per *skill*, so a topic that is solid overall can
+  // still bring back the one skill inside it that is fading. Same shape as the topic proxy, read
+  // off skillStats; a skill needs only >=2 first-attempt items in a session (a module authors far
+  // fewer items per skill than per topic), still at most one rung per calendar day.
+  function g7skillProxy(t,sk){
+    var s=(t&&t.skillStats&&t.skillStats[sk])||null,a=(s&&s.attempts)||0;
+    if(a<=0)return 0;
+    var acc=(a-((s&&s.misses)||0))/a;
+    var base=acc>=0.95?4:acc>=0.85?3:acc>=0.70?2:acc>=0.50?1:0;
+    var cap=a>=12?4:a>=8?3:a>=4?2:a>=2?1:0;
+    return Math.min(base,cap);
+  }
+  function g7review(first,correct,qid){
+    if(!first)return;                                  // only first attempts test retrieval
+    _revFirst++;if(correct)_revCorrect++;
+    var o=g7all(),t=g7topic(o);
+    // AN-4: bucket this first-attempt as retention (topic was due at session start) or acquisition
+    if(_revWasDue){t.retFirst=(t.retFirst||0)+1;if(correct)t.retCorrect=(t.retCorrect||0)+1;}
+    else{t.acqFirst=(t.acqFirst||0)+1;if(correct)t.acqCorrect=(t.acqCorrect||0)+1;}
+    var today=Math.floor(Date.now()/86400000);
+    if(_revFirst>=3 && !(!_revCommitted&&t.reviewDay===today)){  // >=3 evidence; at most one rung/day
+      _revCommitted=true;
+      var pass=(_revCorrect/_revFirst)>=0.8;
+      t.reviewStreak=pass?Math.min(4,_revBase+1):0;
+      t.reviewDay=today;
+    }
+    if(qid){
+      var sk=G7_SKILLS[qid]||'reasoning';
+      var ss=t.skillStats[sk]=t.skillStats[sk]||{attempts:0,misses:0};
+      // base is snapshotted the first time this skill is seen this session — before any write below
+      var S=_revSkill[sk]=_revSkill[sk]||{first:0,correct:0,committed:false,
+        base:(typeof ss.streak==='number')?ss.streak:g7skillProxy(t,sk)};
+      S.first++;if(correct)S.correct++;
+      if(S.first>=2 && !(!S.committed && ss.day===today)){
+        S.committed=true;
+        ss.streak=(S.correct/S.first)>=0.8?Math.min(4,S.base+1):0;
+        ss.day=today;
+      }
+    }
+    g7save(o);
+    // v1.5: the streak and the acquisition/retention buckets are part of the topic record, so they
+    // must reach the cloud like any other write. Guarded because not every stamped copy carries the
+    // sync layer (the Starter_Kit template does not) — there it is simply a no-op.
+    if(typeof schedulePush==='function')schedulePush();
+  }
+  window.__modReview={review:g7review,proxy:g7revProxy,init:g7reviewInit,wasDue:g7wasDue,skillProxy:g7skillProxy};
+
+  // ===== answer helpers =====
+  function kdec(s){try{return atob(s);}catch(e){return '';}}
+  function ansVal(inp){var a=(inp&&inp.dataset&&inp.dataset.answer)||'';return a.slice(0,3)==='k1:'?kdec(a.slice(3)):a;}
+  function optCorrect(el){if(!el||!el.dataset)return false;var k=String(el.dataset.k||'');if(k.slice(0,3)==='k1:'){var d=kdec(k.slice(3));return d.slice(d.indexOf('|')+1)==='1';}return el.dataset.correct==='true';}
+  function normalizeText(s){s=String(s).toLowerCase().trim();var neg=/^[-–—]/.test(s);s=s.replace(/[\s–—-]+/g,'-').replace(/^-|-$/g,'').replace(/\s+/g,' ');return (neg?'-':'')+s;}
+  function g7fracVal(s){s=String(s).trim().replace(/\s+/g,'');var m=s.match(/^(-?\d+)\/(-?\d+)$/);if(m){var d=parseFloat(m[2]);if(d===0)return null;return parseFloat(m[1])/d;}if(/^-?\d+(?:\.\d+)?$/.test(s))return parseFloat(s);return null;}
+  function g7isLowest(s){var m=String(s).trim().match(/^-?(\d+)\/(\d+)$/);if(!m)return true;var a=parseInt(m[1],10),b=parseInt(m[2],10);function g(x,y){x=Math.abs(x);y=Math.abs(y);while(y){var t=y;y=x%y;x=t;}return x;}return g(a,b)===1;}
+  function checkInput(input){
+    var val=input.value.trim(); if(val==='')return null;
+    var type=input.dataset.type||'numeric'; var correct=false;
+    if(type==='numeric'){var ex=parseFloat(ansVal(input)),tol=parseFloat(input.dataset.tol||'0.01'),v=parseFloat(val);correct=!isNaN(v)&&Math.abs(v-ex)<=tol;}
+    else{var raw=ansVal(input);var ans=raw.split('|');correct=ans.map(function(a){return normalizeText(a);}).indexOf(normalizeText(val))>=0;input.dataset.simplify='';
+      if(!correct){var ev=g7fracVal(ans[0]),uv=g7fracVal(val);if(ev!==null&&uv!==null&&Math.abs(ev-uv)<1e-9){correct=true;if(!g7isLowest(val))input.dataset.simplify='1';}}}
+    input.classList.remove('correct','wrong');input.classList.add(correct?'correct':'wrong');
+    var fb=input.parentElement.querySelector('.feedback');if(!fb){var row=input.closest('.input-row, td');if(row)fb=row.querySelector('.feedback');}
+    if(fb){fb.classList.remove('correct','wrong');fb.classList.add(correct?'correct':'wrong');fb.textContent=correct?(input.dataset.simplify==='1'?'✓ simplify':'✓'):'✗';}
+    return correct;
+  }
+  function setStepDisabled(step,dis){step.querySelectorAll('input,textarea,button').forEach(function(el){el.disabled=dis;});}
+  function unlockNext(step){var n=step.nextElementSibling;while(n&&!n.classList.contains('step'))n=n.nextElementSibling;if(n&&n.classList.contains('locked')){n.classList.remove('locked');setStepDisabled(n,false);}}
+  function saveStepDone(card,step){var qid=card.dataset.qid;if(!qid)return;var tr=loadData();if(!tr[qid])tr[qid]={steps:{}};var idx=Array.prototype.indexOf.call(card.querySelectorAll('.step'),step);tr[qid].steps[idx]=true;saveData(tr);refreshOverall();}
+
+  document.addEventListener('click',function(e){
+    if(e.target.matches('.check-btn')&&!e.target.classList.contains('ms-check')&&!e.target.classList.contains('cr-save')){
+      var step=e.target.closest('.step');if(!step)return;var inputs=step.querySelectorAll('.ans-input');if(inputs.length===0)return;
+      var anyVal=false;inputs.forEach(function(i){if(String(i.value).trim()!=='')anyVal=true;});if(!anyVal)return;
+      var all=true;inputs.forEach(function(i){if(checkInput(i)!==true)all=false;});
+      var card=step.closest('.qcard');var qid=card?card.dataset.qid:'';var lbl=(step.querySelector('.step-label')||{}).textContent||'';var exam=card&&card.dataset.exam==='1';
+      var fiFirst=!step.dataset.att;step.dataset.att='1';
+      if(all){step.classList.add('completed');e.target.classList.add('done');e.target.textContent='Step complete';unlockNext(step);if(card)saveStepDone(card,step);if(!step.dataset.logged){g7log(qid,false,lbl,'',exam&&fiFirst);step.dataset.logged='1';}}
+      else{var your=Array.prototype.slice.call(inputs).map(function(i){return i.value;}).filter(function(v){return v!=='';}).join(', ');g7log(qid,true,lbl,your,exam&&fiFirst);}
+      g7review(fiFirst,all,qid);
+    }
+    if(e.target.closest('.mc-option')){
+      var opt=e.target.closest('.mc-option');var group=opt.closest('.mc-group');if(!group||group.classList.contains('answered')||opt.classList.contains('disabled'))return;
+      var correct=optCorrect(opt);
+      var fb=group.parentElement.querySelector('.mc-feedback');if(fb&&fb.dataset.exp===undefined)fb.dataset.exp=fb.textContent||'';
+      var mcStep=group.closest('.step');var mcCard=group.closest('.qcard');var mcQid=mcCard?mcCard.dataset.qid:'';var mcLbl=mcStep?((mcStep.querySelector('.step-label')||{}).textContent||''):'';var mcExam=mcCard&&mcCard.dataset.exam==='1';
+      var mcFirst=mcStep&&!mcStep.dataset.att;if(mcStep)mcStep.dataset.att='1';
+      g7log(mcQid,!correct,mcLbl,(opt.textContent||'').trim(),mcExam&&mcFirst);g7review(mcFirst,correct,mcQid);
+      if(correct){
+        group.classList.add('answered');group.querySelectorAll('.mc-option').forEach(function(b){b.classList.add('disabled');});opt.classList.add('correct');
+        if(fb){fb.textContent='✓ Correct! '+(fb.dataset.exp||'');fb.classList.remove('wrong');fb.classList.add('correct');}
+        if(mcStep){mcStep.classList.add('completed');unlockNext(mcStep);if(mcCard)saveStepDone(mcCard,mcStep);}
+      }else{
+        opt.classList.add('wrong');opt.classList.add('disabled');
+        if(fb){fb.textContent='✗ Not quite — re-read the question, rule that one out, and try again.';fb.classList.remove('correct');fb.classList.add('wrong');}
+        var rest=Array.prototype.filter.call(group.querySelectorAll('.mc-option'),function(b){return !b.classList.contains('disabled');});
+        rest.forEach(function(b){b.classList.add('cooldown');});
+        setTimeout(function(){rest.forEach(function(b){b.classList.remove('cooldown');});},1600);
+      }
+    }
+    var mso=e.target.closest('.ms-option');
+    if(mso){var g=mso.closest('.ms-group');if(g&&!g.classList.contains('answered'))mso.classList.toggle('sel');return;}
+    if(e.target.matches('.ms-check')){
+      var st=e.target.closest('.step');if(!st)return;var grp=st.querySelector('.ms-group');if(!grp||grp.classList.contains('answered'))return;
+      var opts=Array.prototype.slice.call(grp.querySelectorAll('.ms-option'));if(!opts.some(function(o){return o.classList.contains('sel');}))return;
+      var ok=opts.every(function(o){return optCorrect(o)===o.classList.contains('sel');});
+      var card2=st.closest('.qcard');var qid2=card2?card2.dataset.qid:'';var lbl2=(st.querySelector('.step-label')||{}).textContent||'';var exam2=card2&&card2.dataset.exam==='1';
+      var msFirst=!st.dataset.att;st.dataset.att='1';
+      if(ok){grp.classList.add('answered');opts.forEach(function(o){o.classList.add('disabled');if(optCorrect(o))o.classList.add('correct');});st.classList.add('completed');e.target.classList.add('done');e.target.textContent='Correct';unlockNext(st);if(card2)saveStepDone(card2,st);if(!st.dataset.logged){g7log(qid2,false,lbl2,'',exam2&&msFirst);st.dataset.logged='1';}}
+      else{var your2=opts.filter(function(o){return o.classList.contains('sel');}).map(function(o){return (o.textContent||'').trim().slice(0,24);}).join('; ');opts.forEach(function(o){if(o.classList.contains('sel')&&!optCorrect(o))o.classList.add('wrong');});g7log(qid2,true,lbl2,your2,exam2&&msFirst);setTimeout(function(){opts.forEach(function(o){o.classList.remove('wrong');});},1100);}
+      g7review(msFirst,ok,qid2);
+      return;
+    }
+    if(e.target.matches('.cr-save')){
+      var st3=e.target.closest('.step');if(!st3)return;var ta=st3.querySelector('.cr-area');if(!ta||!ta.value.trim())return;
+      var card3=st3.closest('.qcard');var qid3=card3?card3.dataset.qid:'';var lbl3=(st3.querySelector('.step-label')||{}).textContent||'';
+      var o=g7all();var t=g7topic(o);t.responses=t.responses||[];t.responses.push({qid:qid3,label:lbl3.trim(),text:ta.value.trim(),ts:Date.now()});if(t.responses.length>60)t.responses=t.responses.slice(-60);g7save(o);
+      g7sheet('constructed_response',lbl3.trim(),ta.value.trim().slice(0,180));
+      st3.classList.add('completed');e.target.classList.add('done');e.target.textContent='Saved';unlockNext(st3);if(card3)saveStepDone(card3,st3);
+      if(!st3.querySelector('.cr-saved')){var sv=document.createElement('div');sv.className='cr-saved';sv.textContent='Saved — your teacher will review this.';st3.appendChild(sv);}
+      return;
+    }
+    if(e.target.matches('.hint-btn')){var nx=e.target.nextElementSibling;if(nx&&nx.classList.contains('hint-content')){nx.classList.toggle('show');e.target.textContent=nx.classList.contains('show')?'Hide hint':'Hint';}}
+  });
+  document.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.matches('.ans-input')){e.preventDefault();var step=e.target.closest('.step');if(step){var b=step.querySelector('.check-btn');if(b&&!b.classList.contains('ms-check')&&!b.classList.contains('cr-save'))b.click();else checkInput(e.target);}else checkInput(e.target);}});
+  document.querySelectorAll('.step.locked').forEach(function(s){setStepDisabled(s,true);});
+  document.addEventListener('wheel',function(e){if(e.target&&e.target.matches&&e.target.matches('.ans-input')&&document.activeElement===e.target)e.target.blur();},{passive:true});
+  /* v1.4.2 anti-cheat: block copy/cut from question cards (typing areas exempt) */
+  ['copy','cut'].forEach(function(ev){document.addEventListener(ev,function(e){var t=e.target;if(t&&t.closest&&t.closest('.qcard')&&!(t.matches&&t.matches('input,textarea')))e.preventDefault();});});
+  /* v1.4.2 anti-cheat: shuffle MC/MS options on load (3+ options only; add data-noshuffle to a group to opt out) */
+  document.querySelectorAll('.mc-group,.ms-group').forEach(function(g){if(g.hasAttribute('data-noshuffle'))return;var o=Array.prototype.slice.call(g.querySelectorAll('.mc-option,.ms-option'));if(o.length<3)return;for(var i=o.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=o[i];o[i]=o[j];o[j]=t;}o.forEach(function(b){g.appendChild(b);});});
+
+  function countAllSteps(){return document.querySelectorAll('.qcard .step').length;}
+  function refreshOverall(){var d=loadData(),done=0;document.querySelectorAll('.qcard').forEach(function(c){var q=c.dataset.qid;if(q&&d[q]&&d[q].steps)done+=Object.keys(d[q].steps).filter(function(k){return d[q].steps[k];}).length;});var tot=countAllSteps();document.getElementById('op-done').textContent=done;document.getElementById('op-total').textContent=tot;document.getElementById('op-pct').textContent=(tot?Math.round(done/tot*100):0)+'%';renderSecReport();}
+  /* v1.4.3: student-facing per-section report card, injected after the overall progress box */
+  function renderSecReport(){
+    var host=document.querySelector('.overall-progress');if(!host)return;
+    var box=document.getElementById('sec-report');
+    if(!box){box=document.createElement('div');box.id='sec-report';box.className='sec-report';host.parentNode.insertBefore(box,host.nextSibling);}
+    var rows='';
+    document.querySelectorAll('section.topic').forEach(function(sec){
+      var steps=sec.querySelectorAll('.qcard .step');if(!steps.length)return;
+      var done=sec.querySelectorAll('.qcard .step.completed').length;
+      var h=sec.querySelector('h2');var name=(h?h.textContent:sec.id).replace(/[<>&]/g,'').trim();
+      var pct=steps.length?Math.round(done/steps.length*100):0;
+      rows+='<div class="sec-row'+(pct>=100?' full':'')+'"><a href="#'+sec.id+'">'+name+'</a><span class="bar"><span style="width:'+pct+'%"></span></span><span class="val">'+done+'/'+steps.length+' · '+pct+'%</span></div>';
+    });
+    if(rows)box.innerHTML='<h3>Your section scores</h3>'+rows; else box.style.display='none';
+  }
+
+  function restoreProgress(){
+    var nm=document.getElementById('g7name');if(nm)nm.textContent=g7current();
+    if(!localStorage.getItem(K('current'))&&nm&&!document.getElementById('g7guestnote')){var gw=document.createElement('a');gw.id='g7guestnote';gw.href='Grade_8_Math_Hub.html';gw.style.cssText='margin-left:.6rem;color:var(--orange);font-weight:600;text-decoration:none';gw.textContent='Not signed in — choose your name in the Hub so your work is tracked';nm.parentNode.appendChild(gw);}
+    var d=loadData();var topic=g7topic(g7all());
+    document.querySelectorAll('.qcard').forEach(function(card){
+      var qid=card.dataset.qid;if(!qid||!d[qid]||!d[qid].steps)return;
+      var steps=Array.prototype.slice.call(card.querySelectorAll('.step'));
+      steps.forEach(function(step,idx){
+        if(d[qid].steps[idx]){
+          step.classList.add('completed');step.classList.remove('locked');setStepDisabled(step,false);step.dataset.logged='1';step.dataset.att='1';
+          if(idx+1<steps.length){steps[idx+1].classList.remove('locked');setStepDisabled(steps[idx+1],false);}
+          var b=step.querySelector('.check-btn');if(b){b.classList.add('done');b.textContent=b.classList.contains('cr-save')?'Saved':'Step complete';}
+          var mc=step.querySelector('.mc-group');if(mc){mc.classList.add('answered');mc.querySelectorAll('.mc-option').forEach(function(o){o.classList.add('disabled');if(optCorrect(o))o.classList.add('correct');});var mfb=mc.parentElement.querySelector('.mc-feedback');if(mfb)mfb.classList.add('correct');}
+          var ms=step.querySelector('.ms-group');if(ms){ms.classList.add('answered');ms.querySelectorAll('.ms-option').forEach(function(o){o.classList.add('disabled');if(optCorrect(o))o.classList.add('correct');});}
+          var ta=step.querySelector('.cr-area');if(ta){var rs=(topic.responses||[]).filter(function(r){return r.qid===qid;});if(rs.length){ta.value=rs[rs.length-1].text;if(rs[rs.length-1].reviewed&&!step.querySelector('.cr-saved')){var rv=document.createElement('div');rv.className='cr-saved';rv.textContent='✓ Reviewed by your teacher';step.appendChild(rv);}}}
+          step.querySelectorAll('.ans-input').forEach(function(i){i.classList.add('correct');i.value=ansVal(i).split('|')[0];});
+        }
+      });
+    });
+    refreshOverall();
+  }
+  window.addEventListener('load',restoreProgress);
+
+  /* ===== v1.5 cloud sync (offline-first; shared multi-hub backend) ===== */
+  /* The /exec URL is public, so it grants nothing alone: a student authenticates with their
+     own PIN and can only ever read/write their OWN record. Modules never hold the teacher key.
+     Ported from Grade 8, which had this layer first. */
+  function g7pin(){try{var m=JSON.parse(localStorage.getItem(K('pins'))||'{}');var n=g7current();return (n&&m&&m[n]!==undefined)?String(m[n]):'';}catch(e){return '';}}
+  function syncPush(kind,name,sub,payload){var u=localStorage.getItem(K('sheetURL'));if(!u)return;try{fetch(u,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({op:'put',hub:G7_SYNC_HUB||'default',kind:kind,name:name,sub:sub||'',payload:payload,ts:Date.now(),pin:g7pin()})}).catch(function(){});}catch(e){}}
+  function syncPull(cb){var u=localStorage.getItem(K('sheetURL'));if(!u){cb(null);return;}try{var nm='__modcb'+Math.floor(Math.random()*1e9);var s=document.createElement('script');
+    window[nm]=function(doc){try{cb(doc||null);}finally{try{delete window[nm];}catch(e2){}if(s.parentNode)s.parentNode.removeChild(s);}};
+    s.onerror=function(){try{delete window[nm];}catch(e2){}if(s.parentNode)s.parentNode.removeChild(s);cb(null);};
+    s.src=u+(u.indexOf('?')>=0?'&':'?')+'op=pull&hub='+encodeURIComponent(G7_SYNC_HUB||'default')+'&cb='+nm+'&name='+encodeURIComponent(g7current()||'')+'&pin='+encodeURIComponent(g7pin());document.head.appendChild(s);}catch(e){cb(null);}}
+  var _pushT=null;
+  /* Debounced: a student answering quickly would otherwise fire a push per keystroke-check.
+     It re-reads storage when it fires, so every write since the last push rides along. */
+  function schedulePush(){if(!localStorage.getItem(K('sheetURL')))return;clearTimeout(_pushT);_pushT=setTimeout(function(){try{var o=g7all();var s=g7current();var to=o.students&&o.students[s]&&o.students[s].topics&&o.students[s].topics[G7_TOPIC_ID];if(to)syncPush('topic',s,G7_TOPIC_ID,to);}catch(e){}},1500);}
+  function mergeCloudTopic(doc){if(!doc)return false;var s=g7current();var changed=false;
+    var o=g7all();var t=g7topic(o);
+    var c=doc.topics&&doc.topics[s]&&doc.topics[s][G7_TOPIC_ID];
+    if(c&&((c.lastPracticed||0)>(t.lastPracticed||0))){o.students[s].topics[G7_TOPIC_ID]=c;changed=true;}
+    var m=doc.reviews&&doc.reviews[s]&&doc.reviews[s][G7_TOPIC_ID];
+    if(m){var to=o.students[s].topics[G7_TOPIC_ID];((to&&to.responses)||[]).forEach(function(r){var k=String(r.ts);if(Object.prototype.hasOwnProperty.call(m,k)&&(r.reviewed||0)!==(m[k]||0)){r.reviewed=m[k]||0;changed=true;}});}
+    if(changed){g7save(o);}else if((t.lastPracticed||0)>((c&&c.lastPracticed)||0)){schedulePush();}
+    return changed;}
+  window.__modSync={mergeCloudTopic:mergeCloudTopic,schedulePush:schedulePush};
+  window.addEventListener('load',function(){syncPull(function(doc){if(mergeCloudTopic(doc))restoreProgress();g7plotSync();});});
+
+
+  /* ===== plot input (6th format) =============================================================
+     A number line or coordinate grid the student clicks to place a point. The value lives in a
+     hidden .ans-input inside the same .step, so the ordinary engine does all the real work:
+     checkInput (numeric tolerance or text match), setStepDisabled (locking), restoreProgress
+     (re-fill), g7revReset (clearing for retrieval). Nothing here touches an answer handler.
+     Markup:
+       <div class="plotbox" data-plot="line" data-min="-10" data-max="10" data-step="1">
+         <input type="hidden" class="ans-input" data-answer="k1:..." data-tol="0"/></div>
+       <div class="plotbox" data-plot="grid" data-xmax="10" data-ymax="20" data-xstep="1" data-ystep="2">
+         <input type="hidden" class="ans-input" data-type="text" data-answer="k1:..."/></div>
+  ============================================================================================ */
+  function g7plotNum(el,name,dflt){var v=parseFloat(el.dataset[name]);return isNaN(v)?dflt:v;}
+  function g7plotDraw(box){
+    var inp=box.querySelector('.ans-input'); if(!inp)return;
+    var kind=box.dataset.plot||'line', W=360, sv;
+    if(kind==='line'){
+      var mn=g7plotNum(box,'min',-10), mx=g7plotNum(box,'max',10), st=g7plotNum(box,'step',1);
+      var H=88, x0=26, x1=W-26, y=52;
+      var px=function(v){return x0+(v-mn)/(mx-mn)*(x1-x0);};
+      var parts=['<line class="axis" x1="'+x0+'" y1="'+y+'" x2="'+x1+'" y2="'+y+'"/>'];
+      for(var v=mn; v<=mx+1e-9; v+=st){
+        parts.push('<line class="tick" x1="'+px(v).toFixed(1)+'" y1="'+(y-6)+'" x2="'+px(v).toFixed(1)+'" y2="'+(y+6)+'"/>');
+        parts.push('<text class="tlab" x="'+px(v).toFixed(1)+'" y="'+(y+22)+'" text-anchor="middle">'+(Math.round(v*100)/100)+'</text>');
+        parts.push('<circle class="hint-dot" cx="'+px(v).toFixed(1)+'" cy="'+y+'" r="2"/>');
+      }
+      var cur=parseFloat(inp.value);
+      if(!isNaN(cur)&&cur>=mn&&cur<=mx) parts.push('<circle class="pt" cx="'+px(cur).toFixed(1)+'" cy="'+y+'" r="7"/>');
+      parts.push('<rect class="hit" x="0" y="0" width="'+W+'" height="'+H+'"/>');
+      var _cur=parseFloat(inp.value);
+      sv='<svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" tabindex="0" role="slider" '+
+        'aria-valuemin="'+mn+'" aria-valuemax="'+mx+'" aria-valuenow="'+(isNaN(_cur)?'':_cur)+'" '+
+        'aria-label="Number line from '+mn+' to '+mx+'. Use the arrow keys to move the point, or click.">'+parts.join('')+'</svg>';
+    } else {
+      var xmn=g7plotNum(box,'xmin',0), xmx=g7plotNum(box,'xmax',10), xst=g7plotNum(box,'xstep',1);
+      var ymn=g7plotNum(box,'ymin',0), ymx=g7plotNum(box,'ymax',10), yst=g7plotNum(box,'ystep',1);
+      var H=300, L=44, R=W-16, T=16, B=H-40;
+      var gx=function(v){return L+(v-xmn)/(xmx-xmn)*(R-L);};
+      var gy=function(v){return B-(v-ymn)/(ymx-ymn)*(B-T);};
+      var g=[],i;
+      for(i=xmn;i<=xmx+1e-9;i+=xst){
+        g.push('<line class="gridline" x1="'+gx(i).toFixed(1)+'" y1="'+T+'" x2="'+gx(i).toFixed(1)+'" y2="'+B+'"/>');
+        g.push('<text class="tlab" x="'+gx(i).toFixed(1)+'" y="'+(B+18)+'" text-anchor="middle">'+(Math.round(i*100)/100)+'</text>');
+      }
+      for(i=ymn;i<=ymx+1e-9;i+=yst){
+        g.push('<line class="gridline" x1="'+L+'" y1="'+gy(i).toFixed(1)+'" x2="'+R+'" y2="'+gy(i).toFixed(1)+'"/>');
+        g.push('<text class="tlab" x="'+(L-7)+'" y="'+(gy(i)+4).toFixed(1)+'" text-anchor="end">'+(Math.round(i*100)/100)+'</text>');
+      }
+      g.push('<line class="axis" x1="'+L+'" y1="'+B+'" x2="'+R+'" y2="'+B+'"/>');
+      g.push('<line class="axis" x1="'+L+'" y1="'+T+'" x2="'+L+'" y2="'+B+'"/>');
+      var pr=String(inp.value||'').split(',');
+      if(pr.length===2){
+        var cx=parseFloat(pr[0]), cy=parseFloat(pr[1]);
+        if(!isNaN(cx)&&!isNaN(cy)&&cx>=xmn&&cx<=xmx&&cy>=ymn&&cy<=ymx)
+          g.push('<circle class="pt" cx="'+gx(cx).toFixed(1)+'" cy="'+gy(cy).toFixed(1)+'" r="7"/>');
+      }
+      g.push('<rect class="hit" x="0" y="0" width="'+W+'" height="'+H+'"/>');
+      sv='<svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" tabindex="0" role="application" '+
+        'aria-label="Coordinate grid, x from '+xmn+' to '+xmx+', y from '+ymn+' to '+ymx+'. '+
+        'Use the arrow keys to move the point, or click. Current point: '+(inp.value||'none')+'.">'+g.join('')+'</svg>';
+    }
+    var old=box.querySelector('svg'); if(old)old.parentNode.removeChild(old);
+    box.insertAdjacentHTML('afterbegin',sv);
+    var ro=box.querySelector('.readout');
+    if(!ro){ro=document.createElement('div');ro.className='readout';box.appendChild(ro);}
+    ro.textContent=inp.value?('Placed: '+(box.dataset.plot==='grid'?'('+inp.value+')':inp.value)):'Click to place your point, or focus it and use the arrow keys.';
+    box.classList.toggle('locked',!!inp.disabled);
+  }
+  function g7plotSet(box,evt){
+    var inp=box.querySelector('.ans-input');
+    if(!inp||inp.disabled)return;                       // a locked step must stay locked
+    var svg=box.querySelector('svg'); if(!svg)return;
+    // Read the viewBox ATTRIBUTE rather than svg.viewBox.baseVal: the SVG DOM geometry interfaces
+    // are not universally implemented (jsdom has none), and an attribute parse works everywhere.
+    var r=svg.getBoundingClientRect();
+    var vb=String(svg.getAttribute('viewBox')||'0 0 360 100').split(/[\s,]+/).map(parseFloat);
+    var vw=vb[2]||360, vh=vb[3]||100;
+    var sx=vw/(r.width||vw), sy=vh/(r.height||vh);
+    var px=(evt.clientX-r.left)*sx, py=(evt.clientY-r.top)*sy;
+    var snap=function(v,st,mn,mx){var n=mn+Math.round((v-mn)/st)*st;return Math.min(mx,Math.max(mn,Math.round(n*1e6)/1e6));};
+    if((box.dataset.plot||'line')==='line'){
+      var mn=g7plotNum(box,'min',-10), mx=g7plotNum(box,'max',10), st=g7plotNum(box,'step',1);
+      var x0=26, x1=360-26;
+      var v=mn+(px-x0)/(x1-x0)*(mx-mn);
+      inp.value=String(snap(v,st,mn,mx));
+    } else {
+      var xmn=g7plotNum(box,'xmin',0), xmx=g7plotNum(box,'xmax',10), xst=g7plotNum(box,'xstep',1);
+      var ymn=g7plotNum(box,'ymin',0), ymx=g7plotNum(box,'ymax',10), yst=g7plotNum(box,'ystep',1);
+      var L=44, R=360-16, T=16, B=300-40;
+      var vx=xmn+(px-L)/(R-L)*(xmx-xmn), vy=ymn+(B-py)/(B-T)*(ymx-ymn);
+      inp.value=snap(vx,xst,xmn,xmx)+','+snap(vy,yst,ymn,ymx);
+    }
+    inp.classList.remove('correct','wrong');
+    g7plotDraw(box);
+  }
+  function g7plotSync(){Array.prototype.forEach.call(document.querySelectorAll('.plotbox'),g7plotDraw);}
+  document.addEventListener('click',function(e){
+    var box=e.target.closest&&e.target.closest('.plotbox');
+    if(box&&e.target.classList.contains('hit'))g7plotSet(box,e);
+  });
+
+  /* Keyboard operation. Shipped click-only, which locked keyboard and screen-reader users out of
+     every plot item — including a real released MCAP capstone. Arrow keys step the point; Home/End
+     jump to the ends; the first press on an empty plot starts in the middle rather than doing
+     nothing, so there is always a way in without a pointer. */
+  function g7plotKey(box, e){
+    var inp=box.querySelector('.ans-input');
+    if(!inp||inp.disabled)return;
+    var k=e.key, grid=(box.dataset.plot||'line')==='grid';
+    var mn,mx,st,xmn,xmx,xst,ymn,ymx,yst,vx,vy;
+    var clamp=function(v,a,b){return Math.min(b,Math.max(a,Math.round(v*1e6)/1e6));};
+    if(!grid){
+      mn=g7plotNum(box,'min',-10); mx=g7plotNum(box,'max',10); st=g7plotNum(box,'step',1);
+      var cur=parseFloat(inp.value);
+      if(isNaN(cur)){ if(k.indexOf('Arrow')!==0&&k!=='Home'&&k!=='End')return;
+        cur=clamp(mn+Math.round(((mn+mx)/2-mn)/st)*st,mn,mx); }
+      else if(k==='ArrowLeft'||k==='ArrowDown')cur=clamp(cur-st,mn,mx);
+      else if(k==='ArrowRight'||k==='ArrowUp')cur=clamp(cur+st,mn,mx);
+      else if(k==='Home')cur=mn; else if(k==='End')cur=mx;
+      else return;
+      inp.value=String(cur);
+    } else {
+      xmn=g7plotNum(box,'xmin',0); xmx=g7plotNum(box,'xmax',10); xst=g7plotNum(box,'xstep',1);
+      ymn=g7plotNum(box,'ymin',0); ymx=g7plotNum(box,'ymax',10); yst=g7plotNum(box,'ystep',1);
+      var pr=String(inp.value||'').split(','); vx=parseFloat(pr[0]); vy=parseFloat(pr[1]);
+      if(isNaN(vx)||isNaN(vy)){ if(k.indexOf('Arrow')!==0&&k!=='Home'&&k!=='End')return;
+        vx=clamp(xmn+Math.round(((xmn+xmx)/2-xmn)/xst)*xst,xmn,xmx);
+        vy=clamp(ymn+Math.round(((ymn+ymx)/2-ymn)/yst)*yst,ymn,ymx); }
+      else if(k==='ArrowLeft')vx=clamp(vx-xst,xmn,xmx);
+      else if(k==='ArrowRight')vx=clamp(vx+xst,xmn,xmx);
+      else if(k==='ArrowDown')vy=clamp(vy-yst,ymn,ymx);
+      else if(k==='ArrowUp')vy=clamp(vy+yst,ymn,ymx);
+      else if(k==='Home'){vx=xmn;vy=ymn;} else if(k==='End'){vx=xmx;vy=ymx;}
+      else return;
+      inp.value=vx+','+vy;
+    }
+    e.preventDefault();
+    inp.classList.remove('correct','wrong');
+    g7plotDraw(box);
+    var sv=box.querySelector('svg'); if(sv&&sv.focus)sv.focus();   // redraw replaces the node
+  }
+  document.addEventListener('keydown',function(e){
+    var box=e.target.closest&&e.target.closest('.plotbox');
+    if(box)g7plotKey(box,e);
+  });
+
+  window.__modPlot={sync:g7plotSync,draw:g7plotDraw,key:g7plotKey};
+
+  /* ===== spaced review (MR-1) phase-3: in-module retrieval mode, ?review=<skill> ===== */
+  // Why this exists: restoreProgress() re-fills a completed item with its own correct answer, so a
+  // student sent back by the hub's "Due for review" would have re-read an answer key — the opposite
+  // of retrieval. Review mode takes the due skill's ALREADY-AUTHORED items (no new content), clears
+  // them for a real attempt, and hides the rest of the lesson. The stored tree is never touched, so
+  // the mastery bar stays monotonic; the re-attempt logs normally and lands in the AN-4 retention
+  // bucket because the topic was due when the session started.
+  var _oCap=false;
+  function g7capture(){                                   // originals, snapshotted before any restore
+    if(_oCap)return;_oCap=true;
+    Array.prototype.forEach.call(document.querySelectorAll('.qcard .step'),function(s){
+      s.dataset.olock=s.classList.contains('locked')?'1':'0';
+      var b=s.querySelector('.check-btn');if(b&&b.dataset.olbl===undefined)b.dataset.olbl=b.textContent;
+      var f=s.querySelector('.mc-feedback');if(f&&f.dataset.exp===undefined)f.dataset.exp=f.textContent||'';
+    });
+  }
+  g7capture();
+  function g7hubHref(){var a=document.querySelector('a[href$="Hub.html"]');return (a&&a.getAttribute('href'))||'index.html';}
+  function g7revParam(){try{return (new URLSearchParams(location.search)).get('review')||'';}catch(e){return '';}}
+  // The retrieval core for a skill: its Target/Exam items. Learn/Guided are scaffolded re-reads and
+  // Stretch is beyond the standard, so neither belongs in a review set — but if a skill authored
+  // nothing else, fall back to what exists rather than showing an empty panel.
+  function g7revSet(sk){
+    var core=[],any=[];
+    Array.prototype.forEach.call(document.querySelectorAll('.qcard[data-qid]'),function(c){
+      var q=c.dataset.qid;if((G7_SKILLS[q]||'reasoning')!==sk)return;
+      any.push(c);var lv=g7level(q);if(lv===2||lv===3)core.push(c);
+    });
+    return (core.length?core:any).slice(0,4);           // a short set — review is a pass, not a re-run
+  }
+  function g7revReset(card){
+    Array.prototype.forEach.call(card.querySelectorAll('.step'),function(s){
+      s.classList.remove('completed');
+      delete s.dataset.att;delete s.dataset.logged;
+      var lock=s.dataset.olock==='1';
+      s.classList.toggle('locked',lock);setStepDisabled(s,lock);
+      var b=s.querySelector('.check-btn');
+      if(b){b.classList.remove('done');if(b.dataset.olbl!==undefined)b.textContent=b.dataset.olbl;b.disabled=lock;}
+      Array.prototype.forEach.call(s.querySelectorAll('.ans-input'),function(i){
+        i.value='';i.classList.remove('correct','wrong');i.dataset.simplify='';});
+      Array.prototype.forEach.call(s.querySelectorAll('.feedback'),function(f){
+        f.textContent='';f.classList.remove('correct','wrong');});
+      var mc=s.querySelector('.mc-group');
+      if(mc){mc.classList.remove('answered');Array.prototype.forEach.call(mc.querySelectorAll('.mc-option'),function(o){
+        o.classList.remove('disabled','correct','wrong','sel','cooldown');});}
+      var mfb=s.querySelector('.mc-feedback');
+      if(mfb){mfb.classList.remove('correct','wrong');if(mfb.dataset.exp!==undefined)mfb.textContent=mfb.dataset.exp;}
+      var ms=s.querySelector('.ms-group');
+      if(ms){ms.classList.remove('answered');Array.prototype.forEach.call(ms.querySelectorAll('.ms-option'),function(o){
+        o.classList.remove('disabled','correct','wrong','sel');});}
+      var ta=s.querySelector('.cr-area');if(ta)ta.value='';
+      var sv=s.querySelector('.cr-saved');if(sv&&sv.parentNode)sv.parentNode.removeChild(sv);
+      var hc=s.querySelector('.hint-content');if(hc)hc.classList.remove('show');
+      var hb=s.querySelector('.hint-btn');if(hb)hb.textContent='Hint';
+    });
+    if(window.__modPlot)Array.prototype.forEach.call(card.querySelectorAll('.plotbox'),g7plotDraw);
+  }
+  function g7reviewMode(){
+    var sk=g7revParam();if(!sk)return;
+    var set=g7revSet(sk);if(!set.length)return;          // unknown/unauthored skill -> the normal lesson
+    var panel=document.createElement('div');panel.className='rev-panel';panel.id='g7-review-panel';
+    var h=document.createElement('h2');h.textContent='Review — '+(G7_SKILL_LABELS[sk]||sk);
+    var p=document.createElement('p');p.className='rev-sub';
+    p.textContent=set.length+' item'+(set.length===1?'':'s')+' you have worked before, cleared for a fresh '+
+      'attempt. Answer from memory — pulling it back is what makes it stick. Nothing here can move your '+
+      'mastery bar down.';
+    panel.appendChild(h);panel.appendChild(p);
+    set.forEach(function(c){g7revReset(c);panel.appendChild(c);});   // moved, never removed: totals stay honest
+    var done=document.createElement('div');done.className='rev-done';
+    var a1=document.createElement('a');a1.className='btn';a1.href=g7hubHref();a1.textContent='Done — back to the Hub';
+    var a2=document.createElement('a');a2.className='btn ghost';
+    a2.href=(location.pathname.split('/').pop()||'');a2.textContent='Open the full lesson';
+    done.appendChild(a1);done.appendChild(a2);panel.appendChild(done);
+    var first=document.querySelector('section.topic');
+    if(first&&first.parentNode)first.parentNode.insertBefore(panel,first);
+    else (document.querySelector('.container')||document.body).appendChild(panel);
+    document.body.classList.add('g7-review-mode');
+  }
+  /* ===== homework deep-link: ?q=<qid>[,<qid>...] =====
+   * A homework set can reference exact questions in this module. Reuses the review reset so the
+   * student makes a REAL attempt; the stored tree is untouched, so the hub reads completion back. */
+  function g7hwParam(){try{return (new URLSearchParams(location.search)).get('q')||'';}catch(e){return '';}}
+  function g7hwSet(csv){
+    var want=String(csv||'').split(',').map(function(s){return s.trim();}).filter(Boolean);
+    var byId={};
+    Array.prototype.forEach.call(document.querySelectorAll('.qcard[data-qid]'),function(c){byId[c.dataset.qid]=c;});
+    var out=[];
+    want.forEach(function(q){var c=byId[q];if(c&&out.indexOf(c)<0)out.push(c);});
+    return out;                                           // order follows the homework set, not the page
+  }
+  function g7homeworkMode(){
+    var csv=g7hwParam();if(!csv)return false;
+    var set=g7hwSet(csv);if(!set.length)return false;     // unknown qid -> fall through to the normal lesson
+    var panel=document.createElement('div');panel.className='rev-panel';panel.id='g7-homework-panel';
+    var h=document.createElement('h2');h.textContent='Homework';
+    var p=document.createElement('p');p.className='rev-sub';
+    p.textContent=set.length+' question'+(set.length===1?'':'s')+' set for you, cleared for a fresh '+
+      'attempt. Work each one out before you answer.';
+    panel.appendChild(h);panel.appendChild(p);
+    set.forEach(function(c){g7revReset(c);panel.appendChild(c);});
+    var done=document.createElement('div');done.className='rev-done';
+    var a1=document.createElement('a');a1.className='btn';a1.href=g7hubHref();a1.textContent='Done — back to the Hub';
+    var a2=document.createElement('a');a2.className='btn ghost';
+    a2.href=(location.pathname.split('/').pop()||'');a2.textContent='Open the full lesson';
+    done.appendChild(a1);done.appendChild(a2);panel.appendChild(done);
+    var first=document.querySelector('section.topic');
+    if(first&&first.parentNode)first.parentNode.insertBefore(panel,first);
+    else (document.querySelector('.container')||document.body).appendChild(panel);
+    document.body.classList.add('g7-review-mode');
+    return true;
+  }
+  // Homework wins over review: it is an explicit instruction, not a suggestion.
+  window.addEventListener('load',function(){if(!g7homeworkMode())g7reviewMode();});
+  window.__modHomeworkMode={set:g7hwSet,mode:g7homeworkMode,param:g7hwParam};
+  window.__modReviewMode={set:g7revSet,reset:g7revReset,mode:g7reviewMode,param:g7revParam};
+
+  document.getElementById('btn-export').addEventListener('click',function(){
+    var d=loadData();var cards=document.querySelectorAll('.qcard');var lines=[],td=0,ts=0;
+    cards.forEach(function(c){var q=c.dataset.qid||'?';var title=(c.querySelector('.qtitle')||{}).textContent||'';var steps=c.querySelectorAll('.step');ts+=steps.length;var done=0;if(d[q]&&d[q].steps)done=Object.keys(d[q].steps).filter(function(k){return d[q].steps[k];}).length;td+=done;lines.push(q.padEnd(8)+(done+'/'+steps.length).padEnd(8)+title.trim());});
+    var date=new Date().toLocaleDateString('en-US',{day:'2-digit',month:'short',year:'numeric'});
+    var sum=G7_TOPIC_TITLE+' — Progress Report\nStudent: '+g7current()+'    Date: '+date+'\n'+'='.repeat(58)+'\nOverall: '+td+' / '+ts+' steps  ('+(ts?Math.round(td/ts*100):0)+'%)\n'+'='.repeat(58)+'\n\n'+lines.join('\n');
+    var blob=new Blob([sum],{type:'text/plain'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='progress-'+g7current().replace(/\W+/g,'_')+'-'+new Date().toISOString().slice(0,10)+'.txt';a.click();URL.revokeObjectURL(a.href);
+  });
+  document.getElementById('btn-reset-all').addEventListener('click',function(){if(!confirm('Reset your progress for this module? This cannot be undone.'))return;var o=g7all();var s=g7current();if(o.students&&o.students[s]&&o.students[s].topics){delete o.students[s].topics[G7_TOPIC_ID];g7save(o);}location.reload();});
+
+  var sections=document.querySelectorAll('section.topic'),navlinks=document.querySelectorAll('.navlink');
+  function updateActive(){var cur='';sections.forEach(function(s){if(window.scrollY+120>=s.offsetTop)cur=s.id;});navlinks.forEach(function(a){a.classList.toggle('active',a.getAttribute('href')==='#'+cur);});}
+  window.addEventListener('scroll',updateActive);window.addEventListener('load',updateActive);
+</script>
+</body>
+</html>

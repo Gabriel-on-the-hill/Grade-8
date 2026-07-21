@@ -19,13 +19,13 @@ domain is missing.** Grade 7's equivalent audit turned up a domain with zero wor
 standard taught backwards, so the standing assumption was that Grade 8 had its own version of that
 until somebody looked. It does.
 
-## Headline: 2 of 5 mathematics domains are built
+## Headline: 3 of 5 mathematics domains are built
 
 | Domain | CCSS clusters | Status | Where |
 |---|---|---|---|
 | **8.NS** The Number System | 1 | ✅ built | `The_Number_System.html` — 31 items, 10 exam |
 | **8.EE** Expressions & Equations | 3 | ◐ built, **two** gaps | `Expressions_and_Equations.html` — 33 items, 10 exam |
-| **8.F** Functions | 2 | ❌ **absent** | hub tile: *coming soon* |
+| **8.F** Functions | 2 | ✅ **built** 21 Jul 2026 | `Functions.html` — 36 items, 9 exam |
 | **8.G** Geometry | 3 | ❌ **absent** | hub tile: *coming soon* |
 | **8.SP** Statistics & Probability | 1 | ❌ **absent** | hub tile: *coming soon* |
 
@@ -58,15 +58,20 @@ one whole standard short, not just missing a derivation.
 | 8.EE.7 | Solve linear equations in one variable; one / none / infinitely many solutions; expand and collect terms | ✅ | §4 solving, §5 one-none-infinite |
 | 8.EE.8 | Systems: graph and interpret intersection, solve algebraically, real-world problems | ✅ | §6 |
 
-## 8.F — Functions ❌ absent
+## 8.F — Functions ✅ built 21 Jul 2026
 
-| Std | Requirement | Status |
-|---|---|---|
-| 8.F.1 | A function assigns exactly one output to each input; graph = set of ordered pairs | ❌ |
-| 8.F.2 | Compare two functions represented **differently** (algebraic, graphical, numerical, verbal) | ❌ |
-| 8.F.3 | `y = mx + b` defines a linear function; recognise non-linear examples | ❌ |
-| 8.F.4 | Construct a function to model a linear relationship; rate of change and initial value | ❌ |
-| 8.F.5 | Describe a graph **qualitatively** (increasing/decreasing, linear/non-linear); sketch from a description | ❌ |
+| Std | 2025 | Requirement | Status | Evidence |
+|---|---|---|---|---|
+| 8.F.1 | `8.AT.C.6` | A function assigns exactly one output to each input; graph = set of ordered pairs | ✅ | §1, incl. the vertical line test; **MCAP Q2** capstone (`1-5`) |
+| 8.F.2 | `8.AT.C.7` | Compare two functions represented **differently** (algebraic, graphical, numerical, verbal) | ✅ | §2 four representations, §6 comparing; **MCAP Q20** capstone (`6-4`) |
+| 8.F.3 | `8.AT.C.8` | `y = mx + b` defines a linear function; recognise non-linear examples | ✅ | §3, incl. a textbook-lifted three-table item (`3-2`) |
+| — | **`8.AT.D.9`** | **NEW in 2025** — interpret the graph of `y = mx + b`; identify slope and intercept; match equation to graph | ✅ | **§4, authored** — no released item and no textbook lesson exists for it |
+| 8.F.4 | `8.AT.D.10` | Construct a function to model a linear relationship; rate of change and initial value | ✅ | §5; **MCAP Q35** capstone (`5-5`) |
+| 8.F.5 | `8.AT.D.11` | Describe a graph **qualitatively**; sketch from a description | ✅ | §7, incl. the first **click-to-plot** items; **MCAP Q14** capstone (`7-5`) |
+
+**This is the row that justifies the dual-coding.** `8.AT.D.9` has no 2010 predecessor, so on the
+2010-only view above there is no row it could occupy — the unit would have shipped complete-looking
+and one standard short. It exists in the module only because the crosswalk was read first.
 
 ## 8.G — Geometry ❌ absent
 
@@ -118,11 +123,13 @@ is the only thing keeping the sequence whole.
 
 ## Recommended order, by exam weight and dependency
 
-1. **8.F Functions** — the spine of Grade 8 algebra; 8.EE.5/6 already lean on it, and 8.SP.3 needs it.
-2. **8.G Geometry** — largest domain (9 standards), carries the Pythagorean Theorem, and is where two
-   of the three inbound Grade 7 clusters land.
-3. **8.SP Statistics** — smallest, and depends on 8.F for the linear-model work.
-4. **8.EE.6's similar-triangles derivation** — small, and can ride any Expressions edit.
+1. ~~**8.F Functions**~~ — **done 21 Jul 2026.**
+2. **`8.AT.B.4` linear inequalities + `8.AT.A.2`'s derivation** — both ride one Expressions edit, and
+   the inequalities standard is a whole missing standard rather than a missing explanation.
+3. **8.SP Statistics** — 6 standards under 2025; now unblocked, since it depends on 8.F for the
+   linear-model work. Author to the 2025 verbs (judge a given model, don't fit one).
+4. **8.G Geometry** — **5 standards under 2025, not 9**, and only 4 of 23 blueprint items. Two of the
+   five are the inbound Grade 7 clusters, so this is the one that closes P4.
 
 **Do not close these by relabelling.** `exam_coverage` counts an exam item per skill and will happily
 pass a domain that does not exist, because it only sees the skills a module declares. The pressure

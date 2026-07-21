@@ -1,6 +1,6 @@
 # Grade 8 Mathematics Hub — Project Operating Standard
 
-**Purpose:** Single source of truth for this Grade 8 Mathematics hub, built from the Starter Kit. Any assistant/session should **read this file and `Module_Template.html` first**, then continue at (or above) this standard with minimal prompting. Keep this file updated as the standard evolves.
+**Purpose:** Single source of truth for this Grade 8 Mathematics hub, built from the Starter Kit. Any assistant/session should **read this file and `Starter_Kit/Module_Template.html` first**, then continue at (or above) this standard with minimal prompting. Keep this file updated as the standard evolves.
 
 > Project facts:
 > - **Grade:** 8
@@ -9,7 +9,7 @@
 > - **Curriculum units + standards (CCSS / MCCRS domains):**
 >   - **The Number System (8.NS)** — irrational numbers; rational vs irrational; decimal expansions (terminating/repeating); converting repeating decimals to fractions; square & cube roots; approximating, comparing and ordering irrationals on a number line; estimating expressions. *(BUILT — first unit.)*
 >   - **Expressions & Equations (8.EE)** — integer exponents & properties; scientific notation; proportional relationships & slope; solving linear equations (one solution / none / infinite); systems of two linear equations. *(BUILT — second unit.)*
->   - **Functions (8.F)** — define/evaluate/compare functions; linear vs nonlinear; rate of change & initial value; construct & interpret functions and graphs. *(coming soon)*
+>   - **Functions (8.F)** — define/evaluate/compare functions; linear vs nonlinear; rate of change & initial value; construct & interpret functions and graphs. *(BUILT — third unit, 21 Jul 2026. Authored to **MCCRS 2025 `8.AT.C`/`8.AT.D`**, which includes the new `8.AT.D.9`.)*
 >   - **Geometry (8.G)** — rigid transformations & congruence; dilations & similarity; angle relationships; Pythagorean Theorem & its converse; distance; volume of cylinders, cones & spheres. *(coming soon)*
 >   - **Statistics & Probability (8.SP)** — scatter plots & bivariate data; lines of best fit; two-way tables & association. *(coming soon)*
 > - **Textbooks / source materials in folder (consult every unit):**
@@ -48,6 +48,8 @@ A Grade 8 Mathematics **study & practice hub** for a teacher with one or more st
 - `Grade_8_Math_Hub.html` — the home hub (renamed from `Hub_Template.html`). Multi-subject: edit the `SUBJECTS` array + title only. Hosts Mathematics (built) and Science (first unit built — Matter & Its Interactions); one sign-in, one roster, one teacher dashboard across all subjects.
 - `Starter_Kit/Module_Template.html` — canonical module engine + showcase of all **6** formats. **Stamp every unit from this.** *(Path corrected 21 Jul 2026: this file has never been at the repo root, though §3 and `CLAUDE.md` both said `Module_Template.html`.)*
 - `The_Number_System.html` — first built unit (8.NS).
+- `Expressions_and_Equations.html` — second built unit (8.EE).
+- `Functions.html` — third built unit (8.F / MCCRS 2025 `8.AT.C`–`8.AT.D`), 21 Jul 2026. First unit to use the click-to-plot format.
 - One HTML module per remaining unit (built from the template).
 - `Starter_Kit/HUB_Google_Sheet_Setup.md` — optional cloud activity log (not yet connected).
 
@@ -81,6 +83,9 @@ Header (title · unit · standard · objectives) → hub bar → progress → **
 
 ### The Number System — skill tags used (drives the struggle dashboard)
 `rational-decimal` (rational numbers & decimal expansions), `repeat-fraction` (repeating decimal → fraction), `irrational` (identify irrational numbers), `roots` (square & cube roots), `estimate` (approximate irrationals between integers / truncating), `compare` (compare & order on a number line), `expr-est` (estimate value of expressions), `reasoning` (reasoning & error analysis).
+
+### Functions — skill tags used (drives the struggle dashboard)
+`func-def` (what a function is — one output per input), `func-rep` (representing & comparing functions), `linearity` (linear vs non-linear), `graph-read` (slope & y-intercept from a graph — **MCCRS 2025 `8.AT.D.9`, new**), `func-build` (building a linear function from a rate and an initial value), `qualitative` (describing & sketching graphs), `reasoning` (reasoning & error analysis).
 
 ## 6. Homework model
 Auto-suggested from each student's weakest concepts; optional teacher-set per-student assignment; the make-your-own challenge as the creative anchor. Verification is automatic via timestamped tracking + dashboard.
@@ -184,6 +189,12 @@ Engine v1.2 (v1.1 + the multi-subject hub layer: flat `UNITS` replaced by `SUBJE
 
 - **2026-07-19** — **Per-student subject visibility (`STUDENT_SUBJECTS`).** Every student saw every subject; Ayodeji (Grade 8 maths, three classes in, real foundational gaps) had a Science tab she will not open this term. Added an edit-per-deployment constant `{Ayodeji:['math']}` — unlisted students see all — gating **only** `renderSubjectTabs`, `firstSubject` and `curSubject`. `subjectById`/`eachTopic`/`topicMeta` are deliberately untouched (data plumbing; filtering them would orphan records), and the **teacher dashboard stays unfiltered** — hidden-subject data is retained and still shown to the teacher, never deleted. Single visible subject ⇒ tab bar hidden. The validator now **rejects a plan whose subject the student cannot see**: `hwPlanFor()` is keyed by subject, so such a plan would have published and rendered nothing — the same silent-loss class as the `ref:"task"` gap found the same day. **Verified:** suite **248 passed, 0 failed (+18)**, all three gates mutation-checked. **One mutation initially did not fail**, which was the point of running it: the `curSubject` assertions were checking only the tab bar, which `visibleSubjects()` filters anyway, so they passed even with the gate removed — while `renderApp()` would in fact resolve a stored foreign `sci` and render **Science content under a Maths tab bar** (reachable on a shared device, since `<prefix>subject` is device-level). Assertions re-pointed at the resolved subject label and the rendered topic list; the mutation then failed 4 assertions as it should. **Live site is stale until pushed** (§11).
 - **2026-07-19** — **Dashboard labels non-enrolment instead of filtering it.** With `STUDENT_SUBJECTS` live, a gated student's dashboard showed a bare subject heading plus "No activity yet in Science" — technically true, actively misleading (she has no activity because she *cannot see it*). Considered three options and **rejected filtering-with-a-toggle**: the noise it removes is two lines per student per untouched subject, while the cost is a default-hidden **audit surface** — the place `AN-4` retention, `AS-4` level focus and exam-readiness are verified, and the one view that would expose exactly the "renders nothing but looks fine" bugs found twice earlier the same day. Built the minimal alternative instead: a `hidden from <name>` chip on the subject heading, and an empty state naming non-enrolment. **Nothing is ever hidden** — a gated student with records still renders every row in full, and the not-enrolled note yields to real data. Revisit filtering only at ~8+ students × 3+ subjects, and even then fold with a visible count rather than removing. **Verified:** suite **248 → 259, 0 failed**; three mutations checked, including one asserting the dashboard must *not* filter. **Mutation-testing again caught a weak assertion**: the empty-state note also contains "hidden from <name>", so a whole-block match could not prove the heading chip existed — assertions re-pointed at `.dash-subject` text only. Also corrected a wrong assumption while writing the tests: the dashboard renders **every** student, so panel-wide matches leak across students; assertions are now scoped to one `.student-block` via its `open-as` `data-n`.
+- **2026-07-21** — **Functions (8.F / MCCRS 2025 `8.AT.C`–`8.AT.D`) built as the third maths unit** → `Functions.html`, topic id `functions`, **8 sections / 36 items / 44 steps**, all six formats including the first use of the **click-to-plot** input. Flow: what a function is → four representations → linear vs non-linear → **reading `y = mx + b` off a graph** → building a linear function → comparing two functions → describing & sketching graphs → mixed module check. Generated by script from `Starter_Kit/Module_Template.html` with every replacement asserted to match exactly once (§7.5); coordinate figures are authored inline SVG with `role="img"` and full `aria-label`s.
+  **Authored to the 2025 cut, not the 2010 one** (`MCCRS_2025_DUAL_CODING.md`): §4 exists solely for **`8.AT.D.9`**, which is new in MCCRS 2025 and has *no released item and no textbook lesson*, so it was authored — the rest of the unit could have been built without ever noticing it was missing.
+  **Four real MCAP capstones**, pre-cleared in `MCAP_PROVENANCE.md` before authoring began: Q2 (`1-5`), Q20 (`6-4`, rendered as two locked MC steps preserving the released drop-down order), Q35 (`5-5`), Q14 (`7-5`, figure rebuilt as SVG — the release prints no axis scale, so what had to be reproduced was that `P→Q` is visibly straight and the rest curved). **Q8 was deliberately not used**: it asks for *any two points* on `x + 3y = −3` and the engine matches one exact string, so it could only have shipped adapted — and adapted, it loses the label.
+  **Two guard failures on first run, both correct and both fixed rather than worked around:** `mcap_provenance` rejected four items claiming `MCAP` before their manifest rows moved up, and `module_integrity` caught a hint on exam capstone `8-3` (§2.4 bans them). `plot_format`'s Part B, written hours earlier, armed itself on the new module unprompted.
+  **Verified:** `node --check`; 36 unique qids, all skill-mapped, zero plaintext answers; **all 30 keys recomputed independently** with `fractions.Fraction`; jsdom drive confirming two-part unlocking (fill-in *and* MC), case-insensitive text answers (`Yes`/`NO`), equivalent-fraction acceptance (`0.5` and `2/4` for `1/2`), and preserved option order on the `data-noshuffle` semantic scale. **12 guards green, behavioural 269.** New guard: `tests/module_smoke.test.js` (P5), which also asserts every `available` hub tile points at a file on disk whose `G7_TOPIC_ID` matches its topic id. **Live site is stale until pushed** (§11).
+
 ## 11. Deployment & publishing rules
 
 ### Outstanding deploys — clear a line only when it is actually pushed
@@ -197,6 +208,8 @@ Engine v1.2 (v1.1 + the multi-subject hub layer: flat `UNITS` replaced by `SUBJE
 - [x] **2026-07-15 — Science unit (Matter & Its Interactions)** — **verified live** (`Matter_and_Its_Interactions.html` returns HTTP 200).
 
 - [x] **2026-07-19 — dashboard labels non-enrolment** — pushed in `4feb7ee`; **verified live** (served hub carries the `hidden from <name>` chip).
+
+- [ ] **2026-07-21 — Functions unit (`Functions.html`) + hub tile now `available`** — **not yet verified live**; fetch the deployed hub and confirm the Functions tile links, and that `Functions.html` returns HTTP 200, before clearing this line.
 
 *Nothing outstanding as of 19 Jul 2026, through `4feb7ee`. Verified by fetching the deployed site, not by assuming a push shipped — a green `git push` only proves the remote updated, and Pages rebuilds a minute or two later.*
 

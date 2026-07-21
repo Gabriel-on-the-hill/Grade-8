@@ -30,16 +30,25 @@ its key recomputed independently. Citations are as MSDE prints them.
 | `Expressions_and_Equations.html` | `1-5` | `…Math 8 2024` | Math 8 2024 Release, Question 1 | 8.EE.A.1 |
 | `Expressions_and_Equations.html` | `2-4` | `…Math 8 2024` | Math 8 2024 Release, Question 9 | 8.EE.A.3 |
 | `Expressions_and_Equations.html` | `4-4` | `…Math 8 2024` | Math 8 2024 Release, Question 6 | 8.EE.C.7b |
+| `Functions.html` | `1-5` | `…Math 8 Functions` | Math 8 2024 Release, Question 2 | 8.F.A.1 |
+| `Functions.html` | `6-4` | `…Math 8 Functions` | Math 8 2024 Release, Question 20 | 8.F.A.2 |
+| `Functions.html` | `5-5` | `…Math 8 Functions` | Math 8 2024 Release, Question 35 | 8.F.B.4 |
+| `Functions.html` | `7-5` | `…Math 8 Functions` | Math 8 2024 Release, Question 14 | 8.F.B.5 |
 
-**Keys, recomputed independently before checking anything:**
+**Keys, recomputed independently before checking anything.** Rows are prefixed by module — `NS` The
+Number System, `EE` Expressions & Equations, `Fn` Functions — because qids repeat across modules.
 
 | qid | Item | Working | Key |
 |---|---|---|---|
-| `3-3` | Which of the following numbers are rational? *Select all.* | `−72` ✓, `4/5` ✓, `√6` ✗, `√(5/16)=√5/4` ✗, `√100=10` ✓ | −72, 4/5, √100 |
-| `6-4` | Best estimate for `√65 ÷ √122` | `√(65/122)=√0.5328≈0.7299`; `8/11≈0.7273` is nearest | `8/11` |
-| `1-5` | Equivalent to `8⁻⁴ · 8³` | `8⁻⁴⁺³ = 8⁻¹` | `1/8` |
-| `2-4` | `8×10⁹` is how many times `2×10⁸`? | `8/2 × 10⁹⁻⁸ = 4 × 10¹` | `40` |
-| `4-4` | `5(x−6) − 2(x+3) = 12` | `5x−30−2x−6=12 → 3x=48` | `x = 16` |
+| `NS 3-3` | Which of the following numbers are rational? *Select all.* | `−72` ✓, `4/5` ✓, `√6` ✗, `√(5/16)=√5/4` ✗, `√100=10` ✓ | −72, 4/5, √100 |
+| `NS 6-4` | Best estimate for `√65 ÷ √122` | `√(65/122)=√0.5328≈0.7299`; `8/11≈0.7273` is nearest | `8/11` |
+| `EE 1-5` | Equivalent to `8⁻⁴ · 8³` | `8⁻⁴⁺³ = 8⁻¹` | `1/8` |
+| `EE 2-4` | `8×10⁹` is how many times `2×10⁸`? | `8/2 × 10⁹⁻⁸ = 4 × 10¹` | `40` |
+| `EE 4-4` | `5(x−6) − 2(x+3) = 12` | `5x−30−2x−6=12 → 3x=48` | `x = 16` |
+| `Fn 1-5` | Which sets of ordered pairs represent functions? *Select all.* | Distinct inputs: A `1,2,3` ✓ · B `2,2,4` ✗ · C `3,4,5` ✓ · D `6,6,6` ✗ · E `7,8,9` ✓ — repeated **outputs** are allowed | A, C, E |
+| `Fn 6-4` | Compare slopes and y-intercepts of `J` (table) and `K: y = 3x + 8` | `J`: `(7−2)/(1−0)=5` and `(12−7)/(2−1)=5` → linear, `m=5`, `b=2`. `K`: `m=3`, `b=8` | slope **greater than**; y-intercept **less than** |
+| `Fn 5-5` | Anton's savings after `x` hours | `m=(600−450)/(20−10)=15`; `450=15(10)+b → b=300`; only option fitting both points | `y = 15x + 300` |
+| `Fn 7-5` | Over which interval is the rate of change constant? | Constant rate ⇔ a straight stretch. `P→Q` is a straight segment; `Q→R`, `R→S`, `S→T` are curved | From `P` to `Q` |
 
 **One fidelity repair, 21 Jul 2026.** `6-4` printed the stem as `√(65/122)` — one root of a quotient.
 MCAP prints `√65 ÷ √122`, a quotient of two roots. They are equal in value, but the released form is
@@ -120,10 +129,16 @@ before demoting an item — the same discipline that governs lifting one.**
 
 ## Pre-cleared for the Functions build — adjudicated 21 Jul 2026, not yet used
 
-**These are not claims yet.** No module carries them, so they are deliberately **outside the
-"Verified items" tables above** — `tests/mcap_provenance.test.js` parses only those two headings, and
-a row there pointing at no card would (correctly) fail as a stale row. Move a row up into the MCAP
-table **in the same commit** as the item that uses it.
+**Four of the five have since been used** — `Functions.html` shipped 21 Jul 2026 and their rows
+moved up into the MCAP table above, in the same commit as the items, exactly as this section
+prescribed. The guard proved the discipline works: the module failed `mcap_provenance` on first run
+with four *"claims MCAP but has no row"* violations, and passed once the rows moved. **`Q8` remains
+unused and blocked** (below).
+
+The original note, kept because the next packet will need it: rows live here while no module carries
+them, deliberately **outside the "Verified items" tables above** — `tests/mcap_provenance.test.js`
+parses only those two headings, and a row there pointing at no card would (correctly) fail as stale.
+Move a row up **in the same commit** as the item that uses it.
 
 **Why clear them before authoring rather than after.** The P1 audit above exists because labels were
 applied first and checked never. Doing it in this order costs nothing and makes the mistake
@@ -136,11 +151,11 @@ them, including the internal item codes.
 
 | Packet p. | Citation | Standard | Format | Fit |
 |---|---|---|---|---|
-| 2 | Math 8 2024 Release, Question 2 (8.F.A.1-1) — No Calculator | 8.F.A.1 → `8.AT.C.6` | multi-select | ✅ direct |
+| 2 | Math 8 2024 Release, Question 2 (8.F.A.1-1) — No Calculator | 8.F.A.1 → `8.AT.C.6` | multi-select | ✅ **used — `Functions.html` `1-5`** |
 | 3 | Math 8 2024 Release, Question 8 (8.F.A.3-1) — No Calculator | 8.F.A.3 → `8.AT.C.8` | **place two points** | ⚠️ **blocked — see below** |
-| 4 | Math 8 2024 Release, Question 14 (8.F.B.5-1) — No Calculator | 8.F.B.5 → `8.AT.D.11` | single MC | ✅ direct |
-| 5 | Math 8 2024 Release, Question 20 (8.F.A.2) — Calculator | 8.F.A.2 → `8.AT.C.7` | two drop-downs | ✅ as a two-part item |
-| 6 | Math 8 2024 Release, Question 35 (8.F.B.4) — Calculator | 8.F.B.4 → `8.AT.D.10` | single MC | ✅ direct |
+| 4 | Math 8 2024 Release, Question 14 (8.F.B.5-1) — No Calculator | 8.F.B.5 → `8.AT.D.11` | single MC | ✅ **used — `Functions.html` `7-5`** |
+| 5 | Math 8 2024 Release, Question 20 (8.F.A.2) — Calculator | 8.F.A.2 → `8.AT.C.7` | two drop-downs | ✅ **used — `Functions.html` `6-4`** |
+| 6 | Math 8 2024 Release, Question 35 (8.F.B.4) — Calculator | 8.F.B.4 → `8.AT.D.10` | single MC | ✅ **used — `Functions.html` `5-5`** |
 
 **Keys, recomputed independently (`fractions.Fraction`, never floats) before any published key was
 consulted:**

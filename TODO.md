@@ -119,8 +119,12 @@ scope of two of these items and added a third. 2025 codes in brackets.
 > remaining work**, and `8.AT.D.11`'s own textbook source items are "Sketch a graph" on an empty
 > grid (`TEXTBOOK_SOURCES.md`).
 
-- [ ] **8.F Functions — absent.** 5 standards `[8.AT.C.6–8, 8.AT.D.10–11]`, **+1 new**
-      `[8.AT.D.9 — interpret the graph of y=mx+b]`. **Still build first, and now on better evidence:**
+- [x] **8.F Functions — BUILT 21 Jul 2026** → `Functions.html`, 8 sections / 36 items / 44 steps, all
+      six formats, wired into the hub as `available`. Covers all 6 standards `[8.AT.C.6–8,
+      8.AT.D.9–11]`, **4 real MCAP capstones**, 1 textbook lift, and `8.AT.D.9` authored (no released
+      item, no textbook lesson — it is new in 2025). First unit to use the click-to-plot format.
+      Detail in `PROJECT_STANDARD.md` §10. *Original entry, for the reasoning:* 5 standards + 1 new.
+      **Built first on this evidence:**
       it is the **highest-weight unbuilt domain on the blueprint (5 of 23 content items)**, one of
       only three domains carrying a Reasoning statement, and under 2025 it **completes 8.AT**
       alongside the built Expressions & Equations. Author `8.AT.D.9` in from the start.
@@ -174,13 +178,18 @@ scope of two of these items and added a third. 2025 codes in brackets.
 
 ## P5 · Guards this app does not have
 
-Grade 7 runs 13 `.test.js`; Grade 8 runs **11** (4 of which arrived on 21 Jul). *(This line and P1 both said 11
+Grade 7 runs 13 `.test.js`; Grade 8 runs **12** (5 of which arrived on 21 Jul). *(This line and P1 both said 11
 when the true count was 10; corrected, then `plot_format` took it to a real 11. The three still
 missing below, less `homework_backend.test.js` which Grade 7 does not have, is the 13 → 11
 difference.)* Still missing:
 
 - [x] `mcap_provenance.test.js` — **done 21 Jul 2026**, covering both MCAP and MISA (see P1).
-- [ ] `module_smoke.test.js` — catches a module that loads but does not work.
+- [x] `module_smoke.test.js` — **ported 21 Jul 2026**, mutation-checked on three paths. Boots every
+      module, drives a wrong then a right answer, and asserts locked controls are really disabled.
+      **Grade-8 Part B added:** every `available` hub tile must point at a file that exists on disk
+      whose `G7_TOPIC_ID` matches its topic id (§4 — a mismatch writes progress the dashboard never
+      reads, and every page involved looks correct on its own), and every built module must be
+      reachable from some tile. All three mutations caught.
 - [x] `plot_format.test.js` — **ported 21 Jul 2026. 26 assertions, mutation-checked on five paths**
       (lock-guard removed · snapping un-rounded · `role="slider"` dropped · the `d10` demo card
       removed · the keyboard handler neutered — each caught, template restored bit-identically).
@@ -235,4 +244,4 @@ for t in tests/*.test.js; do node "$t" || echo "FAILED: $t"; done
 node tests/behavioral_test_suite.js .
 ```
 
-Currently **11 guards green, behavioural 269**.
+Currently **12 guards green, behavioural 269**.

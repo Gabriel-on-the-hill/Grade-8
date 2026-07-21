@@ -131,7 +131,7 @@ Functions build.
 
 | File | qid | Book | Lesson | Page (PDF / printed) | Verbatim or adapted |
 |---|---|---|---|---|---|
-| *(none yet)* | | | | | |
+| `Functions.html` | `3-2` | enVision Additional Practice G8 | 3-2 *Connect Representations of Functions*, Q6 | 48 / 42 | **Adapted** — the three input/output tables are reproduced exactly; the stem was changed from *"Which of these tables represent a nonlinear function?"* (open) to *"Select every table that represents a non-linear function"* (multi-select), because the engine grades a fixed option set. The mathematics is unchanged: Tables I and III are non-linear, II is linear with rate −5. |
 
 **Rules for this table** (`PROJECT_STANDARD.md` §7.7):
 
