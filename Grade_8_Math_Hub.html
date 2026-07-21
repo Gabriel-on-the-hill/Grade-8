@@ -410,7 +410,22 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     'estimate':'Approximating irrational numbers',
     'compare':'Comparing & ordering on a number line',
     'expr-est':'Estimating the value of expressions',
-    'reasoning':'Reasoning & error analysis'
+    'reasoning':'Reasoning & error analysis',
+    /* Expressions & Equations (8.EE / MCCRS 2025 8.NOS.B, 8.AT.A-B) */
+    'exponents':'Properties of integer exponents',
+    'sci-notation':'Scientific notation',
+    'slope':'Proportional relationships & slope',
+    'linear-eq':'Solving linear equations',
+    'solutions':'One, none, or infinitely many solutions',
+    'systems':'Systems of linear equations',
+    'inequalities':'Linear inequalities & solution sets',
+    /* Functions (8.F / MCCRS 2025 8.AT.C-D) */
+    'func-def':'What a function is (one output per input)',
+    'func-rep':'Representing & comparing functions',
+    'linearity':'Linear vs non-linear',
+    'graph-read':'Slope & y-intercept from a graph',
+    'func-build':'Building a linear function',
+    'qualitative':'Describing & sketching graphs'
   };
 
   var SCIENCE_SKILLS={
@@ -680,6 +695,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
   function rerenderView(){try{if(!document.getElementById('view-teacher').classList.contains('hidden')){renderTeacher();}else if(!document.getElementById('view-app').classList.contains('hidden')){renderApp();}}catch(e){}}
   window.__hubSync={applyCloud:applyCloud,recTs:recTs,reviewMapFor:reviewMapFor,pingText:pingStatusText};
   window.__hubHw={validate:hwValidatePlans,links:hwLinks,progress:hwSetProgress};
+  window.__hubSkills={labels:SKILL_LABELS,subjects:SUBJECTS};   // so a guard can prove every module skill is labelled
 
 
   function subjectById(id){for(var i=0;i<SUBJECTS.length;i++){if(SUBJECTS[i].id===id)return SUBJECTS[i];}return null;}

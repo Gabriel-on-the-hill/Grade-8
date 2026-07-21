@@ -29,7 +29,8 @@ until somebody looked. It does.
 | **8.G** Geometry | 3 | ❌ **absent** | hub tile: *coming soon* |
 | **8.SP** Statistics & Probability | 1 | ❌ **absent** | hub tile: *coming soon* |
 
-Science (`Matter_and_Its_Interactions.html`, 31 items) is outside this matrix.
+Science (`Matter_and_Its_Interactions.html`, 31 items) **was outside this matrix until 21 Jul 2026** —
+audited below. A module nobody has checked cannot be called complete, whatever its item count.
 
 **8.EE's second gap was invisible to this table, and is now closed.** MCCRS 2025 adds `8.AT.B.4` —
 solve linear *inequalities* in one variable — with **no 2010 predecessor**, so it has no row below
@@ -104,6 +105,38 @@ above, the cluster tilts from *constructing* models to *critiquing* them. It als
 events from Grade 7 (`8.DS.C.6`). A module authored off the 2010 text would drill the wrong verb.
 
 ---
+
+---
+
+## Science — MS-PS1 Matter & Its Interactions ✅ (audited 21 Jul 2026)
+
+`Matter_and_Its_Interactions.html` — 7 sections, 31 items, 10 exam, 8 skills. Audited against NGSS
+**MS-PS1** because the module had **never been checked against its own standards**; it was excluded
+from this matrix from the day it shipped (2026-07-15) purely because the matrix was written for
+mathematics.
+
+| Std | Requirement | Status | Evidence |
+|---|---|---|---|
+| MS-PS1-1 | Develop models of atoms, molecules and extended structures | ✅ | §1 atoms/elements/molecules; **MISA capstones** on sugar composition and why water is a molecule |
+| MS-PS1-2 | Analyse data on properties before and after a reaction to decide if one occurred | ✅ | §4 physical vs chemical change; `4-2`/`4-4` reaction evidence |
+| MS-PS1-3 | Synthetic materials from natural resources, and their impact | ✅ | §6; `6-4` where materials come from, `6-5` exam-style |
+| MS-PS1-4 | Model how temperature and pressure change particle motion and state | ✅ | §2 particle model, §3 thermal energy; **MISA two-part thermometer capstone** |
+| MS-PS1-5 | Conservation of mass in a chemical reaction | ✅ | §5, incl. the released constructed-response |
+| MS-PS1-6 | **Design a device** that releases or absorbs thermal energy | ✅ | §6 endo/exothermic + `6-3` *Judge the design*, which applies stated criteria |
+
+**All six covered.** Two things this audit settled that the item count could not:
+
+- **`MS-PS1-6` is the one that could have been missing** — it is an *engineering design* performance
+  expectation sitting inside a chemistry unit, and it is the kind of standard that gets absorbed into
+  "energy in reactions" without ever being assessed. It is genuinely there (`6-3`).
+- **Only three MS-PS1 codes appear anywhere in the file** (`-2`, `-3`, `-5`). The other three are
+  covered by items that carry **no code in their title** — which is exactly the pattern that made the
+  P1 provenance audit nearly discard six real MISA items. **A code search is not a coverage audit**,
+  in either direction.
+
+**Not yet dual-coded.** Maryland's 2025 re-cut covered mathematics; whether MISA/NGSS Grade 8 science
+shifts for SY 2026-27 has **not** been checked, and no science crosswalk is in `Curriculum/`. Treat
+this table as 2013-NGSS-coded until someone reads a science crosswalk.
 
 ## The MCCRS 2026-27 handoff does not currently land
 

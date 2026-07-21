@@ -693,6 +693,28 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     </div>
   </div>
 
+  <div class="qcard" data-qid="7-6">
+    <div class="qhead"><span class="qtag apply">Apply</span><span class="qtitle">Sketch the graph from the description</span></div>
+    <div class="qbody">
+      <p class="muted-note" style="font-size:.86rem">A drone rises steadily from the ground to 20&nbsp;m over the first 4 seconds, hovers at that height for the next 4 seconds, then descends steadily back to the ground over the final 4 seconds. Plot the three points that fix the shape of its height-against-time graph.</p>
+      <div class="step">
+        <div class="step-label">Step 1 &middot; Plot its height at 4 seconds.</div>
+        <div class="plotbox" data-plot="grid" data-xmin="0" data-xmax="12" data-xstep="2" data-ymin="0" data-ymax="20" data-ystep="5"><input type="hidden" class="ans-input" data-type="text" data-answer="k1:NCwyMA=="/></div>
+        <button class="check-btn">Check</button>
+      </div>
+      <div class="step locked">
+        <div class="step-label">Step 2 &middot; Plot its height at 8 seconds.</div>
+        <div class="plotbox" data-plot="grid" data-xmin="0" data-xmax="12" data-xstep="2" data-ymin="0" data-ymax="20" data-ystep="5"><input type="hidden" class="ans-input" data-type="text" data-answer="k1:OCwyMA=="/></div>
+        <button class="check-btn">Check</button>
+      </div>
+      <div class="step locked">
+        <div class="step-label">Step 3 &middot; Plot its height at 12 seconds.</div>
+        <div class="plotbox" data-plot="grid" data-xmin="0" data-xmax="12" data-xstep="2" data-ymin="0" data-ymax="20" data-ystep="5"><input type="hidden" class="ans-input" data-type="text" data-answer="k1:MTIsMA=="/></div>
+        <button class="check-btn">Check</button>
+      </div>
+    </div>
+  </div>
+
   <div class="qcard" data-qid="7-5" data-exam="1">
     <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">MCAP &middot; 8.F.B.5</span></div>
     <div class="qbody">
@@ -766,7 +788,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
   const G7_TOPIC_ID='functions';
   const G7_TOPIC_TITLE='Functions';
   var G7_SYNC_HUB='grade8'; // shared-cloud namespace for this deployment (must match the hub's SYNC_HUB_ID)
-  const G7_SKILLS={'1-1':'func-def','1-2':'func-def','1-3':'func-def','1-4':'func-def','1-5':'func-def','2-1':'func-rep','2-2':'func-rep','2-3':'func-rep','2-4':'func-rep','3-1':'linearity','3-2':'linearity','3-3':'linearity','3-4':'linearity','3-5':'linearity','4-1':'graph-read','4-2':'graph-read','4-3':'graph-read','4-4':'graph-read','4-5':'graph-read','5-1':'func-build','5-2':'func-build','5-3':'func-build','5-4':'func-build','5-5':'func-build','6-1':'func-rep','6-2':'func-rep','6-3':'func-rep','6-4':'func-rep','7-1':'qualitative','7-2':'qualitative','7-3':'qualitative','7-4':'qualitative','7-5':'qualitative','8-1':'func-build','8-2':'reasoning','8-3':'linearity'};
+  const G7_SKILLS={'1-1':'func-def','1-2':'func-def','1-3':'func-def','1-4':'func-def','1-5':'func-def','2-1':'func-rep','2-2':'func-rep','2-3':'func-rep','2-4':'func-rep','3-1':'linearity','3-2':'linearity','3-3':'linearity','3-4':'linearity','3-5':'linearity','4-1':'graph-read','4-2':'graph-read','4-3':'graph-read','4-4':'graph-read','4-5':'graph-read','5-1':'func-build','5-2':'func-build','5-3':'func-build','5-4':'func-build','5-5':'func-build','6-1':'func-rep','6-2':'func-rep','6-3':'func-rep','6-4':'func-rep','7-1':'qualitative','7-2':'qualitative','7-3':'qualitative','7-4':'qualitative','7-5':'qualitative','7-6':'qualitative','8-1':'func-build','8-2':'reasoning','8-3':'linearity'};
   const G7_SKILL_LABELS={'func-def':'What a function is (one output per input)','func-rep':'Representing & comparing functions','linearity':'Linear vs non-linear','graph-read':'Slope & y-intercept from a graph','func-build':'Building a linear function','qualitative':'Describing & sketching graphs','reasoning':'Reasoning & error analysis'};
 
   // ===== Shared [GRADE] Hub store =====

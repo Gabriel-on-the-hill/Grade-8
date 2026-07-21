@@ -230,6 +230,32 @@ Engine v1.2 (v1.1 + the multi-subject hub layer: flat `UNITS` replaced by `SUBJE
   before section 7); every new key recomputed independently with `fractions.Fraction`; `node --check`
   clean; zero plaintext answers.
 
+
+- **2026-07-21** — **Completion audit of the four shipped modules — three real gaps, none of which
+  made anything fail.** Held to "100% before any new module". (1) **Thirteen skills had no label in
+  the hub.** `MATH_SKILLS` carried only The Number System's eight; Expressions & Equations had
+  shipped **since 2026-06-22** with seven unlabelled and Functions added six more the same morning.
+  The app kept working and degraded quietly, in two different ways: the teacher's skill line falls
+  back to the **raw slug** (`func-build`), and the struggle list falls back to the **empty string**,
+  so a correctly-captured struggle displays with no concept attached — which reads as *no pattern
+  here*, the opposite of what the data says. Labels added; `window.__hubSkills` exposed beside the
+  existing `__hub*` test hooks; **new guard `tests/skill_labels.test.js`** proves every declared
+  skill is named by both the module and its owning hub subject, mutation-checked on four paths.
+  (2) **`8.AT.D.11` was not actually met in Functions** — the standard says *"**Sketch** a graph that
+  exhibits the qualitative features"*, and the section had `7-2` (plotting points of a known line),
+  a constructed-response that only asked the student to *describe* what they would draw, and three
+  multiple-choice items. **Nobody sketched anything.** Added `7-6`: three chained plot steps that fix
+  the shape of a drone's height-time graph from a narrative — the same bar-lowering caught for
+  `8.AT.A.1a` and `8.NOS.A.2`, in a module built the same day. (3) **Science had never been audited
+  against its own standards**, having been excluded from the coverage matrix since it shipped merely
+  because the matrix was written for maths. Audited: **all six MS-PS1 covered**, including the one
+  most likely to have been missed — `MS-PS1-6`, an *engineering design* expectation inside a
+  chemistry unit, present as `6-3`. Worth recording that **only three MS-PS1 codes appear anywhere in
+  the file**; the other three are covered by items carrying no code, the same pattern that nearly
+  cost six real MISA items in P1. **A code search is not a coverage audit, in either direction.**
+  Also removed E&E's orphaned `realworld` label. **Verified:** 13 guards green, behavioural 271
+  passed / 0 failed; `node --check` clean; zero plaintext answers.
+
 ## 11. Deployment & publishing rules
 
 ### Outstanding deploys — clear a line only when it is actually pushed
@@ -253,6 +279,10 @@ Engine v1.2 (v1.1 + the multi-subject hub layer: flat `UNITS` replaced by `SUBJE
       `g7revReset()` plot clear, both on `G7_STORE='g8.'`, **zero plaintext answers**. The three
       hooks were checked individually because markup without them is the exact failure this change
       started from — a plot that renders nothing, or one that keeps its answer on re-assignment.
+
+- [ ] **2026-07-21 — completion audit** (13 hub skill labels, Functions `7-6`, Science audited) —
+      **not yet verified live**; fetch the hub and confirm it serves the new labels, and Functions
+      for `7-6`, before clearing this line.
 
 *Nothing outstanding as of 21 Jul 2026, through `0684401`. Verified by fetching the deployed site, not by assuming a push shipped — a green `git push` only proves the remote updated, and Pages rebuilds a minute or two later.*
 

@@ -228,6 +228,23 @@ difference.)* Still missing:
       hub-namespaced. Grade 8 **owns** that file, so its version should assert the inverse: that the
       file is present here and that `homework_backend.test.js` still drives it.
 
+## P5.5 · Completion audit — DONE 21 Jul 2026
+
+Held before starting any new module. **Three gaps, none of which made anything fail** — which is
+why they survived: every one sat outside what the guards could see.
+
+- [x] **13 skills unlabelled in the hub.** `MATH_SKILLS` held only NS's eight; E&E had shipped that
+      way **since 22 Jun**. Fallbacks differ and both are bad — the teacher's skill line prints the
+      **raw slug**, the struggle list prints **nothing**, so a real struggle shows with a blank
+      concept. Fixed, and **`tests/skill_labels.test.js`** now guards it (4 mutations caught).
+- [x] **`8.AT.D.11` was not met in Functions.** The standard says *sketch a graph*; the section had
+      point-plotting, a describe-only CR and three MC items — **nobody sketched anything**. Added
+      `7-6` (three chained plot steps fixing a drone's height-time shape from a narrative).
+- [x] **Science audited for the first time.** All six MS-PS1 covered, incl. `MS-PS1-6` (engineering
+      design inside a chemistry unit — the one most likely to be absorbed and never assessed).
+      **Only three MS-PS1 codes appear in the file at all**; a code search is not a coverage audit.
+      **Not dual-coded** — no science crosswalk is in `Curriculum/`; treat it as 2013-NGSS.
+
 ## P6 · Housekeeping
 
 - [x] **Accessibility — done 21 Jul 2026.** Icon glyphs marked `aria-hidden`, and all three modals
