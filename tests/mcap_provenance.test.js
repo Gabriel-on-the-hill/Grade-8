@@ -43,7 +43,10 @@ for (const line of fs.readFileSync(MANIFEST, 'utf8').split('\n')) {
   if (!cur) continue;
   const m = line.match(/^\|\s*`([^`]+\.html)`\s*\|\s*`([^`]+)`\s*\|([^|]*)\|([^|]*)\|([^|]*)\|([^|]*)\|/);
   if (m) cur.rows.set(m[1].trim() + '::' + m[2].trim(),
-    { cite: (m[3] + ' | ' + m[4]).trim(), stimulus: (m[6] || '').trim().toLowerCase() });
+    // case is PRESERVED here: the stimulus marker is matched against alt/aria text, and folding it
+    // made three rows fail on capitals while 7-1/7-3 falsely PASSED by matching the lower-case
+    // words in their own stem ("table sugar molecules differ..."). A marker must match the figure.
+    { cite: (m[3] + ' | ' + m[4]).trim(), stimulus: (m[6] || '').trim() });
 }
 const total = Object.values(TABLES).reduce((n, t) => n + t.rows.size, 0);
 if (!total) { console.log('FAIL manifest parsed 0 item rows — the table format changed; fix this guard'); process.exit(1); }
@@ -126,7 +129,13 @@ for (const f of MODULES) {
 // named) nor the label check (which only checks a row exists) could see it.
 for (const label of Object.keys(TABLES)) {
   for (const [key, row] of TABLES[label].rows) {
-    if (row.stimulus !== 'figure') continue;
+    if (!row.stimulus.toLowerCase().startsWith('figure')) continue;
+    // The row NAMES its stimulus, e.g. `figure: ALCOHOL THERMOMETER MODEL`. Checking for "some figure
+    // somewhere" is not enough: a released item SET shares one stimulus and its section holds several,
+    // so a missing one would hide behind its neighbours. Two mutations proved exactly that before this
+    // was tightened — both passed a section-wide "is there any figure?" test.
+    const want = (row.stimulus.split(':')[1] || '').trim();
+    if (!want) { console.log('FAIL ' + key + ': stimulus marked `figure` but names no figure'); fail++; continue; }
     const [file, qid] = key.split('::');
     if (!MODULES.includes(file)) continue;
     const html = fs.readFileSync(path.join(DIR, file), 'utf8');
@@ -134,10 +143,16 @@ for (const label of Object.keys(TABLES)) {
     if (i < 0) continue;
     let end = html.indexOf('<div class="qcard"', i + 10);
     if (end < 0) end = html.length;
-    const card = html.slice(i, end);
-    if (!/<svg|<img/i.test(card)) {
-      bad.push(file + ' ' + qid + ': the manifest says the released item carries a figure, but the'
-        + ' card renders none — the item has lost the stimulus it asks about');
+    // A released item SET shares one stimulus, printed once above its questions — so a figure
+    // anywhere earlier in the same <section> counts. Anything BELOW the item does not: the student
+    // meets the question first, which is exactly the dangling reference this check exists to stop.
+    let secStart = html.lastIndexOf('<section', i);
+    if (secStart < 0) secStart = 0;
+    const card = html.slice(secStart, end);
+    if (!card.includes(want)) {
+      console.log('FAIL ' + file + ' ' + qid + ': needs the figure "' + want + '" and nothing above'
+        + ' it in the section renders one — the item has lost the stimulus it asks about');
+      fail++;
     }
   }
 }

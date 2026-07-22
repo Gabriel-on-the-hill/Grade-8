@@ -316,15 +316,19 @@ packet carries **three stimulus figures** and the module rendered **none** of th
       `tests/mcap_provenance.test.js` fails if a row marked `figure` renders no figure.
       Mutation-checked. Neither `a11y` (checks only that *present* figures are named) nor the label
       check (checks only that a row exists) could see this class.
-- [ ] **`7-1` and `7-3` still lack the molecule diagrams**, and their stems were made
+- [x] **`7-1` / `7-3` molecule diagrams restored 22 Jul 2026** — and by **extracting the released
+      figure rather than redrawing it**, which is strictly more faithful and carries no transcription
+      risk. That is the better method for all four: the two I hand-drew earlier were replaced with
+      the originals too. §7.7.2's *rebuild the figure* is satisfied best by *reproducing* it.
+- [x] **`7-6` now narrates the Water and Sugar investigation** it had been citing blindly.
+- [x] ~~`7-1` and `7-3` still lack the molecule diagrams~~, and their stems were made
       **self-contained** to compensate (`7-1` states `C12H22O11` in the stem; the released stem
       leans on the diagram). Under §7.7.4 that edit is an **adaptation, which loses the label** — so
       either rebuild the sucrose and water structural diagrams, or demote those two to
       `Exam-style ·`. **Do not leave them as they are**; decide. The sucrose structural formula is
       intricate — if it cannot be rebuilt with certainty, §7.7.2 says the item is *blocked*, which
       here means demote.
-- [ ] **`7-6` (CR) cites "the Water and Sugar investigation"** the module never narrates. Lower
-      risk — it is teacher-reviewed — but it is the same dangling reference.
+- [x] ~~`7-6` cites an investigation the module never narrates.~~ Closed above.
 
 ## P6 · Housekeeping
 

@@ -286,6 +286,25 @@ Engine v1.2 (v1.1 + the multi-subject hub layer: flat `UNITS` replaced by `SUBJE
   guards green (`mcap_provenance` failed first, as designed, until the two manifest rows existed),
   behavioural **271 passed / 0 failed**, zero plaintext answers.
 
+
+- **2026-07-22 (later)** — **Matter's four missing stimuli restored, and the guard that hid them
+  sharpened twice.** Answering *"are the lessons 100%?"*: they were not. The `MS-PS1-1 / MS-PS1-4`
+  packet carries an alcohol-thermometer model, a liquid-versus-frozen-water model and a pair of
+  molecule diagrams; the module rendered **none**, and `7-5` read *"In the thermometer model…"* to a
+  student who had never seen one. **The method changed mid-repair and that is the durable lesson:** I
+  first *redrew* two models, and the first thermometer drew **more molecules at higher temperature** —
+  contradicting its own `aria-label` and teaching the opposite of `MS-PS1-4`. Rendering it caught that.
+  The right method is to **extract the released figure**, which is more faithful than any redraw and
+  carries no transcription risk; all four are now the originals, greyscaled and downsampled to ~40 KB.
+  `7-6` now narrates the investigation it had been citing blindly. **The guard needed three passes,
+  and mutation testing earned its keep at every one:** (1) scoped to the card, it could not express a
+  shared item-set stimulus; (2) scoped to the section, **both mutations passed** — any figure anywhere
+  satisfied every row; (3) each row now **names its own stimulus** (`figure: ALCOHOL THERMOMETER
+  MODEL`), matched case-sensitively above the item. Case matters: folding it made three rows fail on
+  capitals *and* let `7-1`/`7-3` **falsely pass** by matching the lower-case words in their own stem.
+  **Five mutations now caught.** Matter: 4 figures, 273 KB. **Verified:** 13 guards green, behavioural
+  **271 passed / 0 failed**, zero plaintext answers.
+
 ## 11. Deployment & publishing rules
 
 ### Outstanding deploys — clear a line only when it is actually pushed
@@ -325,6 +344,9 @@ Engine v1.2 (v1.1 + the multi-subject hub layer: flat `UNITS` replaced by `SUBJE
 
 - [x] **2026-07-22 — Matter stimuli restored** (`7-4`, `7-5`) + the `Stimulus` guard — pushed in
       `e7977b5`; **verified live**: the served module renders both rebuilt models.
+
+- [ ] **2026-07-22 — Matter's four released figures embedded** (`7-1`,`7-3`,`7-4`,`7-5`) + `7-6`
+      narrative — **not yet verified live**.
 
 *Nothing outstanding as of 22 Jul 2026, through `e7977b5`. Verified by fetching the deployed site, not by assuming a push shipped — a green `git push` only proves the remote updated, and Pages rebuilds a minute or two later.*
 

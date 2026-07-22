@@ -30,12 +30,12 @@ its key recomputed independently. Citations are as MSDE prints them.
 | `Expressions_and_Equations.html` | `1-5` | `…Math 8 2024` | Math 8 2024 Release, Question 1 | 8.EE.A.1 | text |
 | `Expressions_and_Equations.html` | `2-4` | `…Math 8 2024` | Math 8 2024 Release, Question 9 | 8.EE.A.3 | text |
 | `Expressions_and_Equations.html` | `4-4` | `…Math 8 2024` | Math 8 2024 Release, Question 6 | 8.EE.C.7b | text |
-| `Expressions_and_Equations.html` | `3-8` | `…Math 8 Expressions and Equations` | Math 8 2024 Release, Question 21 | 8.EE.B.6 | figure |
-| `Expressions_and_Equations.html` | `6-4` | `…Math 8 Expressions and Equations` | Math 8 2024 Release, Question 11 | 8.EE.C.8a | figure |
+| `Expressions_and_Equations.html` | `3-8` | `…Math 8 Expressions and Equations` | Math 8 2024 Release, Question 21 | 8.EE.B.6 | figure: Triangle P R T |
+| `Expressions_and_Equations.html` | `6-4` | `…Math 8 Expressions and Equations` | Math 8 2024 Release, Question 11 | 8.EE.C.8a | figure: Two straight lines |
 | `Functions.html` | `1-5` | `…Math 8 Functions` | Math 8 2024 Release, Question 2 | 8.F.A.1 | text |
 | `Functions.html` | `6-4` | `…Math 8 Functions` | Math 8 2024 Release, Question 20 | 8.F.A.2 | text |
 | `Functions.html` | `5-5` | `…Math 8 Functions` | Math 8 2024 Release, Question 35 | 8.F.B.4 | text |
-| `Functions.html` | `7-5` | `…Math 8 Functions` | Math 8 2024 Release, Question 14 | 8.F.B.5 | figure |
+| `Functions.html` | `7-5` | `…Math 8 Functions` | Math 8 2024 Release, Question 14 | 8.F.B.5 | figure: A graph starting at |
 
 **Keys, recomputed independently before checking anything.** Rows are prefixed by module — `NS` The
 Number System, `EE` Expressions & Equations, `Fn` Functions — because qids repeat across modules.
@@ -75,11 +75,11 @@ constructed response.
 
 | File | qid | Packet | Citation | Standard | Stimulus |
 |---|---|---|---|---|---|
-| `Matter_and_Its_Interactions.html` | `7-1` | `…MS-PS1-1 and MS-PS1-4` | MISA Released Questions, "Table sugar is composed of…" | MS-PS1-1 | text |
+| `Matter_and_Its_Interactions.html` | `7-1` | `…MS-PS1-1 and MS-PS1-4` | MISA Released Questions, "Table sugar is composed of…" | MS-PS1-1 | figure: TABLE SUGAR MOLECULE |
 | `Matter_and_Its_Interactions.html` | `7-2` | `…MS-PS1-1 and MS-PS1-4` | MISA Released Questions, "Water is classified as a molecule because…" | MS-PS1-1 | text |
-| `Matter_and_Its_Interactions.html` | `7-3` | `…MS-PS1-1 and MS-PS1-4` | MISA Released Questions, "How do table sugar molecules differ from water molecules?" | MS-PS1-1 | text |
-| `Matter_and_Its_Interactions.html` | `7-4` | `…MS-PS1-1 and MS-PS1-4` | MISA Released Questions, Question 1 — "The volume of water increases when water freezes because…" | MS-PS1-4 | figure |
-| `Matter_and_Its_Interactions.html` | `7-5` | `…MS-PS1-1 and MS-PS1-4` | MISA Released Questions, "In the thermometer model, the liquid expanded because…" (two-part) | MS-PS1-4 | figure |
+| `Matter_and_Its_Interactions.html` | `7-3` | `…MS-PS1-1 and MS-PS1-4` | MISA Released Questions, "How do table sugar molecules differ from water molecules?" | MS-PS1-1 | figure: TABLE SUGAR MOLECULE |
+| `Matter_and_Its_Interactions.html` | `7-4` | `…MS-PS1-1 and MS-PS1-4` | MISA Released Questions, Question 1 — "The volume of water increases when water freezes because…" | MS-PS1-4 | figure: frozen water |
+| `Matter_and_Its_Interactions.html` | `7-5` | `…MS-PS1-1 and MS-PS1-4` | MISA Released Questions, "In the thermometer model, the liquid expanded because…" (two-part) | MS-PS1-4 | figure: ALCOHOL THERMOMETER MODEL |
 | `Matter_and_Its_Interactions.html` | `7-6` | `…MS-PS1-1 and MS-PS1-4` | MISA Released Questions, Constructed Response — "explain what causes water to change phases" | MS-PS1-4 | text |
 
 ### Rows carrying a caveat
