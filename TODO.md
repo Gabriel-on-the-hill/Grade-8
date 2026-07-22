@@ -299,6 +299,33 @@ Full report: [SOURCE_ACQUISITION.md](SOURCE_ACQUISITION.md).
       standards) is the sharpest guide to what an exam item must *elicit*. It was referenced by the
       blueprint all along and never held; no authored capstone has been checked against it.
 
+## P5.7 · Matter shipped without its stimuli — PARTLY FIXED 22 Jul 2026
+
+Answering *"are the lessons 100% now?"* honestly: **they were not.** The `MS-PS1-1 / MS-PS1-4`
+packet carries **three stimulus figures** and the module rendered **none** of them.
+
+- [x] **`7-5` was outright broken.** It read *"In the thermometer model, the liquid expanded
+      because…"* to a student who had never been shown a thermometer model. **Alcohol-thermometer
+      model rebuilt** — nine molecules in every tube, liquid rising and spacing widening with
+      temperature. *(My first attempt drew **more molecules** at higher temperature, contradicting
+      its own `aria-label` and teaching the opposite of `MS-PS1-4`. Caught by rendering it. This is
+      why the rule is render-and-read, including your own figures.)*
+- [x] **`7-4` liquid-versus-frozen-water model rebuilt** — same molecules, irregular when liquid,
+      open regular lattice when frozen, with the released KEY.
+- [x] **Guard added so this cannot recur.** `MCAP_PROVENANCE.md` gains a **`Stimulus`** column and
+      `tests/mcap_provenance.test.js` fails if a row marked `figure` renders no figure.
+      Mutation-checked. Neither `a11y` (checks only that *present* figures are named) nor the label
+      check (checks only that a row exists) could see this class.
+- [ ] **`7-1` and `7-3` still lack the molecule diagrams**, and their stems were made
+      **self-contained** to compensate (`7-1` states `C12H22O11` in the stem; the released stem
+      leans on the diagram). Under §7.7.4 that edit is an **adaptation, which loses the label** — so
+      either rebuild the sucrose and water structural diagrams, or demote those two to
+      `Exam-style ·`. **Do not leave them as they are**; decide. The sucrose structural formula is
+      intricate — if it cannot be rebuilt with certainty, §7.7.2 says the item is *blocked*, which
+      here means demote.
+- [ ] **`7-6` (CR) cites "the Water and Sugar investigation"** the module never narrates. Lower
+      risk — it is teacher-reviewed — but it is the same dangling reference.
+
 ## P6 · Housekeeping
 
 - [x] **Accessibility — done 21 Jul 2026.** Icon glyphs marked `aria-hidden`, and all three modals

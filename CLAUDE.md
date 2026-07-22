@@ -31,4 +31,16 @@ The short version:
 - **Public repo, publishes `.md`.** Any per-student data must be gitignored before commit (see how
   Grade 7 handles `<student>/`).
 
+- **Science is a union, and the sequencing is half the point.** The Grade 8 MISA is **~1/3 Earth &
+  Space, ~1/3 Life, ~1/3 Physical**, drawn from **all of Grades 6-8** — but the Grade 8 *course* is
+  Physical Science. §2.2 is *curriculum ∪ exam, never a trade-off*, so the answer is both, at
+  **different depths**: PS is taught this year and needs full units; LS and the rest of ESS were
+  learned in Grades 6-7 and need **retrieval** units — leaner, built on the released packets, wired
+  into the review ladder. **Start them early and space them.** MISA is at the *end* of Grade 8, and
+  a topic learned two years ago and revisited only in a final cram is the exact failure the review
+  ladder exists to prevent. Plan in `TODO.md` P5.6; packet map in `STANDARDS_COVERAGE_MATRIX.md`.
+- **A lifted exam item must bring its stimulus.** If the released item shows a model, diagram or
+  graph, rebuild it — dropping it turns a model-interpretation item into a recall item and quietly
+  lowers the bar. The manifest's `Stimulus` column and `tests/mcap_provenance.test.js` enforce this.
+
 House pedagogy is in the root [AGENTS.md](../AGENTS.md).

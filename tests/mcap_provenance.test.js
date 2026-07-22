@@ -41,8 +41,9 @@ for (const line of fs.readFileSync(MANIFEST, 'utf8').split('\n')) {
     continue;
   }
   if (!cur) continue;
-  const m = line.match(/^\|\s*`([^`]+\.html)`\s*\|\s*`([^`]+)`\s*\|([^|]*)\|([^|]*)\|/);
-  if (m) cur.rows.set(m[1].trim() + '::' + m[2].trim(), (m[3] + ' | ' + m[4]).trim());
+  const m = line.match(/^\|\s*`([^`]+\.html)`\s*\|\s*`([^`]+)`\s*\|([^|]*)\|([^|]*)\|([^|]*)\|([^|]*)\|/);
+  if (m) cur.rows.set(m[1].trim() + '::' + m[2].trim(),
+    { cite: (m[3] + ' | ' + m[4]).trim(), stimulus: (m[6] || '').trim().toLowerCase() });
 }
 const total = Object.values(TABLES).reduce((n, t) => n + t.rows.size, 0);
 if (!total) { console.log('FAIL manifest parsed 0 item rows — the table format changed; fix this guard'); process.exit(1); }
@@ -52,7 +53,8 @@ if (!total) { console.log('FAIL manifest parsed 0 item rows — the table format
 const SHARED_OK = new Set([]);
 const byCitation = new Map();
 for (const t of Object.values(TABLES)) {
-  for (const [key, cite] of t.rows) {
+  for (const [key, row] of t.rows) {
+    const cite = row.cite;
     const q = (cite.split('|')[1] || cite).trim();
     if (!/Question\s*\d/.test(q)) continue;      // rows citing by stem can't be compared this way
     if (!byCitation.has(q)) byCitation.set(q, []);
@@ -108,6 +110,36 @@ for (const f of MODULES) {
   }
   if (bad.length) { console.log('FAIL ' + f); bad.forEach(b => console.log('     ' + b)); }
   else console.log('PASS ' + f);
+}
+
+// ---------------------------------------------------------------------------------------------
+// Stimulus check (added 22 Jul 2026). A row marked `figure` says the RELEASED item supplies a
+// picture the student needs. If the module renders no figure inside that card, the item has been
+// shipped without the thing it is about.
+//
+// This is not cosmetic. Three MISA items shipped this way: the packet carries an alcohol-thermometer
+// model, a liquid-vs-frozen-water model and a pair of molecule diagrams, and the module had none of
+// them. `7-5` read "In the thermometer model, the liquid expanded because…" to a student who had
+// never been shown a thermometer model. Beyond being unanswerable-as-intended, dropping the figure
+// converts a MODEL-INTERPRETATION item into a RECALL item — and modelling is the practice the MISA
+// blueprint weights at 50 to 67 per cent. Neither a11y (which only checks that figures PRESENT are
+// named) nor the label check (which only checks a row exists) could see it.
+for (const label of Object.keys(TABLES)) {
+  for (const [key, row] of TABLES[label].rows) {
+    if (row.stimulus !== 'figure') continue;
+    const [file, qid] = key.split('::');
+    if (!MODULES.includes(file)) continue;
+    const html = fs.readFileSync(path.join(DIR, file), 'utf8');
+    const i = html.indexOf('data-qid="' + qid + '"');
+    if (i < 0) continue;
+    let end = html.indexOf('<div class="qcard"', i + 10);
+    if (end < 0) end = html.length;
+    const card = html.slice(i, end);
+    if (!/<svg|<img/i.test(card)) {
+      bad.push(file + ' ' + qid + ': the manifest says the released item carries a figure, but the'
+        + ' card renders none — the item has lost the stimulus it asks about');
+    }
+  }
 }
 
 // stale rows: the manifest promises a citation for something that no longer claims the label

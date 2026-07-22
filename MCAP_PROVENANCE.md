@@ -23,19 +23,19 @@ the real item next to it. Close a coverage gap with a sourced item or an honestl
 Every row was read off the **rendered** packet page in `MCAP MATHS/`, not the text extraction, and
 its key recomputed independently. Citations are as MSDE prints them.
 
-| File | qid | Packet | Citation | Standard |
-|---|---|---|---|---|
-| `The_Number_System.html` | `3-3` | `…Math 8 2024` | Math 8 2024 Release, Question 7 | 8.NS.A.1 |
-| `The_Number_System.html` | `6-4` | `…Math 8 2024` | Math 8 2024 Release, Question 5 | 8.NS.A.2 |
-| `Expressions_and_Equations.html` | `1-5` | `…Math 8 2024` | Math 8 2024 Release, Question 1 | 8.EE.A.1 |
-| `Expressions_and_Equations.html` | `2-4` | `…Math 8 2024` | Math 8 2024 Release, Question 9 | 8.EE.A.3 |
-| `Expressions_and_Equations.html` | `4-4` | `…Math 8 2024` | Math 8 2024 Release, Question 6 | 8.EE.C.7b |
-| `Expressions_and_Equations.html` | `3-8` | `…Math 8 Expressions and Equations` | Math 8 2024 Release, Question 21 | 8.EE.B.6 |
-| `Expressions_and_Equations.html` | `6-4` | `…Math 8 Expressions and Equations` | Math 8 2024 Release, Question 11 | 8.EE.C.8a |
-| `Functions.html` | `1-5` | `…Math 8 Functions` | Math 8 2024 Release, Question 2 | 8.F.A.1 |
-| `Functions.html` | `6-4` | `…Math 8 Functions` | Math 8 2024 Release, Question 20 | 8.F.A.2 |
-| `Functions.html` | `5-5` | `…Math 8 Functions` | Math 8 2024 Release, Question 35 | 8.F.B.4 |
-| `Functions.html` | `7-5` | `…Math 8 Functions` | Math 8 2024 Release, Question 14 | 8.F.B.5 |
+| File | qid | Packet | Citation | Standard | Stimulus |
+|---|---|---|---|---|---|
+| `The_Number_System.html` | `3-3` | `…Math 8 2024` | Math 8 2024 Release, Question 7 | 8.NS.A.1 | text |
+| `The_Number_System.html` | `6-4` | `…Math 8 2024` | Math 8 2024 Release, Question 5 | 8.NS.A.2 | text |
+| `Expressions_and_Equations.html` | `1-5` | `…Math 8 2024` | Math 8 2024 Release, Question 1 | 8.EE.A.1 | text |
+| `Expressions_and_Equations.html` | `2-4` | `…Math 8 2024` | Math 8 2024 Release, Question 9 | 8.EE.A.3 | text |
+| `Expressions_and_Equations.html` | `4-4` | `…Math 8 2024` | Math 8 2024 Release, Question 6 | 8.EE.C.7b | text |
+| `Expressions_and_Equations.html` | `3-8` | `…Math 8 Expressions and Equations` | Math 8 2024 Release, Question 21 | 8.EE.B.6 | figure |
+| `Expressions_and_Equations.html` | `6-4` | `…Math 8 Expressions and Equations` | Math 8 2024 Release, Question 11 | 8.EE.C.8a | figure |
+| `Functions.html` | `1-5` | `…Math 8 Functions` | Math 8 2024 Release, Question 2 | 8.F.A.1 | text |
+| `Functions.html` | `6-4` | `…Math 8 Functions` | Math 8 2024 Release, Question 20 | 8.F.A.2 | text |
+| `Functions.html` | `5-5` | `…Math 8 Functions` | Math 8 2024 Release, Question 35 | 8.F.B.4 | text |
+| `Functions.html` | `7-5` | `…Math 8 Functions` | Math 8 2024 Release, Question 14 | 8.F.B.5 | figure |
 
 **Keys, recomputed independently before checking anything.** Rows are prefixed by module — `NS` The
 Number System, `EE` Expressions & Equations, `Fn` Functions — because qids repeat across modules.
@@ -57,20 +57,30 @@ MCAP prints `√65 ÷ √122`, a quotient of two roots. They are equal in value,
 what makes the item test `√a/√b = √(a/b)`; rewriting it quietly removes the step being assessed. The
 notation was restored to the release's rather than the label being dropped.
 
+**The `Stimulus` column, added 22 Jul 2026.** `figure` = the released item supplies a picture the
+student needs; `text` = it stands on its own words. It exists because **three MISA items had shipped
+without the models they are built on** — the packet carries an alcohol-thermometer model, a
+liquid-versus-frozen-water model and molecule diagrams, and this module rendered none of them.
+`7-5` was the worst: it said *"In the thermometer model…"* to a student who had never been shown
+one. Dropping a stimulus does not merely look incomplete — it converts a **model-interpretation**
+item into a **recall** item, and modelling is the practice the MISA blueprint weights at **50-67%**.
+Neither `a11y` (which only checks that figures *present* are named) nor the label check (which only
+checks a row exists) could see it. The guard now fails if a `figure` row renders no figure.
+
 ## Verified items — MISA (science)
 
 All six come from **one item set** built on a single "Sugar and Water Investigation" stimulus, which
 is why they sit together as the module check. The release numbers them Question 1–5 plus a
 constructed response.
 
-| File | qid | Packet | Citation | Standard |
-|---|---|---|---|---|
-| `Matter_and_Its_Interactions.html` | `7-1` | `…MS-PS1-1 and MS-PS1-4` | MISA Released Questions, "Table sugar is composed of…" | MS-PS1-1 |
-| `Matter_and_Its_Interactions.html` | `7-2` | `…MS-PS1-1 and MS-PS1-4` | MISA Released Questions, "Water is classified as a molecule because…" | MS-PS1-1 |
-| `Matter_and_Its_Interactions.html` | `7-3` | `…MS-PS1-1 and MS-PS1-4` | MISA Released Questions, "How do table sugar molecules differ from water molecules?" | MS-PS1-1 |
-| `Matter_and_Its_Interactions.html` | `7-4` | `…MS-PS1-1 and MS-PS1-4` | MISA Released Questions, Question 1 — "The volume of water increases when water freezes because…" | MS-PS1-4 |
-| `Matter_and_Its_Interactions.html` | `7-5` | `…MS-PS1-1 and MS-PS1-4` | MISA Released Questions, "In the thermometer model, the liquid expanded because…" (two-part) | MS-PS1-4 |
-| `Matter_and_Its_Interactions.html` | `7-6` | `…MS-PS1-1 and MS-PS1-4` | MISA Released Questions, Constructed Response — "explain what causes water to change phases" | MS-PS1-4 |
+| File | qid | Packet | Citation | Standard | Stimulus |
+|---|---|---|---|---|---|
+| `Matter_and_Its_Interactions.html` | `7-1` | `…MS-PS1-1 and MS-PS1-4` | MISA Released Questions, "Table sugar is composed of…" | MS-PS1-1 | text |
+| `Matter_and_Its_Interactions.html` | `7-2` | `…MS-PS1-1 and MS-PS1-4` | MISA Released Questions, "Water is classified as a molecule because…" | MS-PS1-1 | text |
+| `Matter_and_Its_Interactions.html` | `7-3` | `…MS-PS1-1 and MS-PS1-4` | MISA Released Questions, "How do table sugar molecules differ from water molecules?" | MS-PS1-1 | text |
+| `Matter_and_Its_Interactions.html` | `7-4` | `…MS-PS1-1 and MS-PS1-4` | MISA Released Questions, Question 1 — "The volume of water increases when water freezes because…" | MS-PS1-4 | figure |
+| `Matter_and_Its_Interactions.html` | `7-5` | `…MS-PS1-1 and MS-PS1-4` | MISA Released Questions, "In the thermometer model, the liquid expanded because…" (two-part) | MS-PS1-4 | figure |
+| `Matter_and_Its_Interactions.html` | `7-6` | `…MS-PS1-1 and MS-PS1-4` | MISA Released Questions, Constructed Response — "explain what causes water to change phases" | MS-PS1-4 | text |
 
 ### Rows carrying a caveat
 
