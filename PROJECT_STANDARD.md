@@ -305,6 +305,27 @@ Engine v1.2 (v1.1 + the multi-subject hub layer: flat `UNITS` replaced by `SUBJE
   **Five mutations now caught.** Matter: 4 figures, 273 KB. **Verified:** 13 guards green, behavioural
   **271 passed / 0 failed**, zero plaintext answers.
 
+
+- **2026-07-22 (later still)** — **The unit-grew notice: telling a student *why* the percentage fell.**
+  Gabriel asked what happens to work a student did before a change. Verified mechanically against the
+  session baseline rather than asserted: **no qid removed, no step index shifted inside any
+  pre-existing item, and no answer key changed** — the step-index check is the one that mattered,
+  because `tree[qid].steps` is keyed by position and an inserted step would have mis-restored answers.
+  Nothing was lost. But one real effect remained: **Expressions & Equations went 38 → 52 steps**, so
+  every returning student's mastery drops — numerator is their real work, denominator just grew — and
+  the app said nothing. An unexplained fall reads as *lost work*. Added a `role="status"` banner above
+  the progress box naming the exact number of new questions and stating the finished work is still
+  saved. **No new storage:** the topic record already keeps `totalSteps` as of the student's last save,
+  and `saveData()` only overwrites it when they next answer, so the gap *is* the number. `_grewFrom`
+  latches on first call so the banner survives the session instead of vanishing the instant they
+  answer. It never fires on a first visit (no prior record is not growth), never renders a negative,
+  and is **suppressed in review/homework mode**, which deliberately show a subset. Propagated to all
+  four modules **and `Module_Template.html`** (§2.5 — one engine). **A miscount surfaced while testing
+  and is worth recording:** the "76 → 104" figure first reported was wrong, because a `class="step`
+  substring count also matched `class="step-label"`. The engine's own selector (`.qcard .step`) gives
+  **38 → 52**. jsdom disagreeing with my arithmetic is what exposed it. Suite **271 → 281**, three
+  mutations checked (first-visit guard, review suppression, placement above the box).
+
 ## 11. Deployment & publishing rules
 
 ### Outstanding deploys — clear a line only when it is actually pushed
@@ -348,6 +369,8 @@ Engine v1.2 (v1.1 + the multi-subject hub layer: flat `UNITS` replaced by `SUBJE
 - [x] **2026-07-22 — Matter's four released figures embedded** (`7-1`,`7-3`,`7-4`,`7-5`) + `7-6`
       narrative — pushed in `2fc490f`; **verified live**: the served module renders all four
       figures and the investigation narrative, with zero plaintext answers.
+
+- [ ] **2026-07-22 — unit-grew notice** (all 4 modules + template) — **not yet verified live**.
 
 *Nothing outstanding as of 22 Jul 2026, through `2fc490f`. Verified by fetching the deployed site, not by assuming a push shipped — a green `git push` only proves the remote updated, and Pages rebuilds a minute or two later.*
 

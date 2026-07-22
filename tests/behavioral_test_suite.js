@@ -580,6 +580,34 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
   const semantic=[...d.querySelector('[data-qid="5-1"] .mc-group').children].map(e=>e.textContent.trim());
   ok(semantic.join('|')==='One|None|Infinitely many','EE: solution-count options keep semantic order');
 }
+// ===== unit-grew notice: a returning student is told WHY the percentage fell =====
+// When a unit gains items every returning student's mastery drops — numerator is their real work,
+// denominator just grew. Nothing is lost, but silence reads as lost work. E&E went 38 -> 52 steps
+// in a day. No new storage: the topic record's `totalSteps` is the count as of their last save.
+{
+  const rec=n=>JSON.stringify({students:{Divine:{topics:{'expressions-equations':{title:'EE',tree:{},
+    totalSteps:n,sectionTotals:{},lastPracticed:1,attempts:1,correct:1,struggles:[],skillStats:{},
+    exam:{attempts:0,correct:0},responses:[]}},assignments:{}}}});
+  const openEE=(n,qs)=>load(EE, n===null?{[P+'current']:'Divine'}
+                                        :{[P+'current']:'Divine',[P+'data']:rec(n)}, null, qs).window.document;
+  const d=openEE(38), b=d.getElementById('grew-note');
+  ok(!!b,'grew: a returning student whose stored count is lower sees the notice');
+  ok(b&&/14 new questions have been added/.test(b.textContent),
+     'grew: it names the real difference (52 - 38), not a guess');
+  ok(b&&/still saved/.test(b.textContent),'grew: it says the finished work is still saved');
+  ok(b&&b.getAttribute('role')==='status','grew: announced politely, not as an alert');
+  ok(b&&(b.compareDocumentPosition(d.querySelector('.overall-progress'))&4)!==0,
+     'grew: it sits ABOVE the progress box it is explaining');
+  ok(/1 new question has been added/.test(openEE(51).getElementById('grew-note').textContent),
+     'grew: singular reads correctly');
+  ok(!openEE(null).getElementById('grew-note'),
+     'grew: a brand-new student sees nothing — a first visit is not growth');
+  ok(!openEE(52).getElementById('grew-note'),'grew: a student already at the current count sees nothing');
+  ok(!openEE(200).getElementById('grew-note'),'grew: a stored count LARGER than now never renders a negative');
+  ok(!openEE(38,'?review=slope').getElementById('grew-note'),
+     'grew: suppressed in review mode, which deliberately shows a subset');
+}
+
 // ===== SYNC v1.5: hub merge rules =====
 { const data={students:{Divine:{topics:{'number-system':{title:'t',tree:{},totalSteps:31,sectionTotals:{},lastPracticed:5,attempts:0,correct:0,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[{qid:'3-4',label:'Q11',text:'r',ts:77}]}},assignments:{math:{text:'old',ts:5}}}}};
   const w=load(HUB,{[P+'current']:'Divine',[P+'roster']:JSON.stringify(['Divine']),[P+'pins']:JSON.stringify({Divine:'1'}),[P+'data']:JSON.stringify(data),[P+'sheetURL']:'https://sheet.test/exec'}).window;

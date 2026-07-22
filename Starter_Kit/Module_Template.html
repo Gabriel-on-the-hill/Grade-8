@@ -96,6 +96,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
 @media(max-width:640px){main{padding:1rem .75rem 3rem}.qcard,.tcard,.challenge,.guide{padding:.85rem}.qtitle{margin-left:0;width:100%;font-size:.93rem}header.mod h1{font-size:1.25rem}}
 
     /* ===== plot input (6th format): click-to-place on a number line or grid ===== */
+    .grew-note{background:var(--gold-light);border:1px solid var(--gold);border-left:4px solid var(--gold);border-radius:8px;padding:.6rem .8rem;margin:0 0 .7rem;font-size:.9rem;color:var(--navy)}
     .plotbox{margin:.45rem 0 .2rem}
     .plotbox svg{max-width:100%;height:auto;touch-action:manipulation}
     .plotbox .hit{cursor:pointer;fill:transparent}
@@ -580,8 +581,48 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
   document.querySelectorAll('.mc-group,.ms-group').forEach(function(g){if(g.hasAttribute('data-noshuffle'))return;var o=Array.prototype.slice.call(g.querySelectorAll('.mc-option,.ms-option'));if(o.length<3)return;for(var i=o.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=o[i];o[i]=o[j];o[j]=t;}o.forEach(function(b){g.appendChild(b);});});
 
   function countAllSteps(){return document.querySelectorAll('.qcard .step').length;}
-  function refreshOverall(){var d=loadData(),done=0;document.querySelectorAll('.qcard').forEach(function(c){var q=c.dataset.qid;if(q&&d[q]&&d[q].steps)done+=Object.keys(d[q].steps).filter(function(k){return d[q].steps[k];}).length;});var tot=countAllSteps();document.getElementById('op-done').textContent=done;document.getElementById('op-total').textContent=tot;document.getElementById('op-pct').textContent=(tot?Math.round(done/tot*100):0)+'%';renderSecReport();}
+  function refreshOverall(){var d=loadData(),done=0;document.querySelectorAll('.qcard').forEach(function(c){var q=c.dataset.qid;if(q&&d[q]&&d[q].steps)done+=Object.keys(d[q].steps).filter(function(k){return d[q].steps[k];}).length;});var tot=countAllSteps();document.getElementById('op-done').textContent=done;document.getElementById('op-total').textContent=tot;document.getElementById('op-pct').textContent=(tot?Math.round(done/tot*100):0)+'%';renderSecReport();g7growthNotice();}
   /* v1.4.3: student-facing per-section report card, injected after the overall progress box */
+  /* Unit-grew notice (2026-07-22). When a unit gains items, every returning student's mastery
+     percentage DROPS — the numerator is their real work, the denominator just got bigger. Nothing is
+     lost, but the app never said so, and an unexplained fall reads as lost work. Expressions &
+     Equations went 38 -> 52 steps in one day.
+
+     No new storage: the topic record already keeps `totalSteps` as of the student's last save, and
+     saveData() only overwrites it when they next answer something. The gap between that and the
+     live step count IS the "what's new" number.
+
+     `_grewFrom` is latched on first call so the banner survives the whole session — otherwise it
+     would vanish the instant the student answered anything, mid-read. It never fires for a student
+     with no prior record (a first visit is not growth), and never in review or homework mode, which
+     deliberately show a subset. */
+  var _grewFrom = null;
+  function g7growthNotice(){
+    if(_grewFrom===null){
+      _grewFrom = 0;
+      try{
+        var o=g7all(), s=g7current();
+        var t=o.students&&o.students[s]&&o.students[s].topics&&o.students[s].topics[G7_TOPIC_ID];
+        if(t) _grewFrom = Number(t.totalSteps||0);
+      }catch(e){}
+    }
+    var host=document.querySelector('.overall-progress');
+    var box=document.getElementById('grew-note');
+    var focused = /[?&](review|hw)=/.test(location.search);   // a deliberate subset, not the unit
+    var now=document.querySelectorAll('.qcard .step').length;
+    if(!host || focused || !_grewFrom || now<=_grewFrom){ if(box) box.remove(); return; }
+    var n=now-_grewFrom;
+    if(!box){
+      box=document.createElement('div'); box.id='grew-note'; box.className='grew-note';
+      box.setAttribute('role','status');
+      host.parentNode.insertBefore(box, host);
+    }
+    box.innerHTML='<strong>This unit has grown since you were last here.</strong> '+
+      n+' new question'+(n===1?' has':'s have')+' been added. Everything you finished is still saved '+
+      '&mdash; '+
+      'your percentage moved because there is more to do.';
+  }
+
   function renderSecReport(){
     var host=document.querySelector('.overall-progress');if(!host)return;
     var box=document.getElementById('sec-report');
