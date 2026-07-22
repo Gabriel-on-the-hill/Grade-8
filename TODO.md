@@ -257,11 +257,24 @@ Full report: [SOURCE_ACQUISITION.md](SOURCE_ACQUISITION.md).
       Science plus a space unit — **no Life Science unit at all**. §2.2 is *curriculum ∪ exam*, and
       only the curriculum half is met. **Nine of ten released MISA packets are unused** for the same
       reason. Decide this deliberately; the Matter unit itself is fine.
-- [ ] **Re-adjudicate `6-3` (and recheck `5-5`).** The P1 audit ran against **7 of 8** released Math
+- [x] **Re-adjudicated 22 Jul 2026 — `6-3` demotion STANDS, its reason did not.** The packet holds
+      2024 Release **Q11** (`8.EE.C.8a`) with the **identical** four coordinates and four reasons, so
+      `6-3` is an *adaptation* of a real item (two drop-downs collapsed to one MC), not an invention.
+      §7.7.4: adapted loses the label, so `Exam-style ·` is correct — right verdict, wrong reason.
+      `5-5` stands with its reason intact. The three verified E&E rows were independently confirmed.
+- [x] ~~Re-adjudicate `6-3` (and recheck `5-5`).~~ The P1 audit ran against **7 of 8** released Math
       8 modules; the missing one was **Expressions & Equations**. `6-3`'s demotion reason claims
       *every* released `8.EE.C.8` item was checked — it could not have included this packet's own
       two-part `8.EE.C.8` graph item. The verdict may hold; the reasoning does not.
-- [ ] **Lift the new `8.EE.B.6` capstone.** The packet carries a real **similar-triangles on the
+- [x] **Lifted 22 Jul 2026 — E&E now carries two real MCAP capstones it never had.** `3-8` =
+      **8.EE.B.6** (Q21, triangles *PRT*/*QRS*) lands in §3 directly under the equivalent-ratios teach
+      card built 21 Jul — the derivation and its released capstone now sit together. `6-4` =
+      **8.EE.C.8a** (Q11) is Q11 lifted *faithfully*, two locked MC steps standing in for the two
+      drop-downs, released order kept; `6-3` was left alone rather than overwritten, because a
+      student's record already names it. Both figures rebuilt from stated coordinates and **rendered
+      and read** first; both keys recomputed with `Fraction` before the rubric was consulted.
+      E&E: 41 → **43 items, 13 exam, 2 MCAP-titled**.
+- [x] ~~Lift the new `8.EE.B.6` capstone.~~ The packet carries a real **similar-triangles on the
       coordinate plane** item (triangles *PRT*/*QRS*) — the exact standard whose derivation was built
       21 Jul with no MCAP capstone available. Also unused: `8.EE.A.2` (`x² = 49/16`), two-part `8.EE.B.5`.
 - [ ] **Use the evidence statements.** `Curriculum/Grade_8_Evidence_Statements-A.pdf` (33 pp, all 28

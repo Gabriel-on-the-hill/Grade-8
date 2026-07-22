@@ -30,6 +30,8 @@ its key recomputed independently. Citations are as MSDE prints them.
 | `Expressions_and_Equations.html` | `1-5` | `…Math 8 2024` | Math 8 2024 Release, Question 1 | 8.EE.A.1 |
 | `Expressions_and_Equations.html` | `2-4` | `…Math 8 2024` | Math 8 2024 Release, Question 9 | 8.EE.A.3 |
 | `Expressions_and_Equations.html` | `4-4` | `…Math 8 2024` | Math 8 2024 Release, Question 6 | 8.EE.C.7b |
+| `Expressions_and_Equations.html` | `3-8` | `…Math 8 Expressions and Equations` | Math 8 2024 Release, Question 21 | 8.EE.B.6 |
+| `Expressions_and_Equations.html` | `6-4` | `…Math 8 Expressions and Equations` | Math 8 2024 Release, Question 11 | 8.EE.C.8a |
 | `Functions.html` | `1-5` | `…Math 8 Functions` | Math 8 2024 Release, Question 2 | 8.F.A.1 |
 | `Functions.html` | `6-4` | `…Math 8 Functions` | Math 8 2024 Release, Question 20 | 8.F.A.2 |
 | `Functions.html` | `5-5` | `…Math 8 Functions` | Math 8 2024 Release, Question 35 | 8.F.B.4 |
@@ -85,28 +87,37 @@ the headings.** The *identity* of each item is not in doubt — only its ordinal
 These were titled `MCAP` or `MISA` and are now `Exam-style ·`. They are **not bad items**; they are
 ours, and they are now labelled as ours. Nothing was relabelled *up* to compensate.
 
-> ## ⚠ Re-adjudication required (raised 21 Jul 2026)
+> ## Re-adjudication — RESOLVED 22 Jul 2026
 >
-> **This audit was carried out against 7 of the 8 released Math 8 modules.** MSDE publishes **eight**;
-> the folder held seven. The missing one was **`Math 8 Expressions and Equations`** — acquired
-> 21 Jul 2026 — and it carries its own items for `8.EE.A.1`, `A.2`, `A.3`, `B.5`, `B.6`, `C.7` and `C.8`.
+> **The audit had run against 7 of the 8 released Math 8 modules.** MSDE publishes eight; the folder
+> held seven, and the missing one was **`Math 8 Expressions and Equations`**. It has now been read.
 >
-> **What this does and does not change.** The three verified E&E rows are safe: `1-5`, `2-4` and `4-4`
-> cite the 2024 release and those same items appear in the new packet too. **The demotion of `6-3` is
-> not safe.** Its stated reason is *"Every released 8.EE.C.8 item was checked — Q11, Q15, Q17, Q27,
-> Q28, Q34"*, and that enumeration could not have included this packet's own **two-part 8.EE.C.8
-> drop-down item about the graph of a system**. The demotion may still be right, but **its reasoning
-> is unsound as written** and must be redone against the packet. `5-5` should be rechecked in the same
-> pass (the packet's `8.EE.C.7` item is the same `5(x − 6) − 2(x + 3) = 12` already cited by `4-4`, so
-> that demotion probably stands — but *probably* is not the standard this file holds itself to).
+> **`6-3`'s demotion stands, but its stated reason was wrong.** The recorded reason was *"Every
+> released 8.EE.C.8 item was checked … and none is 'two graphs crossing'"* — and the packet does in
+> fact contain such an item (2024 Release **Question 11**, `8.EE.C.8a`), carrying the **identical**
+> four coordinate options `(−1.5, −5) · (1, 6) · (2, 7) · (3, 5)` and the identical four reasons.
+> So `6-3` is not an invention that happened to resemble a released item — **it is an adaptation of
+> one**, collapsing two drop-downs into a single four-option MC. Under §7.7.4 an adapted item loses
+> the label, so `Exam-style ·` is right. **Right verdict, wrong reason, now corrected.**
 >
-> **The lesson is the one this file already teaches, applied to itself:** a negative claim needs its
-> search space proved complete. "Every released item was checked" was true of every packet *we had*,
-> and nobody had checked that we had them all. The count was on MSDE's own collection page all along.
+> **`6-3` is also no longer the only 8.EE.C.8 capstone.** Question 11 has been lifted *faithfully* as
+> **`6-4`** — two locked MC steps standing in for the two drop-downs, released option order kept —
+> so the module now carries both the adaptation and the real thing. `6-3` was left in place rather
+> than replaced: a student's record already names it, and rewriting an item under a qid a student has
+> completed would quietly change what their record means.
 >
-> **Unused capstone supply now available:** `8.EE.A.2` (`x² = 49/16`), `8.EE.B.5` (two-part, key-chain
-> fundraiser) and — directly relevant to the `8.AT.A.2` derivation built 21 Jul — a real `8.EE.B.6`
-> **similar-triangles-on-the-coordinate-plane** item (triangles *PRT* and *QRS*). None is yet lifted.
+> **`5-5`'s demotion stands, and its reason survives.** The packet's two `8.EE.C.7` items are
+> Question 6 (already cited by `4-4`) and Question 13 (a matching table). Neither is `5-5`.
+>
+> **The three verified E&E rows were independently confirmed** — this packet cites Questions 1, 9 and
+> 6 for `1-5`, `2-4` and `4-4`, matching the 2024-release citations already recorded.
+>
+> **The lesson, turned on itself:** a negative claim needs its search space proved complete. *"Every
+> released item was checked"* was true of every packet **we had**, and nobody had checked we had them
+> all. The count was on MSDE's own collection page the whole time.
+>
+> **Still unlifted from this packet:** `8.EE.A.2` (`x² = 49/16`), `8.EE.C.7a` (matching table — the
+> engine has no matching format), `8.EE.C.8c` (plumbers) and `8.EE.C.8b` (solve by elimination).
 
 | File | qid | Claimed | Why demoted |
 |---|---|---|---|

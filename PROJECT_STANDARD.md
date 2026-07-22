@@ -258,6 +258,34 @@ Engine v1.2 (v1.1 + the multi-subject hub layer: flat `UNITS` replaced by `SUBJE
   Also removed E&E's orphaned `realworld` label. **Verified:** 13 guards green, behavioural 271
   passed / 0 failed; `node --check` clean; zero plaintext answers.
 
+
+- **2026-07-22** — **The 8th released packet closes two open questions and adds two real capstones.**
+  Working with the `Math 8 Expressions and Equations` module acquired 21 Jul. **(1) Truth.** `6-3`'s
+  demotion **stands, but its recorded reason was false**: it said every released `8.EE.C.8` item had
+  been checked and none matched, yet the packet holds 2024 Release **Q11** with the **identical** four
+  coordinates and four reasons. `6-3` is therefore an *adaptation* of a real item, not an invention —
+  and §7.7.4 (adapted loses the label) makes `Exam-style ·` the right call anyway. **Right verdict,
+  wrong reason, corrected in place.** `5-5` stands with its reason intact, and the three verified E&E
+  rows were **independently confirmed** by a second packet citing the same question numbers.
+  **(2) Coverage.** Two faithful lifts: **`3-8` = 8.EE.B.6** (Q21, triangles *PRT*/*QRS*) and
+  **`6-4` = 8.EE.C.8a** (Q11). `3-8` matters most — it lands in §3 immediately under the
+  equivalent-ratios teach card written the day before, so the derivation and its released capstone now
+  sit together, and the item's own distractor is precisely the error the teach card warns about
+  (pairing a *run* ratio with a *rise* ratio). `6-4` renders the two released drop-downs as **two
+  locked MC steps** with the released option order kept — the same faithful pattern used for Functions
+  `6-4`. **`6-3` was left in place rather than overwritten:** a student's record already names that
+  qid, and rewriting an item underneath a completed record quietly changes what the record means.
+  Both figures were **rebuilt from stated coordinates and rendered and read before lifting** (the
+  released SVGs screenshotted through a real browser — PyMuPDF rendered them black), and both keys
+  recomputed with `fractions.Fraction` *before* the published rubric was opened: `TR/TP = 10/6 = 5/3
+  = SR/SQ` → option B, and `2x + 3 = x + 5` → `(2, 7)`. One deliberate deviation from MSDE, recorded:
+  the system figure's `aria-label` **does not name the intersection point**, because that is Part A's
+  answer — MSDE's own alt text states it, but their label is presentation metadata and reproducing it
+  would hand a screen-reader user the answer; the intercepts and the printed equations keep the item
+  fully answerable without sight. E&E: 41 → **43 items, 13 exam, 2 MCAP-titled**. **Verified:** 13
+  guards green (`mcap_provenance` failed first, as designed, until the two manifest rows existed),
+  behavioural **271 passed / 0 failed**, zero plaintext answers.
+
 ## 11. Deployment & publishing rules
 
 ### Outstanding deploys — clear a line only when it is actually pushed
@@ -288,6 +316,9 @@ Engine v1.2 (v1.1 + the multi-subject hub layer: flat `UNITS` replaced by `SUBJE
       `realworld`; served `Functions.html` has `7-6`, 37 qcards, 7 plotboxes and zero plaintext
       answers. The label fix was checked on the **served** hub because its failure mode is a
       blank concept on a real student's struggle line, which no page-status check would show.
+
+- [ ] **2026-07-22 — two MCAP capstones lifted into E&E** (`3-8` 8.EE.B.6, `6-4` 8.EE.C.8a) —
+      **not yet verified live**; fetch the served module and confirm both qids and both figures.
 
 *Nothing outstanding as of 21 Jul 2026, through `8d7b0bf`. Verified by fetching the deployed site, not by assuming a push shipped — a green `git push` only proves the remote updated, and Pages rebuilds a minute or two later.*
 
