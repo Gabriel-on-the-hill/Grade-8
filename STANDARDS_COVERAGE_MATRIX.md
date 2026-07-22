@@ -157,8 +157,18 @@ met. This also explains why **nine of the ten released MISA packets are unused**
 LS because the exam does. The blueprint also splits the paper by **practice** (Sensemaking 50–67%,
 Investigating 17–33%, Critiquing 17–33%), which no module has been checked against.
 
-**The Matter unit is not at fault** — it is on-curriculum, on-grade and complete for MS-PS1. This is
-a scope decision about the Science subject, to be taken deliberately rather than by default.
+**The Matter unit is not at fault** — it is on-curriculum, on-grade and complete for MS-PS1.
+
+**And this is not a scope *choice*** *(framing corrected 22 Jul 2026)*. §2.2 is **curriculum ∪ exam,
+never a trade-off**, so the question was never which half to serve. Two corrections to the paragraph
+above: the planned *A Voyage Through Space* unit covers the two `MS-ESS1` packets, so the current
+plan already accounts for **6 of 10** released packets, not one; and the real gap is **packets 3, 4,
+5 and 6** — all of Life Science, plus Earth systems and resources.
+
+The two halves need **different depths, not equal shares**: Physical Science is taught *this year*
+and needs full taught units; Life and Earth Science were learned in **Grades 6-7** and need
+**retrieval** units — leaner, built on the released packets, wired into the spaced-review ladder.
+Plan and sequencing in `TODO.md` P5.6.
 
 ## The MCCRS 2026-27 handoff does not currently land
 

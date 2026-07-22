@@ -252,11 +252,29 @@ Full report: [SOURCE_ACQUISITION.md](SOURCE_ACQUISITION.md).
 - [x] **Science dual-coding question closed.** No science crosswalk exists, and the evidence says
       none should: Maryland adopted **NGSS unchanged** in 2013, so the 2025 MCCRS re-cut has no
       science counterpart, and the **Oct 2024** MISA blueprint still cites the full 6–8 NGSS band.
-- [ ] **Science scope: the exam is not the course.** The Grade 8 MISA is **~1/3 Earth & Space,
-      ~1/3 Life, ~1/3 Physical**, drawn from all of Grades 6–8. The hub's Science plan is Physical
-      Science plus a space unit — **no Life Science unit at all**. §2.2 is *curriculum ∪ exam*, and
-      only the curriculum half is met. **Nine of ten released MISA packets are unused** for the same
-      reason. Decide this deliberately; the Matter unit itself is fine.
+- [ ] **Science: build the union, not a choice between halves.** The Grade 8 MISA is **~1/3 ESS,
+      ~1/3 LS, ~1/3 PS** across all of Grades 6-8 (55 PEs: ESS 15, LS 21, PS 19). The hub's four
+      planned units are Physical Science plus a space unit. *(Framing corrected 22 Jul 2026 — this
+      entry previously called it a scope decision to "take deliberately". It is not a choice:
+      §2.2 is **curriculum ∪ exam, never a trade-off**, so the answer was always both.)*
+      **The gap is also smaller than first stated** — *A Voyage Through Space* covers the two
+      `MS-ESS1` packets, so the current plan already accounts for **6 of the 10** released packets.
+      Genuinely uncovered: **packets 3, 4, 5, 6.**
+      - **Build two kinds of unit, because the two needs differ in kind.** Physical Science is being
+        **taught this year**, so it needs *taught depth* — the existing four units, full sections,
+        teach cards, the climb. Life Science and the rest of Earth Science were learned in **Grades
+        6-7** and are examined at the end of Grade 8, so they need *retrieval depth* — leaner,
+        phenomenon-anchored on the released packets, exam-shaped, wired into the spaced-review
+        ladder. Reactivation, not first teaching.
+      - **Proposed: 3 retrieval units, closing all four packets** — *Cells & Body Systems* (pkt 4),
+        *Ecosystems, Heredity & Natural Selection* (pkts 5, 6), *Earth Systems & Resources* (pkt 3).
+        With the four taught units that is **7 units and all 10 packets**, matching the paper's
+        1/3 · 1/3 · 1/3.
+      - **Start them early and space them.** MISA is at the *end* of Grade 8, and `AGENTS.md`'s
+        *"a topic taught once is a topic being forgotten"* makes LS/ESS learned two years ago the
+        canonical case the review ladder exists for. Cramming them last is the one sequencing that
+        defeats the point.
+      - **The raw material is already here and preferred** (§2.1, §11): nine unused released packets.
 - [x] **Re-adjudicated 22 Jul 2026 — `6-3` demotion STANDS, its reason did not.** The packet holds
       2024 Release **Q11** (`8.EE.C.8a`) with the **identical** four coordinates and four reasons, so
       `6-3` is an *adaptation* of a real item (two drop-downs collapsed to one MC), not an invention.
