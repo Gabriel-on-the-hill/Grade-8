@@ -370,9 +370,10 @@ Engine v1.2 (v1.1 + the multi-subject hub layer: flat `UNITS` replaced by `SUBJE
       narrative — pushed in `2fc490f`; **verified live**: the served module renders all four
       figures and the investigation narrative, with zero plaintext answers.
 
-- [ ] **2026-07-22 — unit-grew notice** (all 4 modules + template) — **not yet verified live**.
+- [x] **2026-07-22 — unit-grew notice** (all 4 modules + template) — pushed in `2807d62`;
+      **verified live**: all four served modules carry `g7growthNotice`.
 
-*Nothing outstanding as of 22 Jul 2026, through `2fc490f`. Verified by fetching the deployed site, not by assuming a push shipped — a green `git push` only proves the remote updated, and Pages rebuilds a minute or two later.*
+*Nothing outstanding as of 22 Jul 2026, through `2807d62`. Verified by fetching the deployed site, not by assuming a push shipped — a green `git push` only proves the remote updated, and Pages rebuilds a minute or two later.*
 
 - Repo: **https://github.com/Gabriel-on-the-hill/Grade-8** → GitHub Pages at **https://gabriel-on-the-hill.github.io/Grade-8/** (branch `main`, root). `index.html` redirects to `Grade_8_Math_Hub.html`.
 - **Publish only** the original web app + docs: `index.html`, the hub, the module HTML files, `README.md`, this standard, `Starter_Kit/`.
