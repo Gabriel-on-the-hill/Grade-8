@@ -317,10 +317,13 @@ Engine v1.2 (v1.1 + the multi-subject hub layer: flat `UNITS` replaced by `SUBJE
       answers. The label fix was checked on the **served** hub because its failure mode is a
       blank concept on a real student's struggle line, which no page-status check would show.
 
-- [ ] **2026-07-22 — two MCAP capstones lifted into E&E** (`3-8` 8.EE.B.6, `6-4` 8.EE.C.8a) —
-      **not yet verified live**; fetch the served module and confirm both qids and both figures.
+- [x] **2026-07-22 — two MCAP capstones lifted into E&E** (`3-8` 8.EE.B.6, `6-4` 8.EE.C.8a) —
+      pushed in `f61ccfe`; **verified live**: the served module returns 43 qcards, both new qids,
+      2 `MCAP ·` titles, both rebuilt figures, and zero plaintext answers. Also checked that the
+      system figure's accessible name still **withholds the intersection point** — that is Part A's
+      answer, and it is the one thing in this change a redeploy could silently undo.
 
-*Nothing outstanding as of 21 Jul 2026, through `8d7b0bf`. Verified by fetching the deployed site, not by assuming a push shipped — a green `git push` only proves the remote updated, and Pages rebuilds a minute or two later.*
+*Nothing outstanding as of 22 Jul 2026, through `f61ccfe`. Verified by fetching the deployed site, not by assuming a push shipped — a green `git push` only proves the remote updated, and Pages rebuilds a minute or two later.*
 
 - Repo: **https://github.com/Gabriel-on-the-hill/Grade-8** → GitHub Pages at **https://gabriel-on-the-hill.github.io/Grade-8/** (branch `main`, root). `index.html` redirects to `Grade_8_Math_Hub.html`.
 - **Publish only** the original web app + docs: `index.html`, the hub, the module HTML files, `README.md`, this standard, `Starter_Kit/`.
