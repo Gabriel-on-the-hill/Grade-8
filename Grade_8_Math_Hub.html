@@ -628,6 +628,12 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
           var oldRec=od.students[name]||{}, oldT=oldRec.topics||{};
           var rec=nd.students[name]=nd.students[name]||{topics:{}}; rec.topics=rec.topics||{};
           Object.keys(oldT).forEach(function(tid){
+            /* Only topics THIS hub owns. The legacy namespace is still live — Grade 7 runs on it
+               today — and a student enrolled in both writes both into it. Carrying a Grade 7 topic
+               into the Grade 8 record was survivable while this ran once; now that the merge runs on
+               every boot it would be a standing cross-grade bleed, which is the exact fault the
+               shared namespace was renamed to end. Roster filters WHO comes across; this filters WHAT. */
+            if(!topicMeta(tid))return;
             var before=JSON.stringify(rec.topics[tid]||null);
             rec.topics[tid]=mergeTopic(oldT[tid],rec.topics[tid]);
             if(JSON.stringify(rec.topics[tid]||null)!==before)changed=true;

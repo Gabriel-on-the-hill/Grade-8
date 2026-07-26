@@ -107,7 +107,8 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
    hard: it must carry OUR students' work across, leave Grade 7's store untouched, and drop the
    foreign records whose presence was the bug being fixed. */
 { const g7data={students:{
-    Divine:{topics:{'number-system':{title:'NS',tree:{'1-1':{steps:{0:true}}},totalSteps:31,sectionTotals:{},lastPracticed:5,attempts:9,correct:7,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[]}},assignments:{}},
+    Divine:{topics:{'number-system':{title:'NS',tree:{'1-1':{steps:{0:true}}},totalSteps:31,sectionTotals:{},lastPracticed:5,attempts:9,correct:7,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[]},
+      'g7-only-topic':{title:'A Grade 7 topic she also studies',tree:{'1-1':{steps:{0:true}}},totalSteps:9,sectionTotals:{},lastPracticed:99,attempts:3,correct:3,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[]}},assignments:{}},
     Kayode:{topics:{'g7-topic':{title:'A Grade 7 topic',tree:{},totalSteps:10,sectionTotals:{},lastPracticed:5,attempts:4,correct:4,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[]}},assignments:{}}}};
   const old={'g7.data':JSON.stringify(g7data),'g7.pins':JSON.stringify({Divine:'Ab',Kayode:'Zz'}),
     'g7.pints':JSON.stringify({Divine:11,Kayode:22}),'g7.current':'Divine','g7.device':'Divine',
@@ -117,6 +118,11 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
   ok(!!g8data.students.Divine,'migrate: our own student’s progress comes across');
   ok(g8data.students.Divine.topics['number-system'].attempts===9,'migrate: the progress carried is the real record, not an empty one');
   ok(!g8data.students.Kayode,'migrate: a student who is not on this roster does NOT come across');
+  /* Grade 7 still runs on the legacy namespace, so a student enrolled in both writes both into it.
+     Roster filters WHO comes across; this filters WHAT — without it the every-boot merge would be a
+     standing cross-grade bleed, the exact fault the rename was meant to end. */
+  ok(!g8data.students.Divine.topics['g7-only-topic'],
+     'migrate: a topic this hub does not own does NOT come across, even for one of our own students');
   ok(JSON.parse(w.localStorage.getItem('g7.data')).students.Kayode,'migrate: COPY not move — Grade 7’s store is left intact');
   ok(JSON.parse(w.localStorage.getItem(P+'pins')).Divine==='Ab','migrate: our student’s PIN comes across');
   ok(!('Kayode' in JSON.parse(w.localStorage.getItem(P+'pins'))),'migrate: a foreign PIN does not');
