@@ -390,6 +390,22 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     closePinModal(); setTeacherAs(''); setCurrent(n); LS.setItem(K('device'),n); boot();
   }
   function getData(){return jget(K('data'),{students:{}});}
+  /* Union of two records of the same topic, used by BOTH the legacy-namespace migration and the
+     adoption of pre-sign-in work. One rule, one place: two copies of a merge is how they drift,
+     and a drifted merge silently drops a student's completed steps.
+     The more recently practised record supplies the stats; every completed step the other holds is
+     OR'd in on top, so neither side can erase the other and a step marked done never becomes undone. */
+  function mergeTopicRecords(a,b){
+    if(!a)return b; if(!b)return a;
+    var base=((a.lastPracticed||0)>=(b.lastPracticed||0))?a:b, other=(base===a)?b:a;
+    base.tree=base.tree||{};
+    Object.keys(other.tree||{}).forEach(function(q){
+      var os=(other.tree[q]&&other.tree[q].steps)||{};
+      var bq=base.tree[q]=base.tree[q]||{steps:{}}; bq.steps=bq.steps||{};
+      Object.keys(os).forEach(function(i){if(os[i])bq.steps[i]=true;});
+    });
+    return base;
+  }
   function current(){return LS.getItem(K('current'))||'';}
   function setCurrent(n){ if(n){LS.setItem(K('current'),n);} else {LS.removeItem(K('current'));} }
   function sheetURL(){return LS.getItem(K('sheetURL'))||'';}
@@ -571,20 +587,26 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     }catch(e){}
   }
 
-  /* ===== one-time migration off the shared 'g7.' namespace (19 Jul 2026) =====
+  /* ===== migration off the shared 'g7.' namespace (19 Jul 2026; made a MERGE 26 Jul 2026) =====
      Every device that has used this hub already holds its student's PINs, progress and device
      binding under 'g7.'. Shipping the rename alone would strand all of it and make a returning
-     student look brand new, so the keys this hub owns are copied across once.
+     student look brand new, so the keys this hub owns are carried across.
 
      COPY, never move: Grade 7 still runs on 'g7.' and its data must stay exactly where it is.
 
      Only students on THIS hub's roster come across. That filter is the point of the whole fix --
      it is what stops the cross-grade bleed the shared namespace caused, rather than faithfully
-     reproducing it under a new name. Never overwrite a key the new namespace already has. */
+     reproducing it under a new name.
+
+     WHY THIS IS NO LONGER ONE-SHOT (26 Jul 2026). The first version copied `data` only when the new
+     namespace had none, yet stamped migv='1' either way. A module writes g8.data from its own
+     cloud merge on page load, before the student has answered anything -- so one module visit
+     disarmed the migration for good and stranded every pre-rename answer in g7.data, unreadable.
+     A merge has no such ordering hazard: it is idempotent, so it runs on every boot and repairs a
+     device whenever it next opens the hub, however many times the old version already ran. */
   function migrateStore(){
     try{
       if(STORE_PREFIX==='g7.')return;            // a hub still on the old prefix has nothing to do
-      if(LS.getItem(K('migv'))==='1')return;     // already migrated on this device
       var own={}; ROSTER_SEED.forEach(function(n){own[n]=true;});
       var fresh=function(k){return LS.getItem(K(k))===null;};
       var carryOwned=function(k){                // name-keyed maps: keep only our own students
@@ -593,13 +615,30 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
         var n={}; Object.keys(o).forEach(function(name){if(own[name])n[name]=o[name];});
         jset(K(k),n);
       };
-      if(fresh('data')){
-        var od=jget('g7.data',null);
-        if(od&&od.students){
-          var nd={students:{}};
-          Object.keys(od.students).forEach(function(name){if(own[name])nd.students[name]=od.students[name];});
-          jset(K('data'),nd);                    // hwplan/hwstate ride along inside each student record
-        }
+      /* Per-topic union. Whichever record was practised more recently supplies the stats, and every
+         completed step the other one has is OR'd in on top. That way neither side can erase the
+         other: a student who practised under 'g7.' AND again under 'g8.' keeps both sets of ticks,
+         and a step already marked done never becomes undone. */
+      var mergeTopic=mergeTopicRecords;
+      var od=jget('g7.data',null);
+      if(od&&od.students){
+        var nd=getData(); nd.students=nd.students||{}; var changed=false;
+        Object.keys(od.students).forEach(function(name){
+          if(!own[name])return;
+          var oldRec=od.students[name]||{}, oldT=oldRec.topics||{};
+          var rec=nd.students[name]=nd.students[name]||{topics:{}}; rec.topics=rec.topics||{};
+          Object.keys(oldT).forEach(function(tid){
+            var before=JSON.stringify(rec.topics[tid]||null);
+            rec.topics[tid]=mergeTopic(oldT[tid],rec.topics[tid]);
+            if(JSON.stringify(rec.topics[tid]||null)!==before)changed=true;
+          });
+          /* hwplan/hwstate/assignments ride along inside the student record; take the legacy copy
+             only where the new namespace has nothing, never over the top of a newer one. */
+          ['hwplan','hwstate','assignments','assignment'].forEach(function(k){
+            if(oldRec[k]&&!rec[k]){rec[k]=oldRec[k];changed=true;}
+          });
+        });
+        if(changed)jset(K('data'),nd);
       }
       carryOwned('pins');
       carryOwned('pints');
@@ -613,8 +652,12 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
         if(!fresh(k))return; var v=LS.getItem('g7.'+k); if(v!==null&&own[v])LS.setItem(K(k),v);
       });
       /* seedv/passv/urlv are deliberately NOT copied -- leaving them unset lets applySeeds()
-         re-apply this deployment's seeds cleanly under the new prefix. */
-      LS.setItem(K('migv'),'1');
+         re-apply this deployment's seeds cleanly under the new prefix.
+
+         migv is written for the record only. NOTHING reads it any more: the moment a flag can
+         short-circuit this function, a device that ran the old one-shot version can never be
+         repaired, which is the whole defect being fixed here. */
+      LS.setItem(K('migv'),'2');
     }catch(e){}
   }
 
@@ -685,7 +728,59 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     return {changed:changed,pushTopics:pushTopics};
   }
   function reviewMapFor(n,tid){var d=getData();var to=d.students&&d.students[n]&&d.students[n].topics&&d.students[n].topics[tid];var m={};((to&&to.responses)||[]).forEach(function(r){if(r.reviewed)m[String(r.ts)]=r.reviewed;});return m;}
-  function runSync(after){syncPull(function(doc){var res=applyCloud(doc);var seen={};(res.pushTopics||[]).forEach(function(p){var k=p.n+'|'+p.tid;if(seen[k])return;seen[k]=1;if(!topicMeta(p.tid))return;/* never re-push a topic this hub doesn't own */
+  /* ===== sync health (26 Jul 2026) =====
+     Between 18 and 26 Jul 2026 both Grade 8 students practised daily and NOTHING reached the cloud.
+     The app said nothing, because both halves of the failure are mute by construction:
+       - syncPush is mode:'no-cors', so the backend's `err: auth` is unreadable to us; and
+       - an unauthenticated PULL returns the same empty doc as "you have no cloud data yet"
+         (HUB_Sync_Apps_Script.gs doGet -- `if (!who) return _jsonp(cb, doc)`).
+     So there is no error to catch anywhere. The one reliable tell is indirect: authenticating AS a
+     student requires a stored PIN, so an authenticated pull ALWAYS brings that student's own pin
+     row back. A signed-in student who holds a local PIN and gets no pin row is, with certainty,
+     not being authenticated -- and therefore none of their work is being saved anywhere but this
+     browser. Report it plainly. §"Truth is the floor": a silent failure is worse than a red banner.
+
+     It also repairs the commoner half outright. The hub only ever published a PIN on the CREATE
+     branch of sign-in, never on ENTER, so a student whose PIN predates that push -- or arrived via
+     a namespace migration -- had a PIN the cloud had never heard of, and every write they have ever
+     made was refused. That is Ayodeji: no pin row, no topic row, ever. Claiming an unclaimed PIN is
+     open by design, so publishing it here fixes them with no teacher involvement. If a DIFFERENT
+     pin is already stored the backend refuses this, exactly as it should -- only the teacher may
+     overwrite someone's PIN -- and the banner stays up asking for a reset. */
+  function setSyncWarning(msg){
+    var el=document.getElementById('sync-warn');
+    if(!msg){ if(el)el.remove(); return; }
+    if(!el){
+      el=document.createElement('div'); el.id='sync-warn'; el.setAttribute('role','alert');
+      el.style.cssText='background:#FEF3C7;border:1px solid #F59E0B;border-left:5px solid #B45309;'+
+        'color:#7C2D12;padding:.65rem .9rem;margin:.6rem auto;max-width:900px;border-radius:8px;'+
+        'font-size:.9rem;line-height:1.45';
+      document.body.insertBefore(el,document.body.firstChild);
+    }
+    el.innerHTML=msg;
+  }
+  var _pinClaimed=false;
+  function syncHealth(doc){
+    var me=current(); if(!me){setSyncWarning('');return;}
+    var mine=pinFor(me); if(!mine){setSyncWarning('');return;}   // no PIN yet — nothing to prove
+    if(!sheetURL()){setSyncWarning('');return;}                  // sync not configured on this device
+    if(doc&&doc.pins&&doc.pins[me]){setSyncWarning('');return;}  // authenticated: we got our own row back
+    if(!doc)return;              // network/JSONP failure: offline is not a lockout, say nothing
+    /* Claim once per load, not once per 60s poll, and publish it under the timestamp this PIN
+       ALREADY carries. markPinTs() would be wrong here: it stamps Date.now(), and applyCloud only
+       adopts a cloud PIN whose ts beats the local one -- so re-stamping on every poll would make a
+       teacher's reset permanently older than the local value and silently un-resettable. */
+    if(!_pinClaimed){_pinClaimed=true;
+      var pts=jget(K('pints'),{}); if(!pts[me]){pts[me]=Date.now();jset(K('pints'),pts);}
+      syncPush('pin',me,'',{v:mine,ts:pts[me]});                 // heals a PIN the cloud never knew
+    }
+    setSyncWarning('<strong>Your work is saving on this device, but it is not reaching your teacher.</strong> '+
+      'Keep working &mdash; nothing is being lost here. If this message is still showing next time '+
+      'you sign in, ask Mr Gabriel to reset your PIN.');
+  }
+  window.__hubHealth={check:syncHealth,warn:setSyncWarning};
+
+  function runSync(after){syncPull(function(doc){var res=applyCloud(doc);try{syncHealth(doc);}catch(e){}var seen={};(res.pushTopics||[]).forEach(function(p){var k=p.n+'|'+p.tid;if(seen[k])return;seen[k]=1;if(!topicMeta(p.tid))return;/* never re-push a topic this hub doesn't own */
     /* ...and never re-push a student this hub does not have on its roster. Kept as defence in
      * depth: the hubs no longer share a storage namespace (Grade 8 owns 'g8.'), so g8.data should
      * hold only this hub's students — but a cloud pull, a backup import or a hand-edited store can
@@ -1512,7 +1607,26 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     };
   }
 
+  /* Adopt work done in a module BEFORE signing in. Modules park that in a local-only slot rather
+     than inventing a roster name, and adopt it themselves on their next load — but the dashboard
+     is how a teacher sees progress, so waiting for the student to happen to reopen the module
+     would leave it invisible here in the meantime. Runs on every boot, including straight after
+     sign-in, and clears the slot so it cannot be adopted twice. */
+  function adoptLocal(){
+    try{
+      var me=current(); if(!me)return;
+      var d=getData(); var st=d.students||{}; var loc=st.__local&&st.__local.topics;
+      if(!loc||!Object.keys(loc).length)return;
+      st[me]=st[me]||{topics:{}}; st[me].topics=st[me].topics||{};
+      Object.keys(loc).forEach(function(tid){
+        if(!topicMeta(tid))return;                 // never adopt a topic this hub does not own
+        st[me].topics[tid]=mergeTopicRecords(loc[tid],st[me].topics[tid]);
+      });
+      delete st.__local; d.students=st; jset(K('data'),d);
+    }catch(e){}
+  }
   function boot(){
+    adoptLocal();
     renderTopbar();
     if(current()) renderApp(); else renderSignIn();
   }

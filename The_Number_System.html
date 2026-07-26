@@ -790,14 +790,87 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     'reasoning':'Reasoning & error analysis'};
 
   // ===== Shared Grade 8 Hub store =====
-  function g7current(){return localStorage.getItem(G7_STORE+'current')||'Guest';}
+  /* The signed-in student, or '' — NEVER an invented name. This returned 'Guest' until
+     26 Jul 2026, which quietly created students.Guest on any device that reached a module
+     without signing in first (a bookmark, a homework deep link, a restored tab). That record
+     is invisible to the teacher dashboard, which lists roster names, and every cloud write it
+     makes is refused for having no PIN — so the work looked saved and reached nobody. */
+  function g7current(){return localStorage.getItem(G7_STORE+'current')||'';}
+  function g7signedIn(){return !!g7current();}
+  /* Where the LOCAL store files this work. A student who lands here from a bookmark or a homework
+     link before signing in still gets a working progress bar — their answers go to a local-only
+     slot and are adopted under their real name by g7adopt() the moment they sign in. What they do
+     NOT get is an invented identity in the cloud or the activity log: that is the half that has to
+     stay honest, because a name the roster never authorised reaches no teacher and is refused by
+     the backend for having no PIN. Saving locally is generous; publishing under a made-up name is
+     a lie about who did the work. */
+  var G7_LOCAL='__local';
+  function g7slot(){return g7current()||G7_LOCAL;}
   function g7all(){try{return JSON.parse(localStorage.getItem(G7_STORE+'data'))||{students:{}};}catch(e){return{students:{}};}}
   function g7save(o){localStorage.setItem(G7_STORE+'data',JSON.stringify(o));}
-  function g7topic(o){o.students=o.students||{};var s=g7current();o.students[s]=o.students[s]||{topics:{}};var T=o.students[s].topics;T[G7_TOPIC_ID]=T[G7_TOPIC_ID]||{title:G7_TOPIC_TITLE,tree:{},totalSteps:0,sectionTotals:{},lastPracticed:0,attempts:0,correct:0,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[]};return T[G7_TOPIC_ID];}
+  function g7topic(o){o.students=o.students||{};var s=g7slot();o.students[s]=o.students[s]||{topics:{}};var T=o.students[s].topics;T[G7_TOPIC_ID]=T[G7_TOPIC_ID]||{title:G7_TOPIC_TITLE,tree:{},totalSteps:0,sectionTotals:{},lastPracticed:0,attempts:0,correct:0,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[]};return T[G7_TOPIC_ID];}
   function g7sectionTotals(){var m={};document.querySelectorAll('.qcard[data-qid]').forEach(function(c){var sec=(c.dataset.qid||'').split('-')[0];m[sec]=(m[sec]||0)+c.querySelectorAll('.step').length;});return m;}
+
+  /* ===== legacy-namespace repair (26 Jul 2026) =====
+     The hub carried its data across when the namespace was renamed; the modules did not, so any
+     student who reached a module before opening the hub read an empty store and was shown a blank
+     slate. Union of completed steps, newer record supplies the stats, scoped to the signed-in
+     student and this topic only. Idempotent, so it is safe to run on every load. */
+  /* Union of two records of the same topic. The more recently practised one supplies the stats;
+     every completed step the other holds is OR'd in on top. Neither side can erase the other, and
+     a step already marked done never becomes undone. */
+  function g7mergeTopic(a,b){
+    if(!a)return b; if(!b)return a;
+    var base=((a.lastPracticed||0)>=(b.lastPracticed||0))?a:b, other=(base===a)?b:a;
+    base.tree=base.tree||{};
+    Object.keys(other.tree||{}).forEach(function(q){
+      var os=(other.tree[q]&&other.tree[q].steps)||{};
+      var bq=base.tree[q]=base.tree[q]||{steps:{}}; bq.steps=bq.steps||{};
+      Object.keys(os).forEach(function(i){if(os[i])bq.steps[i]=true;});
+    });
+    return base;
+  }
+  /* ===== legacy-namespace repair (26 Jul 2026) =====
+     The hub carried its data across when the namespace was renamed; the modules did not, so a
+     student who reached a module before opening the hub read an empty store and was shown a blank
+     slate. Scoped to the signed-in student and this topic only — a module has no roster and must
+     not touch anybody else's record. Idempotent, so it is safe to run on every load, which is the
+     point: the hub's original one-shot copy could be disarmed before it ever ran. */
+  function g7migrate(){
+    try{
+      var LEGACY='g7.'; if(G7_STORE===LEGACY)return;
+      var me=g7current(); if(!me)return;
+      var old=null; try{old=JSON.parse(localStorage.getItem(LEGACY+'data'));}catch(e){return;}
+      var oldT=old&&old.students&&old.students[me]&&old.students[me].topics&&old.students[me].topics[G7_TOPIC_ID];
+      if(!oldT)return;
+      var o=g7all(); o.students=o.students||{};
+      o.students[me]=o.students[me]||{topics:{}}; o.students[me].topics=o.students[me].topics||{};
+      var cur=o.students[me].topics[G7_TOPIC_ID];
+      var merged=g7mergeTopic(oldT,cur);
+      if(JSON.stringify(merged)===JSON.stringify(cur||null))return;
+      o.students[me].topics[G7_TOPIC_ID]=merged; g7save(o);
+    }catch(e){}
+  }
+  /* Sign-in adopts whatever was done before it. Runs AFTER g7migrate() so a device carrying both a
+     legacy-namespace record and a pre-sign-in one ends up with the union of the two, rather than
+     whichever happened to be written last. */
+  function g7adopt(){
+    try{
+      var me=g7current(); if(!me)return;
+      var o=g7all(); var st=o.students||{};
+      var loc=st[G7_LOCAL]&&st[G7_LOCAL].topics&&st[G7_LOCAL].topics[G7_TOPIC_ID];
+      if(!loc)return;
+      st[me]=st[me]||{topics:{}}; st[me].topics=st[me].topics||{};
+      st[me].topics[G7_TOPIC_ID]=g7mergeTopic(loc,st[me].topics[G7_TOPIC_ID]);
+      delete st[G7_LOCAL].topics[G7_TOPIC_ID];
+      if(!Object.keys(st[G7_LOCAL].topics).length)delete st[G7_LOCAL];
+      o.students=st; g7save(o); schedulePush();
+    }catch(e){}
+  }
+  g7migrate(); g7adopt();
   function loadData(){return g7topic(g7all()).tree;}
   function saveData(tree){var o=g7all();var t=g7topic(o);t.tree=tree;t.totalSteps=document.querySelectorAll('.qcard .step').length;t.sectionTotals=g7sectionTotals();t.lastPracticed=Date.now();g7save(o);schedulePush();}
-  function g7sheet(event,question,detail){var url=localStorage.getItem(G7_STORE+'sheetURL');if(!url)return;try{fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({hub:G7_SYNC_HUB||'default',student:g7current(),topic:G7_TOPIC_TITLE,question:question||'',event:event,detail:detail||'',ts:Date.now()})});}catch(e){}}
+  function g7sheet(event,question,detail){var url=localStorage.getItem(G7_STORE+'sheetURL');if(!url||!g7signedIn())return;try{fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({hub:G7_SYNC_HUB||'default',student:g7current(),topic:G7_TOPIC_TITLE,question:question||'',event:event,detail:detail||'',ts:Date.now()})});}catch(e){}}
   // AS-4 (automatic): the lesson's own Learn->Stretch ladder IS the difficulty gradient, so the level is
   // read from the phase tag every stamped module already carries — no per-item tagging, no extra items,
   // and any new module built from Module_Template gets this for free. Untagged cards default to Target.
@@ -916,7 +989,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     s.onerror=function(){try{delete window[nm];}catch(e2){}if(s.parentNode)s.parentNode.removeChild(s);cb(null);};
     s.src=u+(u.indexOf('?')>=0?'&':'?')+'op=pull&hub='+encodeURIComponent(G7_SYNC_HUB||'default')+'&cb='+nm+'&name='+encodeURIComponent(g7current()||'')+'&pin='+encodeURIComponent(g7pin());document.head.appendChild(s);}catch(e){cb(null);}}
   var _pushT=null;
-  function schedulePush(){if(!localStorage.getItem(G7_STORE+'sheetURL'))return;clearTimeout(_pushT);_pushT=setTimeout(function(){try{var o=g7all();var s=g7current();var to=o.students&&o.students[s]&&o.students[s].topics&&o.students[s].topics[G7_TOPIC_ID];if(to)syncPush('topic',s,G7_TOPIC_ID,to);}catch(e){}},1500);}
+  function schedulePush(){if(!localStorage.getItem(G7_STORE+'sheetURL')||!g7signedIn())return;clearTimeout(_pushT);_pushT=setTimeout(function(){try{var o=g7all();var s=g7current();var to=o.students&&o.students[s]&&o.students[s].topics&&o.students[s].topics[G7_TOPIC_ID];if(to)syncPush('topic',s,G7_TOPIC_ID,to);}catch(e){}},1500);}
   function mergeCloudTopic(doc){if(!doc)return false;var s=g7current();var changed=false;
     var o=g7all();var t=g7topic(o);
     var c=doc.topics&&doc.topics[s]&&doc.topics[s][G7_TOPIC_ID];
@@ -926,7 +999,28 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     if(changed){g7save(o);}else if((t.lastPracticed||0)>((c&&c.lastPracticed)||0)){schedulePush();}
     return changed;}
   window.__modSync={mergeCloudTopic:mergeCloudTopic,schedulePush:schedulePush};
-  window.addEventListener('load',function(){syncPull(function(doc){if(mergeCloudTopic(doc))restoreProgress();g7plotSync();});});
+  /* An authenticated pull always returns the student's own pin row, because authenticating as a
+     student REQUIRES a stored PIN. No pin row while holding a local PIN therefore proves the
+     backend is refusing us, and every write this module makes is going nowhere but this browser.
+     Neither half of that failure raises an error: syncPush is no-cors, and an unauthenticated pull
+     returns the same empty doc as "no cloud data yet". Say it out loud instead. */
+  function g7syncHealth(doc){
+    try{
+      var me=g7current(); if(!me||!doc)return;
+      var mine=g7pin(); if(!mine)return;
+      var el=document.getElementById('g7syncwarn');
+      if(doc.pins&&doc.pins[me]){if(el)el.remove();return;}
+      if(el)return;
+      el=document.createElement('div'); el.id='g7syncwarn'; el.setAttribute('role','alert');
+      el.style.cssText='background:#FEF3C7;border:1px solid #F59E0B;border-left:5px solid #B45309;'+
+        'color:#7C2D12;padding:.6rem .85rem;margin:.6rem 0;border-radius:8px;font-size:.9rem';
+      el.innerHTML='<strong>Your work is saving on this device, but it is not reaching your teacher.</strong> '+
+        'Keep going &mdash; nothing is lost here. If you still see this next time, ask Mr Gabriel to reset your PIN.';
+      var host=document.querySelector('.overall-progress');
+      if(host&&host.parentNode)host.parentNode.insertBefore(el,host);
+    }catch(e){}
+  }
+  window.addEventListener('load',function(){syncPull(function(doc){if(mergeCloudTopic(doc))restoreProgress();g7plotSync();g7syncHealth(doc);});});
 
   // ===== answer helpers =====
   function kdec(s){try{return atob(s);}catch(e){return '';}}
@@ -1073,7 +1167,7 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
 
   function restoreProgress(){
     var nm=document.getElementById('g7name');if(nm)nm.textContent=g7current();
-    if(!localStorage.getItem(G7_STORE+'current')&&nm&&!document.getElementById('g7guestnote')){var gw=document.createElement('a');gw.id='g7guestnote';gw.href='Grade_8_Math_Hub.html';gw.style.cssText='margin-left:.6rem;color:var(--orange);font-weight:600;text-decoration:none';gw.textContent='Not signed in — choose your name in the Hub so your work is tracked';nm.parentNode.appendChild(gw);}
+    if(!localStorage.getItem(G7_STORE+'current')&&nm&&!document.getElementById('g7guestnote')){var gw=document.createElement('a');gw.id='g7guestnote';gw.href='Grade_8_Math_Hub.html';gw.style.cssText='margin-left:.6rem;color:var(--orange);font-weight:600;text-decoration:none';gw.textContent='Not signed in — your work is NOT being saved. Tap to choose your name in the Hub.';nm.parentNode.appendChild(gw);}
     var d=loadData();var topic=g7topic(g7all());
     document.querySelectorAll('.qcard').forEach(function(card){
       var qid=card.dataset.qid;if(!qid||!d[qid]||!d[qid].steps)return;

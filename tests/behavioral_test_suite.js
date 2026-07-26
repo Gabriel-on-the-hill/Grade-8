@@ -125,19 +125,77 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
   ok(w.localStorage.getItem(P+'device')==='Divine','migrate: device binding that is ours is kept');
   ok(w.localStorage.getItem(P+'syncKey')==='teacher-key','migrate: device-level settings come across');
   ok(w.localStorage.getItem(P+'seedv')!=='stale-seed-marker','migrate: seed markers are NOT copied, so this deployment’s seeds re-apply cleanly');
-  ok(w.localStorage.getItem(P+'migv')==='1','migrate: the device is marked migrated');
+  ok(w.localStorage.getItem(P+'migv')==='2','migrate: the device records which migration generation ran');
 }
-// ===== HUB: migration is one-shot and never clobbers newer data =====
+// ===== HUB: migration MERGES, and never clobbers newer data =====
 { const g7data={students:{Divine:{topics:{'number-system':{title:'NS',tree:{},totalSteps:31,sectionTotals:{},lastPracticed:5,attempts:99,correct:99,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[]}},assignments:{}}}};
   // a device that already has g8 data must keep it — the old namespace must not overwrite newer work
   const g8data={students:{Divine:{topics:{'number-system':{title:'NS',tree:{},totalSteps:31,sectionTotals:{},lastPracticed:9,attempts:3,correct:3,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[]}},assignments:{}}}};
   let w=load(HUB,{'g7.data':JSON.stringify(g7data),[P+'data']:JSON.stringify(g8data)}).window;
   ok(JSON.parse(w.localStorage.getItem(P+'data')).students.Divine.topics['number-system'].attempts===3,
      'migrate: never overwrites a key the new namespace already holds');
-  // once migv is set, a later change under g7. must not be dragged in a second time
+  /* A device that already ran the ORIGINAL one-shot migration must still be repairable.
+     This assertion used to say the opposite — that migv='1' permanently blocks re-import — and
+     that is precisely the defect it locked in. The old code copied `data` only when the new
+     namespace was empty but stamped migv either way, and a module writes the new namespace from
+     its own cloud merge on page load, before the student has answered anything. So one module
+     visit disarmed the migration for good and stranded every pre-rename answer where nothing
+     would ever read it again. Between 18 and 26 Jul 2026 that is what two students' "wiped"
+     progress actually was. A merge is idempotent, so it can run on every boot and heal a device
+     whenever it next opens the hub, no matter how many times the broken version already ran. */
   w=load(HUB,{'g7.data':JSON.stringify(g7data),[P+'migv']:'1'}).window;
-  ok(w.localStorage.getItem(P+'data')===null||!JSON.parse(w.localStorage.getItem(P+'data')).students.Divine.topics,
-     'migrate: an already-migrated device does not re-import from the old namespace');
+  ok(!!JSON.parse(w.localStorage.getItem(P+'data')).students.Divine.topics['number-system'],
+     'migrate: a device stamped by the old one-shot migration is STILL repaired');
+  /* The union is what makes re-running safe. Whichever record was practised more recently supplies
+     the stats; every completed step the other holds is carried in on top. Neither side can erase
+     the other, which is the property that lets this run unconditionally. */
+  const legacyTree={students:{Divine:{topics:{'number-system':{title:'NS',tree:{'1-1':{steps:{0:true}}},totalSteps:31,sectionTotals:{},lastPracticed:5,attempts:99,correct:99,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[]}},assignments:{}}}};
+  const newerTree={students:{Divine:{topics:{'number-system':{title:'NS',tree:{'2-2':{steps:{0:true}}},totalSteps:31,sectionTotals:{},lastPracticed:9,attempts:3,correct:3,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[]}},assignments:{}}}};
+  w=load(HUB,{'g7.data':JSON.stringify(legacyTree),[P+'data']:JSON.stringify(newerTree),[P+'migv']:'1'}).window;
+  const merged=JSON.parse(w.localStorage.getItem(P+'data')).students.Divine.topics['number-system'];
+  ok(merged.attempts===3,'merge: the more recently practised record supplies the stats');
+  ok(merged.tree['2-2']&&merged.tree['2-2'].steps[0],'merge: the newer record keeps its own completed steps');
+  ok(merged.tree['1-1']&&merged.tree['1-1'].steps[0],'merge: a step completed only under the old namespace is carried across, not dropped');
+}
+// ===== HUB: adopts work a module parked before the student signed in =====
+/* The dashboard is how a teacher sees progress, so the hub adopts the local-only slot itself
+   rather than waiting for the student to happen to reopen the module. */
+{ const local={students:{__local:{topics:{'number-system':{title:'NS',tree:{'1-1':{steps:{0:true}}},totalSteps:31,sectionTotals:{},lastPracticed:7,attempts:4,correct:3,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[]}}}}};
+  const w=load(HUB,{[P+'data']:JSON.stringify(local),[P+'current']:'Divine'}).window;
+  const d=JSON.parse(w.localStorage.getItem(P+'data'));
+  ok(!!(d.students.Divine&&d.students.Divine.topics['number-system']),'hub: adopts pre-sign-in work under the signed-in name');
+  ok(!d.students.__local,'hub: clears the local-only slot once adopted');
+  ok(JSON.parse(w.localStorage.getItem(P+'roster')||'[]').indexOf('__local')<0,
+     'hub: the local-only slot never becomes a roster name a student could sign in as');
+}
+// ===== MODULES: self-repair off the legacy namespace, and pre-sign-in work =====
+/* The hub having a migration was not enough. Every module is reachable WITHOUT the hub — a
+   bookmark, a homework deep link, a restored tab — and a module that reads an empty new namespace
+   shows a blank slate and then writes that blank slate back. These four assertions are the ones
+   that stand between a returning student and "all my work is gone". */
+{ const legacy={students:{Divine:{topics:{'number-system':{title:'NS',tree:{'1-1':{steps:{0:true}}},totalSteps:31,sectionTotals:{},lastPracticed:5,attempts:9,correct:7,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[]}},assignments:{}}}};
+  let w=load(NS,{'g7.data':JSON.stringify(legacy),[P+'current']:'Divine'}).window;
+  let d=JSON.parse(w.localStorage.getItem(P+'data'));
+  ok(!!(d.students.Divine.topics['number-system'].tree['1-1']||{}).steps,
+     'module: repairs itself off the legacy namespace without the hub being opened first');
+
+  /* A module must never invent an identity. Work done before signing in stays in a local-only slot
+     — it is kept, because losing a deep-linked student's whole session is not an acceptable price
+     for a clean roster — but it is never filed under a name the roster did not authorise, and it
+     is never pushed to the cloud or the activity log under one. */
+  w=load(NS,{}).window;
+  ok(w.localStorage.getItem(P+'current')===null,'module: not signed in stays not signed in');
+  d=JSON.parse(w.localStorage.getItem(P+'data')||'{"students":{}}');
+  ok(!d.students.Guest,'module: never creates a record under an invented name');
+
+  /* ...and signing in adopts it, so the work reappears under the real name rather than being
+     stranded in a slot only that one browser can see. */
+  const local={students:{__local:{topics:{'number-system':{title:'NS',tree:{'1-1':{steps:{0:true}}},totalSteps:31,sectionTotals:{},lastPracticed:7,attempts:4,correct:3,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[]}}}}};
+  w=load(NS,{[P+'data']:JSON.stringify(local),[P+'current']:'Divine'}).window;
+  d=JSON.parse(w.localStorage.getItem(P+'data'));
+  ok(!!d.students.Divine&&!!d.students.Divine.topics['number-system'],
+     'module: work done before signing in is adopted under the real name');
+  ok(!d.students.__local,'module: the local-only slot is cleared once adopted, so it cannot be adopted twice');
 }
 // ===== HUB: teacher modal, gated settings, Escape, takeover =====
 { const w=load(HUB,{[P+'teacherPass']:'studentmade'}).window,d=w.document;

@@ -383,6 +383,19 @@ Engine v1.2 (v1.1 + the multi-subject hub layer: flat `UNITS` replaced by `SUBJE
       (`store_prefix`, `a11y`, `module_smoke`, …) treat every root `.html` as a served module, and
       this one legitimately reads **both** namespaces.
 
+- [ ] **2026-07-26 — storage & sync repair** (hub + all 4 modules + template + `store_prefix` guard)
+      — pushed in `PENDING`. Fixes the incident where both students' progress appeared wiped:
+      (1) the hub's `g7.`→`g8.` migration was one-shot and self-disarming, so a single module visit
+      stranded every pre-rename answer permanently — it is now an idempotent **merge** that runs on
+      every boot and repairs already-disarmed devices; (2) the modules had **no** migration at all,
+      so a bookmark or homework deep link showed a blank slate and wrote it back; (3) modules
+      defaulted the student to `'Guest'`, an identity the roster never authorised, whose cloud
+      writes the backend refuses — pre-sign-in work now parks in a local-only slot and is **adopted**
+      under the real name by both the module and the hub; (4) a student whose PIN the cloud does not
+      recognise was failing **silently** in both directions (`syncPush` is `no-cors`; an
+      unauthenticated pull returns the same empty doc as "no data yet") — the hub and every module
+      now detect it, publish an unclaimed PIN to self-heal, and otherwise say so on screen.
+
 *Verified by fetching the deployed site, not by assuming a push shipped — a green `git push` only proves the remote updated, and Pages rebuilds a minute or two later.*
 
 - Repo: **https://github.com/Gabriel-on-the-hill/Grade-8** → GitHub Pages at **https://gabriel-on-the-hill.github.io/Grade-8/** (branch `main`, root). `index.html` redirects to `Grade_8_Math_Hub.html`.

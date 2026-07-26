@@ -34,7 +34,16 @@ const bad = m => { console.log('     ' + m); fail++; };
  * legacy read in a file with no migration to perform, still fails. Delete the row once the
  * migration is retired. */
 const LEGACY_OK = {
-  'Grade_8_Math_Hub.html': 'g7.',   // one-time copy off the shared namespace (19 Jul 2026)
+  'Grade_8_Math_Hub.html': 'g7.',   // copy off the shared namespace (19 Jul 2026; merge since 26 Jul)
+  /* The modules were given the same read on 26 Jul 2026, because the hub having it was not enough.
+   * A student who opened a module first — a bookmark, a homework deep link, a restored tab — read
+   * an empty new namespace and was shown a blank slate, and the module then wrote that blank slate
+   * back, which disarmed the hub's one-shot copy before it ever ran. Every module reachable without
+   * passing through the hub therefore needs to be able to repair itself. */
+  'The_Number_System.html': 'g7.',
+  'Expressions_and_Equations.html': 'g7.',
+  'Matter_and_Its_Interactions.html': 'g7.',
+  'Functions.html': 'g7.',
 };
 
 const prefixes = new Map();   // file -> declared namespace
