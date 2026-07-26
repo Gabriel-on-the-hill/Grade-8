@@ -373,7 +373,13 @@ Engine v1.2 (v1.1 + the multi-subject hub layer: flat `UNITS` replaced by `SUBJE
 - [x] **2026-07-22 — unit-grew notice** (all 4 modules + template) — pushed in `2807d62`;
       **verified live**: all four served modules carry `g7growthNotice`.
 
-*Nothing outstanding as of 22 Jul 2026, through `2807d62`. Verified by fetching the deployed site, not by assuming a push shipped — a green `git push` only proves the remote updated, and Pages rebuilds a minute or two later.*
+- [ ] **2026-07-26 — `tools/diagnose_storage.html`, a read-only storage reporter** — pushed in
+      `PENDING`; needed live because localStorage is per-origin: a page opened from disk cannot see
+      what the served hub wrote. Lives under `tools/` deliberately — the root-scanning guards
+      (`store_prefix`, `a11y`, `module_smoke`, …) treat every root `.html` as a served module, and
+      this one legitimately reads **both** namespaces.
+
+*Verified by fetching the deployed site, not by assuming a push shipped — a green `git push` only proves the remote updated, and Pages rebuilds a minute or two later.*
 
 - Repo: **https://github.com/Gabriel-on-the-hill/Grade-8** → GitHub Pages at **https://gabriel-on-the-hill.github.io/Grade-8/** (branch `main`, root). `index.html` redirects to `Grade_8_Math_Hub.html`.
 - **Publish only** the original web app + docs: `index.html`, the hub, the module HTML files, `README.md`, this standard, `Starter_Kit/`.

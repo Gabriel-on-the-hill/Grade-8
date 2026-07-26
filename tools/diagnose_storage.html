@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Storage check — Grade 8</title>
+<style>
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:820px;margin:0 auto;padding:1.2rem;color:#123;line-height:1.5}
+  h1{font-size:1.25rem;margin:.2rem 0 .1rem}
+  p.sub{color:#667;margin:.2rem 0 1.2rem;font-size:.92rem}
+  .box{border:1px solid #dde;border-radius:8px;padding:.8rem 1rem;margin:0 0 1rem}
+  .box h2{font-size:1rem;margin:.1rem 0 .5rem}
+  .ok{border-left:4px solid #2a7}.warn{border-left:4px solid #d92}.bad{border-left:4px solid #c33}
+  table{border-collapse:collapse;width:100%;font-size:.9rem}
+  th,td{text-align:left;padding:.3rem .5rem;border-bottom:1px solid #eef}
+  th{color:#667;font-weight:600}
+  pre{background:#f6f7fa;padding:.7rem;border-radius:6px;overflow-x:auto;font-size:.78rem}
+  .verdict{font-weight:600}
+</style>
+</head>
+<body>
+<h1>Storage check</h1>
+<p class="sub">Read-only. This page does not write, move or delete anything &mdash; it only reports what this
+browser is holding for the Grade&nbsp;8 hub. Open it on the device where the work went missing.</p>
+<div id="out">Reading&hellip;</div>
+
+<h2 style="font-size:1rem">Raw report (copy this)</h2>
+<pre id="raw"></pre>
+
+<script>
+(function(){
+  var PREFIXES = ['g7.', 'g8.'];
+  function esc(s){return String(s==null?'':s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
+  function jget(k){try{return JSON.parse(localStorage.getItem(k));}catch(e){return null;}}
+
+  function scan(p){
+    var d = jget(p+'data');
+    var s = (d && d.students) || {};
+    var rows = [];
+    Object.keys(s).forEach(function(name){
+      var topics = (s[name] && s[name].topics) || {};
+      Object.keys(topics).forEach(function(tid){
+        var t = topics[tid] || {}, tree = t.tree || {}, done = 0;
+        Object.keys(tree).forEach(function(q){
+          var st = (tree[q] && tree[q].steps) || {};
+          done += Object.keys(st).filter(function(k){return st[k];}).length;
+        });
+        rows.push({name:name, topic:tid, done:done, total:t.totalSteps||0,
+                   attempts:t.attempts||0, last:t.lastPracticed||0});
+      });
+    });
+    return {
+      present: localStorage.getItem(p+'data') !== null,
+      students: Object.keys(s),
+      current: localStorage.getItem(p+'current'),
+      device: localStorage.getItem(p+'device'),
+      pins: Object.keys(jget(p+'pins') || {}),
+      rows: rows,
+      totalDone: rows.reduce(function(a,r){return a+r.done;},0)
+    };
+  }
+
+  var g7 = scan('g7.'), g8 = scan('g8.');
+  var migv = localStorage.getItem('g8.migv');
+
+  function when(ts){return ts ? new Date(ts).toLocaleString() : '—';}
+  function table(sc){
+    if(!sc.rows.length) return '<p style="color:#667;margin:.2rem 0">No topic records.</p>';
+    var h = '<table><tr><th>Student</th><th>Topic</th><th>Steps done</th><th>Attempts</th><th>Last practised</th></tr>';
+    sc.rows.sort(function(a,b){return b.done-a.done;}).forEach(function(r){
+      h += '<tr><td>'+esc(r.name)+'</td><td>'+esc(r.topic)+'</td><td>'+r.done+' / '+r.total+
+           '</td><td>'+r.attempts+'</td><td>'+esc(when(r.last))+'</td></tr>';
+    });
+    return h + '</table>';
+  }
+  function block(title, p, sc, cls){
+    return '<div class="box '+cls+'"><h2>'+esc(title)+' &mdash; <code>'+esc(p)+'</code></h2>'+
+      '<p style="margin:.1rem 0 .5rem;font-size:.88rem;color:#667">signed in as: <strong>'+esc(sc.current||'(none)')+
+      '</strong> &middot; device bound to: <strong>'+esc(sc.device||'(none)')+
+      '</strong> &middot; PINs stored for: <strong>'+esc(sc.pins.join(', ')||'(none)')+'</strong></p>'+
+      table(sc)+'</div>';
+  }
+
+  /* The verdict this page exists to give: is there work sitting in the OLD namespace that the
+     current one cannot see? That is the shape of "it looks wiped but nothing was lost". */
+  var verdict, cls;
+  if (g7.totalDone > 0 && g8.totalDone === 0) {
+    verdict = 'STRANDED. This device is holding ' + g7.totalDone + ' completed steps under the OLD namespace ' +
+              '(g7.) and nothing under the new one (g8.). The work exists and is recoverable. ' +
+              'Do not clear this browser’s data.';
+    cls = 'bad';
+  } else if (g7.totalDone > g8.totalDone) {
+    verdict = 'PARTIALLY STRANDED. Old namespace holds ' + g7.totalDone + ' completed steps, new one holds ' +
+              g8.totalDone + '. The difference never came across. Do not clear this browser’s data.';
+    cls = 'bad';
+  } else if (g8.students.indexOf('Guest') >= 0) {
+    verdict = 'MIS-FILED. Work is saved under the name "Guest", which the hub dashboard does not show. ' +
+              'It happens when a module is opened without signing in at the hub first.';
+    cls = 'warn';
+  } else if (g8.totalDone === 0 && g7.totalDone === 0) {
+    verdict = 'EMPTY. This browser holds no Grade 8 work under either namespace — so the loss is not a ' +
+              'namespace problem. Either this is a different browser/device/profile from the one used before, ' +
+              'or the browser itself cleared its storage.';
+    cls = 'warn';
+  } else {
+    verdict = 'HEALTHY. Work is present under the current namespace (' + g8.totalDone + ' completed steps).';
+    cls = 'ok';
+  }
+
+  var html = '<div class="box '+cls+'"><p class="verdict">'+esc(verdict)+'</p>'+
+    '<p style="font-size:.85rem;color:#667;margin:.4rem 0 0">Migration flag <code>g8.migv</code> = '+
+    esc(migv===null?'(not set — migration has never run here)':migv)+'</p></div>';
+  html += block('Current namespace', 'g8.', g8, g8.totalDone ? 'ok' : 'warn');
+  html += block('Old namespace', 'g7.', g7, g7.totalDone ? 'warn' : 'ok');
+  document.getElementById('out').innerHTML = html;
+
+  document.getElementById('raw').textContent = JSON.stringify({
+    verdict: verdict, migv: migv,
+    g7: {present:g7.present, students:g7.students, current:g7.current, device:g7.device, pins:g7.pins, totalDone:g7.totalDone, rows:g7.rows},
+    g8: {present:g8.present, students:g8.students, current:g8.current, device:g8.device, pins:g8.pins, totalDone:g8.totalDone, rows:g8.rows},
+    keys: Object.keys(localStorage).filter(function(k){return /^g\d+\./.test(k);}).sort()
+  }, null, 2);
+})();
+</script>
+</body>
+</html>
