@@ -383,8 +383,16 @@ Engine v1.2 (v1.1 + the multi-subject hub layer: flat `UNITS` replaced by `SUBJE
       (`store_prefix`, `a11y`, `module_smoke`, …) treat every root `.html` as a served module, and
       this one legitimately reads **both** namespaces.
 
-- [ ] **2026-07-26 — storage & sync repair** (hub + all 4 modules + template + `store_prefix` guard)
-      — pushed in `PENDING`. Fixes the incident where both students' progress appeared wiped:
+- [x] **2026-07-26 — storage & sync repair** (hub + all 4 modules + template + `store_prefix` guard)
+      — pushed in `89c5f81`; **verified live**: all five served files are byte-identical to the
+      committed ones and carry every hook (`mergeTopicRecords`, `adoptLocal`, `syncHealth` and the
+      pin-claim latch on the hub; `g7mergeTopic`, `g7migrate`, `g7adopt`, `g7slot`, `g7syncHealth`
+      and the `g7migrate(); g7adopt();` invocation on each module), the one-shot `migv` guard is
+      **gone** from the served hub, no `'Guest'` fallback survives, and qcard counts are unchanged
+      at 32/43/37/31. The invocation was checked separately from the definitions because a repair
+      that is defined but never called is exactly as useless as one that was never written, and
+      looks fine in a grep for the function name. Fixes the incident where both students' progress
+      appeared wiped:
       (1) the hub's `g7.`→`g8.` migration was one-shot and self-disarming, so a single module visit
       stranded every pre-rename answer permanently — it is now an idempotent **merge** that runs on
       every boot and repairs already-disarmed devices; (2) the modules had **no** migration at all,
