@@ -373,9 +373,13 @@ Engine v1.2 (v1.1 + the multi-subject hub layer: flat `UNITS` replaced by `SUBJE
 - [x] **2026-07-22 — unit-grew notice** (all 4 modules + template) — pushed in `2807d62`;
       **verified live**: all four served modules carry `g7growthNotice`.
 
-- [ ] **2026-07-26 — `tools/diagnose_storage.html`, a read-only storage reporter** — pushed in
-      `PENDING`; needed live because localStorage is per-origin: a page opened from disk cannot see
-      what the served hub wrote. Lives under `tools/` deliberately — the root-scanning guards
+- [x] **2026-07-26 — `tools/diagnose_storage.html`, a read-only storage reporter** — pushed in
+      `a44f3f2`; **verified live**: HTTP 200, byte-identical to the committed file, all five
+      verdict strings present, and **zero** `setItem`/`removeItem`/`clear` calls in the *served*
+      copy. That last check is the one that matters: the old namespace is the only remaining copy
+      of the missing work, so a reporter that turned out to write would consume the evidence it was
+      sent to find. Needed live because localStorage is per-origin — a page opened from disk cannot
+      see what the served hub wrote. Lives under `tools/` deliberately: the root-scanning guards
       (`store_prefix`, `a11y`, `module_smoke`, …) treat every root `.html` as a served module, and
       this one legitimately reads **both** namespaces.
 
