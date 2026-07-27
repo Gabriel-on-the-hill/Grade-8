@@ -588,6 +588,17 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
         var pins=getPins(),prune=false;
         Object.keys(pins).forEach(function(n){if(ROSTER_SEED.indexOf(n)<0){delete pins[n];prune=true;}});
         if(prune)setPins(pins);
+        /* ...and the SIGNED-IN NAME, which pruning PINs alone never touched. A name already sitting
+           in the current key skipped the roster check entirely, because that check only guards the
+           sign-in SCREEN — so a stale identity from another grade kept its dashboard rendering on a
+           hub it is not enrolled in. Both hubs share one browser origin and differ only by key
+           prefix, so this is routine rather than exotic: signing in as a Grade 8 student and later
+           opening the Grade 7 hub does it. Observed 27 Jul 2026 — Grade 7 showing Divine, roster
+           [Fareedah]. Signs them out ONLY: no record is deleted, and their own hub is unaffected.
+           Deliberately not paired with clearing their data — the other-grade record is the legacy
+           copy a namespace migration reads from, and dropping it here would destroy a recovery. */
+        var _cur=LS.getItem(K('current'));
+        if(_cur&&ROSTER_SEED.indexOf(_cur)<0){setCurrent('');LS.removeItem(K('device'));}
       }
       if(TEACHER_PASS_SEED && LS.getItem(K('passv'))!==TEACHER_PASS_SEED){LS.setItem(K('teacherPass'),TEACHER_PASS_SEED);LS.setItem(K('passv'),TEACHER_PASS_SEED);}
       if(SHEET_URL_SEED && LS.getItem(K('urlv'))!==SHEET_URL_SEED){LS.setItem(K('sheetURL'),SHEET_URL_SEED);LS.setItem(K('urlv'),SHEET_URL_SEED);}
