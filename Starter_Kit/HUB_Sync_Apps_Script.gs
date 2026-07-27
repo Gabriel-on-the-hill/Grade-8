@@ -227,15 +227,25 @@ function doGet(e) {
     }
     if (op !== 'pull') return _jsonp(cb, null);
     var hub = String(e.parameter.hub || 'default');
-    var doc = { pins: {}, assign: {}, reviews: {}, topics: {}, hwplan: {}, hwstate: {}, serverTs: Date.now() };
+    var doc = { auth: false, pins: {}, assign: {}, reviews: {}, topics: {}, hwplan: {}, hwstate: {}, serverTs: Date.now() };
 
     /* Scope the read. The URL is public, so on its own it returns an empty doc —
      * the same shape the client already handles when there is no cloud data.
      *   teacher key  -> everyone (the dashboard)
      *   name + PIN   -> that student only
-     *   neither      -> nothing */
+     *   neither      -> nothing
+     *
+     * `auth` says WHICH of those two an empty doc is (added 26 Jul 2026). Without it the two are
+     * indistinguishable, and that ambiguity is not cosmetic — it deadlocks PIN administration.
+     * A student whose PIN the teacher changes can no longer authenticate, so their device can never
+     * be told about the change: it keeps presenting the old PIN, keeps getting a silent empty doc,
+     * and stays locked out for good. It is also how a week of refused writes went unnoticed in
+     * Jul 2026 — nothing on either side of the wire ever said "no". A client that sees auth:false
+     * while holding a PIN knows for certain the PIN is wrong, and can ask for the right one.
+     * Additive and safe to deploy late: an older client simply ignores the field. */
     var who = _who(hub, e.parameter.name || '', e.parameter.pin || '', e.parameter.key || '');
     if (!who) return _jsonp(cb, doc);
+    doc.auth = true;
     var only = (who === 'student') ? String(e.parameter.name || '') : null;
 
     var sh = _ss().getSheetByName(SHEET_SYNC);

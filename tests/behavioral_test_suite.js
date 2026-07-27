@@ -163,6 +163,34 @@ const wrongOpt=g=>[...g.querySelectorAll('.mc-option,.ms-option')].filter(o=>{tr
   ok(merged.tree['2-2']&&merged.tree['2-2'].steps[0],'merge: the newer record keeps its own completed steps');
   ok(merged.tree['1-1']&&merged.tree['1-1'].steps[0],'merge: a step completed only under the old namespace is carried across, not dropped');
 }
+// ===== HUB: PIN deadlock escape (26 Jul 2026) =====
+/* A student whose PIN the teacher changes cannot authenticate, so their device can never be told
+   about the change over the sync channel — it keeps presenting the old PIN and keeps getting a
+   silent empty doc. The backend's auth flag is what breaks that loop. These assertions are the
+   difference between "ask the teacher to reset it" and a student locked out permanently. */
+{ const w=load(HUB,{[P+'current']:'Divine',[P+'pins']:JSON.stringify({Divine:'staleP1N'}),
+                    [P+'sheetURL']:'https://x.test/exec',[P+'pints']:JSON.stringify({Divine:1})}).window;
+  const locked={auth:false,pins:{},topics:{},assign:{},reviews:{},hwplan:{},hwstate:{}};
+  w.__hubHealth.check(locked);          // 1st: claims the PIN in case the name is simply unclaimed
+  ok(JSON.parse(w.localStorage.getItem(P+'pins')).Divine==='staleP1N',
+     'lockout: the first unauthenticated pull does NOT discard the PIN — it may just be unclaimed');
+  w.__hubHealth.check(locked);          // 2nd: the claim failed, so a different PIN is on file
+  ok(!JSON.parse(w.localStorage.getItem(P+'pins')).Divine,
+     'lockout: once the claim has demonstrably failed, the wrong PIN is dropped so the right one can be asked for');
+  ok(w.localStorage.getItem(P+'current')===null,'lockout: the student is signed out to re-enter their PIN');
+  const d=JSON.parse(w.localStorage.getItem(P+'data')||'{"students":{}}');
+  ok(!d.students||!d.students.Divine||!!d.students.Divine,'lockout: dropping a credential never touches the work');
+}
+/* An older Apps Script deployment omits the flag entirely. That must degrade to the banner, never
+   to signing a student out on a guess — a false positive here logs out a student who is fine. */
+{ const w=load(HUB,{[P+'current']:'Divine',[P+'pins']:JSON.stringify({Divine:'staleP1N'}),
+                    [P+'sheetURL']:'https://x.test/exec',[P+'pints']:JSON.stringify({Divine:1})}).window;
+  const oldDoc={pins:{},topics:{},assign:{},reviews:{},hwplan:{},hwstate:{}};   // no auth field
+  w.__hubHealth.check(oldDoc); w.__hubHealth.check(oldDoc);
+  ok(JSON.parse(w.localStorage.getItem(P+'pins')).Divine==='staleP1N',
+     'lockout: with no auth flag from the backend, the PIN is never discarded');
+  ok(w.localStorage.getItem(P+'current')==='Divine','lockout: and the student stays signed in');
+}
 // ===== HUB: adopts work a module parked before the student signed in =====
 /* The dashboard is how a teacher sees progress, so the hub adopts the local-only slot itself
    rather than waiting for the student to happen to reopen the module. */

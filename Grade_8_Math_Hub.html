@@ -359,10 +359,17 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     var two=document.getElementById('pin2'), forgot=document.getElementById('pin-forgot');
     if(_pinMode==='create'){
       document.getElementById('pin-title').textContent=n;
-      document.getElementById('pin-sub').textContent='Create your PIN';
-      document.getElementById('pin-help').textContent='Pick a PIN of any length — numbers or letters. You will enter it each time you sign in.';
-      two.style.display=''; document.getElementById('pin1').placeholder='New PIN';
-      document.getElementById('pin-go').textContent='Set PIN & continue'; forgot.style.visibility='hidden';
+      /* If the cloud already holds a PIN for this student, this is NOT a free choice — whatever they
+         invent here will be refused by the backend and they will be silently locked out, which is
+         exactly how Jul 2026 happened. Ask for the one they were given instead. */
+      var assigned=_pinAssigned[n];
+      document.getElementById('pin-sub').textContent=assigned?'Enter the PIN your teacher gave you':'Create your PIN';
+      document.getElementById('pin-help').textContent=assigned
+        ? 'This device has forgotten your PIN, but your teacher has one on file. Enter that PIN — your work is safe and will come back.'
+        : 'Pick a PIN of any length — numbers or letters. You will enter it each time you sign in.';
+      two.style.display=assigned?'none':''; document.getElementById('pin1').placeholder=assigned?'Your PIN':'New PIN';
+      document.getElementById('pin-go').textContent=assigned?'Sign in':'Set PIN & continue';
+      forgot.style.visibility=assigned?'visible':'hidden';
     }else{
       document.getElementById('pin-title').textContent='Welcome back, '+n;
       document.getElementById('pin-sub').textContent='Enter your PIN to continue';
@@ -765,7 +772,24 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     }
     el.innerHTML=msg;
   }
-  var _pinClaimed=false;
+  var _pinClaimed=false, _pinReprompted=false, _pinAssigned={};
+  /* The escape hatch from a PIN deadlock. Reached only when the backend has told us plainly
+     (auth:false) that it does not accept this PIN, AND our attempt to claim it as an unclaimed name
+     has already failed — which together mean one thing: a DIFFERENT PIN is on file for this student.
+     No amount of retrying fixes that, and the device cannot be told the new PIN over a channel it
+     cannot authenticate on. So stop guessing, drop the PIN this device is holding, and ask for the
+     right one. Their work stays exactly where it is; only the credential is discarded. */
+  function repromptForPin(me){
+    if(_pinReprompted)return; _pinReprompted=true;
+    try{
+      var p=jget(K('pins'),{}); delete p[me]; jset(K('pins'),p);   // local only; the cloud row is untouched
+      _pinAssigned[me]=true;
+      setSyncWarning('');
+      setCurrent(''); renderTopbar(); renderSignIn(); openPinModal(me);
+      var err=document.getElementById('pin-err');
+      if(err)err.textContent='This device had the wrong PIN saved. Enter the PIN your teacher gave you.';
+    }catch(e){}
+  }
   function syncHealth(doc){
     var me=current(); if(!me){setSyncWarning('');return;}
     var mine=pinFor(me); if(!mine){setSyncWarning('');return;}   // no PIN yet — nothing to prove
@@ -779,7 +803,13 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     if(!_pinClaimed){_pinClaimed=true;
       var pts=jget(K('pints'),{}); if(!pts[me]){pts[me]=Date.now();jset(K('pints'),pts);}
       syncPush('pin',me,'',{v:mine,ts:pts[me]});                 // heals a PIN the cloud never knew
+      return;                                                    // give the claim one poll to land
     }
+    /* The claim has had a poll to take effect and we are still unauthenticated, and the backend has
+       said so outright rather than us inferring it. A different PIN is on file. Ask for it. This
+       needs the 26 Jul 2026 Apps Script (auth flag); against an older deployment doc.auth is
+       undefined, this never fires, and the banner alone is the behaviour — degraded, not broken. */
+    if(doc.auth===false){ repromptForPin(me); return; }
     setSyncWarning('<strong>Your work is saving on this device, but it is not reaching your teacher.</strong> '+
       'Keep working &mdash; nothing is being lost here. If this message is still showing next time '+
       'you sign in, ask Mr Gabriel to reset your PIN.');
@@ -1509,6 +1539,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
       return '<div class="roster-row"><span class="nm">'+esc(n)+'</span>'+
         '<span class="muted-note" style="margin-left:.6rem;font-size:.78rem">'+(getPin(n)?'PIN set':'no PIN yet')+'</span>'+
         '<span style="margin-left:auto;display:flex;gap:.4rem">'+
+        '<button class="btn ghost sm set-pin" data-n="'+esc(n)+'">Set PIN</button>'+
         '<button class="btn ghost sm reset-pin" data-n="'+esc(n)+'">Reset PIN</button>'+
         '<button class="x" data-n="'+esc(n)+'" style="margin-left:0">Remove</button></span></div>';
     }).join(''):'<p class="muted-note">No names yet.</p>';
@@ -1528,6 +1559,22 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
         '<button class="btn ghost sm" id="purge-foreign">Clear other-grade data from this device</button></div>';
     }
     list.innerHTML=rows;
+    /* Assign a PIN outright, rather than clearing it and hoping the student invents the right one.
+       This write goes up under the TEACHER key, so the backend accepts it even though a PIN is
+       already claimed — that teacher override is the only way past a claimed PIN, by design.
+       The student's device cannot be told over a channel it can no longer authenticate on, so it
+       finds out the honest way: its next pull comes back auth:false, it drops the PIN it is holding
+       and asks for this one. */
+    Array.prototype.forEach.call(list.querySelectorAll('.set-pin'),function(b){
+      b.onclick=function(){
+        var n=b.getAttribute('data-n');
+        var v=(prompt('Set '+n+"'s PIN to:",pinFor(n)||'')||'').trim();
+        if(!v)return;
+        if(!syncKey()){alert('Set the teacher key in Settings first — without it this change cannot reach the cloud, and only this device would know about it.');return;}
+        setPin(n,v); syncPush('pin',n,'',{v:v,ts:markPinTs(n)}); renderRosterPanel();
+        alert('Set '+n+"'s PIN to “"+v+'”.\n\nTell them the new PIN. Their device will ask for it the next time they open the hub — their work is not affected.');
+      };
+    });
     Array.prototype.forEach.call(list.querySelectorAll('.reset-pin'),function(b){
       b.onclick=function(){var n=b.getAttribute('data-n');if(!confirm('Reset '+n+"'s PIN? They will create a new one next time they sign in."))return;setPin(n,'');syncPush('pin',n,'',{v:'',ts:markPinTs(n)});renderRosterPanel();};
     });
