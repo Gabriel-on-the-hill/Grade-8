@@ -606,6 +606,26 @@ footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;b
     </div>
   </div>
 
+  <div class="tcard">
+    <h3>Round at the end, not at the start</h3>
+    <p>Shortening a number before you calculate with it does not just cost a little accuracy &mdash; the operation <em>magnifies</em> whatever you dropped. Squaring magnifies it most.</p>
+    <div class="worked"><div class="wl">Worked example</div>
+      <p>Take <span class="math">3.8</span>. Round it to 4 first and square: <span class="math">4&sup2; = 16</span>. Square it properly: <span class="math">3.8&sup2; = 14.44</span>. The rounding moved the number by <span class="math">0.2</span>, but it moved the <em>answer</em> by more than <span class="math">1.5</span>.</p>
+      <p>So carry the decimals through the calculation and round only the final answer.</p>
+    </div>
+    <p><strong>This is why <span class="math">&pi;</span> is <span class="math">3.14</span>, never 3.</strong> <span class="math">&pi;</span> is a little larger than 3, and any expression that squares it turns that little into a lot. Reach for <span class="math">3.14</span> every time.</p>
+  </div>
+
+  <div class="tcard">
+    <h3>Expressions with roots: estimate each root first</h3>
+    <p>When an expression contains roots, replace <em>each root</em> with its own decimal estimate, and then carry out the operation. The <span class="math">&divide;</span>, <span class="math">&times;</span> or <span class="math">+</span> applies to the roots &mdash; not to the numbers sitting underneath them.</p>
+    <p>In particular, <span class="math">&radic;a &divide; &radic;b</span> is <strong>not</strong> <span class="math">a &divide; b</span>. Dividing what is under the signs and skipping the roots gives a different number altogether.</p>
+    <div class="worked"><div class="wl">Worked example</div>
+      <p>Estimate <span class="math">&radic;24 &divide; &radic;99</span>. Estimate each root on its own: <span class="math">&radic;24 &asymp; 4.9</span> (because <span class="math">5&sup2; = 25</span>, just above 24) and <span class="math">&radic;99 &asymp; 9.95</span> (because <span class="math">10&sup2; = 100</span>, just above 99). Now divide: <span class="math">4.9 &divide; 9.95 &asymp; 0.49</span> &mdash; about <span class="math">1/2</span>.</p>
+      <p>Dividing the numbers under the roots instead gives <span class="math">24 &divide; 99 &asymp; 0.24</span> &mdash; about <span class="math">1/4</span>. That is a completely different answer, and the wrong one.</p>
+    </div>
+  </div>
+
   <div class="qcard" data-qid="6-1">
     <div class="qhead"><span class="qtag learn">Learn</span><span class="qtitle">Which is greater?</span></div>
     <div class="qbody">
