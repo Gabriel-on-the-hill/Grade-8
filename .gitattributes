@@ -1,0 +1,21 @@
+# Normalise line endings.
+#
+# Every file this repo tracks is text (md, js, html, json, gs). Editing on
+# Windows was rewriting whole files as CRLF, so git reported all ~11,000 lines
+# of a 20-line change as modified and real edits became unreviewable.
+#
+# text=auto  — git stores text as LF in the repository, whatever the checkout did.
+# eol=lf     — and checks it back out as LF, so the working tree stops drifting.
+#
+# Binary files are detected automatically by text=auto and are left untouched.
+# There are none tracked today; this keeps it that way if one is ever added.
+
+* text=auto eol=lf
+
+# Belt and braces for the extensions actually in the tree, so intent is explicit
+# rather than inferred.
+*.html  text eol=lf
+*.md    text eol=lf
+*.js    text eol=lf
+*.json  text eol=lf
+*.gs    text eol=lf
