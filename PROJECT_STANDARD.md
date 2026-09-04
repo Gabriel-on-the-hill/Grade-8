@@ -326,12 +326,58 @@ Engine v1.2 (v1.1 + the multi-subject hub layer: flat `UNITS` replaced by `SUBJE
   **38 → 52**. jsdom disagreeing with my arithmetic is what exposed it. Suite **271 → 281**, three
   mutations checked (first-visit guard, review suppression, placement above the box).
 
+- **2026-08-26** — **The Missing Steps (`missing-steps`)** built as a targeted repair unit, stamped from
+  `Module_Template.html`. Seven sections, 37 cards, 74 steps, reusing the existing `repeat-fraction`,
+  `sci-notation`, `linear-eq`, `irrational`, `roots`, `estimate`, `inequalities` and `reasoning` skill tags
+  so it feeds the same struggle dashboard and the same spaced ladder as the units it repairs.
+  **Design rule it exists to enforce:** each section's teach card works the *failure* case, not a friendly
+  one, and the step that the student's record shows going missing is authored as its own **locked step she
+  must type before the next one opens** — the subtraction in a repeating decimal, the coefficient check in
+  scientific notation, the second sign in a bracket, evaluating a root before classifying it, and the flip.
+  Second module in the hub to use the **click-to-plot** format (5-3, 7-5) — the number-line verb of `8.AT.B.4`.
+  Verified: `node --check`, 37 unique qids all covered by `G7_SKILLS`, **73/73 gradeable steps driven to a
+  correct grade through the real engine in jsdom**, and **71 keys independently recomputed** with
+  `fractions.Fraction`. Guards: module_integrity, exam_coverage, math_formatting, store_prefix, plot_format,
+  a11y, module_smoke, behavioural suite **299 passed / 0 failed**.
+  Three pre-existing defects surfaced while verifying, and are recorded because nothing else was catching them:
+  **(a)** `tests/module_smoke.test.js` had an uncommitted edit declaring `const key` twice, so the guard had
+  been failing to parse — and therefore not running at all — since the Readiness Check shipped on 22 Aug.
+  Fixed here (the duplicate declaration removed; the hoisted one kept).
+  **(b)** With it running again, its hub parser turned out to be **order-dependent** — the regex expects
+  `id, title, desc, file, status`, so the `accent:true` key on the Readiness Check tile made that tile
+  invisible to the guard. The Missing Steps tile is therefore authored with `accent` *after* `status`.
+  **A tile with any extra key before `desc` is still invisible to this guard**; loosening the regex is a
+  separate change and was not made here.
+  **(c)** `Readiness_Check.html` fails `a11y` on four assertions — its plot is not focusable, has no
+  `role="slider"`, reports no `aria-valuenow`, and has no arrow-key handler — and fails `skill_labels`
+  (`rational-irrational` and `equations` are declared by the module but unlabelled in the hub, so the
+  dashboard prints a raw slug on one surface and a blank on the other). Both predate this build and are
+  untouched by it. It was also added to `store_prefix`'s `LEGACY_OK`, alongside the new module.
+
 ## 11. Deployment & publishing rules
 
 ### Outstanding deploys — clear a line only when it is actually pushed
 > Keep this list current. "Say it at the end of the session" (below) relies on a human remembering
 > across sessions; this does not. If you change the hub or a module, **add a line here in the same
 > commit as the change**.
+
+- [ ] **2026-08-26 — The Missing Steps (`The_Missing_Steps.html`) + its hub tile** — built and verified
+      locally; **NOT pushed.** Until it is, the live hub does not own the `missing-steps` topic, so a
+      homework plan containing it **fails validation and publishes nothing at all** (§6 fails closed —
+      one bad item kills the whole file, including the science set). Order is therefore forced:
+      **push, confirm the served hub carries `file:'The_Missing_Steps.html'` and the served module returns
+      `G7_TOPIC_ID='missing-steps'`, then publish `divine.plans.json`.**
+- [ ] **2026-08-26 — `Readiness_Check.html` first commit** — it was untracked, so it had never reached the
+      live site; the 22 Aug check was sat on paper, which is why nothing broke. Its two guard failures are
+      **fixed here, and both were bookkeeping rather than behaviour**:
+      **(a)** `skill_labels` — it declares `rational-irrational` and `equations`, which the hub did not label,
+      so the dashboard printed a raw slug on the skill line and **nothing at all** on the struggle list. Two
+      labels added to `MATH_SKILLS`. The module's own `G7_SKILL_LABELS` was already complete; only the hub half
+      was missing, which is exactly the asymmetry that guard exists to catch.
+      **(b)** `a11y` ×4 — it carried the template's eleven `.plotbox` CSS rules with **no `data-plot` item and no
+      plot engine**, so the guard was matching dead stylesheet text. The rules styled nothing and are removed.
+      *Note for whoever adds a plot item to this module later:* the engine has to come with it (§7.2 — never
+      hand-roll the plot), and this guard will then be checking something real.
 
 - [x] **2026-07-19 — `ref:"task"` homework item kind** — pushed in `b8a7bf1`; **verified live** (the served hub returns `ref must be "module", "bank" or "task"`).
 - [x] **2026-07-19 — per-student subject visibility (`STUDENT_SUBJECTS`)** — pushed in `b8a7bf1`; **verified live** (`STUDENT_SUBJECTS` present in the served hub).

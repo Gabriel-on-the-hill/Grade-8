@@ -74,6 +74,15 @@ input.field:focus{outline:none;border-color:var(--green)}
 .tcard .ico{flex:none;width:38px;height:38px;border-radius:9px;background:var(--green-soft);color:var(--green);display:grid;place-items:center}
 .tcard h3{font-size:1.02rem;margin:0}
 .tcard .desc{font-size:.85rem;color:var(--muted);margin:0}
+/* Accent tile: gold emphasis for a targeted check. Ported from Grade 7. */
+.tcard.accent{border-color:var(--gold);border-width:2px;background:linear-gradient(0deg,var(--card),var(--card))}
+.tcard.accent:before{content:'';position:absolute;inset:-1px -1px auto -1px;height:5px;
+  border-radius:13px 13px 0 0;background:var(--gold)}
+.tcard.accent .ico{background:var(--gold-soft);color:#6b5410}
+.tcard.accent h3{color:var(--green-700)}
+.tcard.accent .badge.av{background:var(--gold);color:var(--green-700);border-color:var(--gold)}
+.tcard.accent.avail:hover{border-color:var(--gold);filter:brightness(1.01)}
+.section-title.accent{color:#6b5410}
 .badge{font-size:.68rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:.16rem .5rem;border-radius:5px}
 .badge.av{background:var(--green-soft);color:var(--green)}
 .badge.so{background:#EEE;color:var(--muted)}
@@ -442,6 +451,11 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     'solutions':'One, none, or infinitely many solutions',
     'systems':'Systems of linear equations',
     'inequalities':'Linear inequalities & solution sets',
+    /* Readiness Check (readiness-check) — its own tags, deliberately coarser than the unit modules'
+       because the check is a triage instrument, not a lesson. Unlabelled here, the dashboard printed
+       a raw slug on the skill line and NOTHING on the struggle list. */
+    'rational-irrational':'Rational & irrational numbers',
+    'equations':'Solving equations',
     /* Functions (8.F / MCCRS 2025 8.AT.C-D) */
     'func-def':'What a function is (one output per input)',
     'func-rep':'Representing & comparing functions',
@@ -487,6 +501,10 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
     {id:'math', label:'Mathematics', tagline:'Grade 8 \u00b7 MCAP-aligned', icon:IC.expr,
      examLabel:'Exam-ready', examLabelLong:'Exam-readiness', skillLabels:MATH_SKILLS,
      units:[
+       {unit:'Set for you now',topics:[
+         {id:'missing-steps',title:'The Missing Steps',desc:'Five methods you already know, rebuilt around the one step in each that tends to go missing — the subtraction, the coefficient check, the second sign in a bracket, evaluating a root, and the flip.',file:'The_Missing_Steps.html',status:'available',accent:true,icon:IC.bolt},
+         {id:'readiness-check',title:'Readiness Check',desc:'Scientific notation, equations, and inequalities. One attempt each — nothing is marked until you submit.',file:'Readiness_Check.html',status:'available',icon:IC.num}
+       ]},
        {unit:'Numerical Reasoning',topics:[
          {id:'number-system',title:'The Number System',desc:'Rational vs irrational numbers, decimal expansions, square & cube roots, and approximating irrationals on a number line.',file:'The_Number_System.html',status:'available',icon:IC.num}
        ]},
@@ -1090,7 +1108,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
 
     var html='';
     subj.units.forEach(function(u){
-      html+='<div class="section-title">'+esc(u.unit)+'</div><div class="topic-grid">';
+      html+='<div class="section-title'+((u.topics&&u.topics[0]&&u.topics[0].accent)?' accent':'')+'">'+esc(u.unit)+'</div><div class="topic-grid">';
       u.topics.forEach(function(t){
         var avail=t.status==='available';
         if(avail){
@@ -1100,7 +1118,7 @@ footer{border-top:1px solid var(--line);margin-top:2.6rem;padding:1.4rem 0;color
           var chip = done ? '<span class="chip clear">Mastered</span>'
                     : (p.struggles>0 ? '<span class="chip review">'+p.struggles+' to review</span>'
                     : (p.last ? '<span class="chip clear">On track</span>' : ''));
-          html+='<div class="tcard avail" role="button" tabindex="0" data-id="'+t.id+'">'+
+          html+='<div class="tcard avail'+(t.accent?' accent':'')+'" role="button" tabindex="0" data-id="'+t.id+'">'+
             '<div class="th"><span class="ico">'+t.icon+'</span><div><h3>'+esc(t.title)+'</h3></div>'+
             '<span class="badge av" style="margin-left:auto">Available</span></div>'+
             '<p class="desc">'+esc(t.desc)+'</p>'+

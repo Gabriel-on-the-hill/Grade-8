@@ -75,12 +75,32 @@ async function check(file) {
   const done = () => Number(d.getElementById('op-done').textContent);
 
   const before = done();
+  const key = dec(inp.getAttribute('data-answer') || '');
+
+  // ---- deferred-feedback ("test") modules -------------------------------------------------------
+  if (w.__modTestMode && w.__modTestMode.on && w.__modTestMode.on()) {
+    inp.value = key;
+    btn.click();
+    ok(done() === before && !step.classList.contains('completed'),
+       qid + ': no verdict before Submit (the Check button is inert)');
+    ok(fb.textContent.trim() === '',
+       qid + ': no feedback text is painted before Submit');
+
+    w.confirm = () => true;
+    w.__modTestMode.submit();
+
+    ok(done() > before, qid + ': Submit grades the correct answer ("' + key + '") through the engine');
+    ok(inp.disabled === true, qid + ': one attempt — inputs are disabled after Submit');
+    ok(w.__modTestMode.on() === false, qid + ': test mode ends at Submit (results are revealed)');
+    return out;
+  }
+
+  // ---- ordinary modules -------------------------------------------------------------------------
   inp.value = '__nonsense__999';
   btn.click();
   ok(fb.textContent.trim().length > 0 || fb.className !== '', qid + ': a wrong answer produces feedback');
   ok(done() === before, qid + ': a wrong answer does not advance progress');
 
-  const key = dec(inp.getAttribute('data-answer') || '');
   inp.value = key;
   btn.click();
   ok(done() > before, qid + ': the correct answer ("' + key + '") advances progress');

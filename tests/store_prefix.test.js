@@ -42,6 +42,8 @@ const LEGACY_OK = {
    * passing through the hub therefore needs to be able to repair itself. */
   'The_Number_System.html': 'g7.',
   'Expressions_and_Equations.html': 'g7.',
+  'Readiness_Check.html': 'g7.',      // stamped 22 Aug 2026, same self-repair read as its siblings
+  'The_Missing_Steps.html': 'g7.',    // stamped 26 Aug 2026, same self-repair read as its siblings
   'Matter_and_Its_Interactions.html': 'g7.',
   'Functions.html': 'g7.',
 };

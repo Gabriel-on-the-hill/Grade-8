@@ -1,0 +1,1606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Missing Steps — Grade 8 Hub</title>
+<style>
+:root{
+  --pitch-green:#14532D; --gold:#FAC415; --navy:#0F172A; --bg:#F5F4EE; --card:#FFFFFF; --muted:#64748B;
+  --green-light:#E7F0EA; --gold-light:#FEF3C7; --border:#E5E7EB; --teach-bg:#F0F7F3; --teach-accent:#0F3D22;
+  --ok:#15803D; --ok-bg:#DCFCE7; --bad:#DC2626; --bad-bg:#FEE2E2; --blue:#1D4ED8; --orange:#B45309; --purple:#6D28D9;
+}
+.math{font-family:"Cambria Math","Times New Roman",Georgia,serif;font-style:italic;white-space:nowrap}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--navy);line-height:1.55}
+header.mod{background:var(--pitch-green);color:#fff;padding:1.3rem 1.5rem;border-bottom:5px solid var(--gold)}
+header.mod h1{margin:0 0 .2rem;font-size:1.5rem;font-weight:600;letter-spacing:-.01em}
+header.mod p{margin:0;opacity:.85;font-size:.92rem}
+#g7bar{background:#fff;border-bottom:1px solid var(--border);padding:.5rem 1rem;font-size:.86rem;color:var(--muted);display:flex;align-items:center;gap:.6rem}
+#g7bar a{color:var(--pitch-green);text-decoration:none;font-weight:600}
+nav.topics{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--border);padding:.55rem 1rem;z-index:50;box-shadow:0 1px 3px rgba(0,0,0,.04);overflow-x:auto;white-space:nowrap}
+nav.topics a{display:inline-block;padding:.35rem .8rem;margin-right:.3rem;color:var(--pitch-green);text-decoration:none;border-radius:6px;font-weight:500;font-size:.86rem;border:1px solid transparent}
+nav.topics a:hover{background:var(--green-light)} nav.topics a.active{background:var(--pitch-green);color:#fff}
+main{max-width:1000px;margin:0 auto;padding:1.3rem 1rem 4rem}
+section.topic{margin-top:2.2rem;scroll-margin-top:80px}
+section.topic > h2{color:var(--pitch-green);font-size:1.45rem;margin:0 0 .3rem;padding-bottom:.35rem;border-bottom:3px solid var(--gold);display:inline-block;padding-right:1rem}
+section.topic > p.intro{margin:.4rem 0 .5rem;color:var(--muted);font-size:.95rem}
+.objective{margin:.1rem 0 1.1rem;font-size:.88rem;color:var(--teach-accent);background:var(--teach-bg);border-left:3px solid var(--pitch-green);padding:.45rem .7rem;border-radius:5px}
+.tcard{background:var(--teach-bg);border:1px solid #C5D8CB;border-left:5px solid var(--pitch-green);border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem}
+.tcard h3{margin:0 0 .55rem;color:var(--teach-accent);font-size:1.04rem}
+.tcard p{margin:.45rem 0} .tcard ul,.tcard ol{margin:.4rem 0;padding-left:1.4rem}
+.worked{background:#fff;border:1px dashed #B7CBBE;border-radius:8px;padding:.6rem .8rem;margin:.5rem 0;font-size:.9rem}
+.worked .wl{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--pitch-green)}
+.qcard{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem;border-left:5px solid var(--gold);box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.qhead{display:flex;align-items:center;flex-wrap:wrap;gap:.5rem;margin-bottom:.55rem}
+.qtag{color:#fff;font-size:.7rem;font-weight:600;padding:.18rem .55rem;border-radius:4px;letter-spacing:.02em;background:var(--pitch-green)}
+.qtag.learn{background:#14532D}.qtag.guided{background:#0F766E}.qtag.practice{background:#1D4ED8}.qtag.apply{background:#15803D}.qtag.exam{background:#B45309}.qtag.stretch{background:#6D28D9}
+.qtitle{font-weight:600;color:var(--pitch-green);font-size:1rem;margin-left:auto}
+.qbody{font-size:.95rem} .qbody p{margin:.45rem 0}
+.step{margin:.65rem 0;padding:.65rem .85rem;background:#FBFBF7;border:1px solid #E8E4D2;border-radius:6px;transition:.3s}
+.step.locked{opacity:.35;pointer-events:none;background:#F5F4EE}
+.step.completed{background:#F0FAF3;border-color:#A7D8B6}
+.step .step-label{font-size:.76rem;font-weight:600;color:var(--pitch-green);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.25rem}
+.step p{margin:.3rem 0}
+.input-row{display:inline-flex;align-items:center;gap:.4rem;margin:.2rem .8rem .2rem 0}
+.input-row .lbl{font-size:.92rem}
+.ans-input{border:2px solid var(--border);padding:.3rem .5rem;border-radius:5px;font-size:.92rem;width:96px;font-family:inherit;background:#fff;transition:.2s}
+.ans-input.wide{width:170px}
+.ans-input:focus{outline:none;border-color:var(--pitch-green)}
+.ans-input.correct{border-color:var(--ok);background:var(--ok-bg)} .ans-input.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.feedback{display:inline-block;font-size:.95rem;font-weight:700;min-width:16px}
+.feedback.correct{color:var(--ok)} .feedback.wrong{color:var(--bad)}
+.check-btn{background:var(--pitch-green);color:#fff;border:none;padding:.38rem .85rem;border-radius:6px;cursor:pointer;font-size:.84rem;font-weight:500;margin-top:.5rem;font-family:inherit;transition:.15s}
+.check-btn:hover{background:#0F3D22} .check-btn.done{background:var(--ok)} .check-btn.done::before{content:'\2713 '}
+.hint-btn{background:transparent;color:var(--muted);border:1px solid var(--border);padding:.28rem .7rem;border-radius:6px;cursor:pointer;font-size:.78rem;margin-left:.4rem;font-family:inherit}
+.hint-btn:hover{color:var(--pitch-green);border-color:var(--pitch-green)}
+.hint-content{display:none;font-size:.85rem;color:var(--muted);font-style:italic;margin-top:.4rem;padding:.4rem .6rem;background:#fff;border-left:3px solid #94A3B8;border-radius:3px}
+.hint-content.show{display:block}
+.mc-group{display:flex;flex-wrap:wrap;gap:.45rem;margin:.4rem 0}
+.mc-option{background:#fff;border:2px solid var(--border);padding:.45rem .9rem;border-radius:6px;cursor:pointer;font-size:.88rem;font-family:inherit;transition:.2s;text-align:left}
+.mc-option:hover{border-color:var(--pitch-green);background:var(--green-light)}
+.mc-option.correct{background:var(--ok-bg);border-color:var(--ok);color:var(--ok);font-weight:600}
+.mc-option.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad);font-weight:600}
+.mc-option.disabled{pointer-events:none;opacity:.55} .mc-option.disabled.correct,.mc-option.disabled.wrong{opacity:1}
+.mc-feedback{margin-top:.4rem;font-size:.86rem;font-weight:500;min-height:1.1em}
+.mc-feedback.correct{color:var(--ok)} .mc-feedback.wrong{color:var(--bad)}
+.ms-group{display:flex;flex-direction:column;gap:.4rem;margin:.4rem 0}
+.ms-option{display:flex;align-items:center;gap:.55rem;background:#fff;border:2px solid var(--border);padding:.45rem .8rem;border-radius:7px;cursor:pointer;font-size:.9rem;font-family:inherit;text-align:left}
+.ms-option .box{width:18px;height:18px;border:2px solid #9aa5b1;border-radius:4px;flex:none;display:grid;place-items:center;font-size:.78rem;color:#fff;font-weight:700}
+.ms-option.sel{border-color:var(--pitch-green);background:var(--green-light)}
+.ms-option.sel .box{background:var(--pitch-green);border-color:var(--pitch-green)} .ms-option.sel .box::after{content:'\2713'}
+.ms-option.correct{border-color:var(--ok);background:var(--ok-bg)} .ms-option.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.ms-option.disabled{pointer-events:none;opacity:.8}
+.cr-area{width:100%;min-height:84px;border:2px solid var(--border);border-radius:8px;padding:.55rem;font:inherit;font-size:.92rem;resize:vertical;background:#fff}
+.cr-area:focus{outline:none;border-color:var(--pitch-green)}
+.cr-saved{color:var(--ok);font-size:.84rem;font-weight:600;margin-top:.3rem}
+table.gtable{border-collapse:collapse;margin:.65rem 0;font-size:.88rem}
+table.gtable th,table.gtable td{border:1px solid #B5C5BB;padding:.35rem .65rem;text-align:center}
+table.gtable th{background:var(--pitch-green);color:#fff;font-weight:600} table.gtable td.label{background:var(--green-light);font-weight:600;text-align:left}
+.keyfact{background:var(--gold-light);border-left:4px solid var(--gold);padding:.5rem .8rem;margin:.55rem 0;border-radius:4px;font-size:.92rem}
+.keyfact strong{color:#7C5E11}
+.guide{background:#Eef4ff;border:1px solid #C7D7F5;border-left:5px solid var(--blue);border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem;font-size:.9rem}
+.guide h3{margin:0 0 .5rem;color:var(--blue);font-size:1rem}
+.guide code{background:#fff;border:1px solid #d6e0f5;border-radius:4px;padding:.05rem .3rem;font-size:.85rem}
+.overall-progress{background:#fff;border:1px solid var(--border);border-radius:10px;padding:.85rem 1rem;margin-bottom:1.2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.7rem}
+.op-counts{display:flex;gap:1rem;flex-wrap:wrap} .op-stat{text-align:center}
+.op-stat .num{font-size:1.45rem;font-weight:700;line-height:1} .op-stat .lbl{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.op-stat.done .num{color:var(--ok)} .op-stat.total .num{color:var(--navy)} .op-stat.pct .num{color:var(--pitch-green)}
+.btn-export{background:var(--pitch-green);color:#fff;border:none;padding:.4rem .85rem;border-radius:6px;cursor:pointer;font-size:.83rem;font-weight:500;font-family:inherit}
+.btn-reset-all{background:#fff;color:var(--muted);border:1px solid var(--border);padding:.4rem .85rem;border-radius:6px;cursor:pointer;font-size:.83rem;font-family:inherit}
+.challenge{background:#F3EEFB;border:1px solid #D6C9F0;border-left:5px solid var(--purple);border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem}
+.challenge h3{margin:0 0 .5rem;color:var(--purple);font-size:1.04rem}
+.legend{font-size:.86rem;color:var(--muted);margin:.5rem 0 1rem} .legend strong{color:var(--pitch-green)}
+footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.85rem;border-top:1px solid var(--border);margin-top:3rem}
+@media(max-width:640px){main{padding:1rem .75rem 3rem}.qcard,.tcard,.challenge,.guide{padding:.85rem}.qtitle{margin-left:0;width:100%;font-size:.93rem}header.mod h1{font-size:1.25rem}}
+
+    /* ===== plot input (6th format): click-to-place on a number line or grid ===== */
+    .grew-note{background:var(--gold-light);border:1px solid var(--gold);border-left:4px solid var(--gold);border-radius:8px;padding:.6rem .8rem;margin:0 0 .7rem;font-size:.9rem;color:var(--navy)}
+    .plotbox{margin:.45rem 0 .2rem}
+    .plotbox svg{max-width:100%;height:auto;touch-action:manipulation}
+    .plotbox .hit{cursor:pointer;fill:transparent}
+    .plotbox.locked .hit{cursor:not-allowed}
+    .plotbox .pt{fill:#FAC415;stroke:#0F3D22;stroke-width:2}
+    .plotbox .gridline{stroke:#D9E4DC;stroke-width:1}
+    .plotbox .axis{stroke:#0F3D22;stroke-width:1.8}
+    .plotbox .tick{stroke:#0F3D22;stroke-width:1.4}
+    .plotbox .tlab{font-size:11px;fill:#0F172A}
+    .plotbox .hint-dot{fill:#B7CBBE}
+    .plotbox .readout{font-size:.82rem;color:var(--muted);margin-top:.2rem}
+  </style>
+<style>
+/* v1.4 engine deltas: gate MC feedback until answered + MC cooldown + locked-step dimming */
+.mc-feedback{display:none;margin-top:.4rem;font-size:.86rem;font-weight:500;min-height:0}
+.mc-feedback.correct,.mc-feedback.wrong{display:block}
+.mc-feedback.correct{color:var(--ok)} .mc-feedback.wrong{color:var(--bad)}
+.mc-option.cooldown{pointer-events:none;opacity:.7}
+.step.locked .ans-input,.step.locked button,.step.locked .mc-option,.step.locked .ms-option{opacity:.5}
+/* v1.4.2 anti-cheat: question text not selectable/copyable (typing areas stay editable) */
+.qcard{-webkit-user-select:none;-moz-user-select:none;user-select:none}
+.qcard input,.qcard textarea{-webkit-user-select:text;-moz-user-select:text;user-select:text}
+/* v1.4.3 section report card (student-facing per-section progress) */
+.sec-report{background:#fff;border:1px solid var(--border);border-radius:10px;padding:.85rem 1rem;margin-bottom:1.2rem}
+.sec-report h3{margin:0 0 .5rem;font-size:.95rem;color:var(--pitch-green)}
+.sec-row{display:flex;align-items:center;gap:.6rem;margin:.3rem 0;font-size:.85rem}
+.sec-row a{flex:none;width:220px;max-width:44%;color:var(--navy);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sec-row a:hover{color:var(--pitch-green)}
+.sec-row .bar{flex:1;height:7px;background:#EDEBE2;border-radius:99px;overflow:hidden}
+.sec-row .bar>span{display:block;height:100%;background:var(--gold);border-radius:99px}
+.sec-row.full .bar>span{background:var(--ok)}
+.sec-row .val{flex:none;width:96px;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+/* MR-1 phase-3: retrieval-practice review mode (?review=<skill>) — the due skill's own
+   authored items, cleared for a fresh attempt. Everything else is hidden so the session is
+   a retrieval, not a re-read; nothing is removed from the DOM, so the step totals stay honest. */
+.g7-review-mode section.topic,.g7-review-mode .overall-progress,.g7-review-mode #sec-report,.g7-review-mode .toc{display:none}
+.rev-panel{background:#fff;border:1px solid var(--border);border-left:4px solid var(--gold);border-radius:10px;padding:1rem 1.1rem;margin-bottom:1.2rem}
+.rev-panel h2{margin:0 0 .35rem;font-size:1.15rem;color:var(--pitch-green)}
+.rev-sub{margin:0 0 1rem;font-size:.88rem;color:var(--muted);line-height:1.5}
+.rev-done{margin-top:1rem;display:flex;gap:.6rem;flex-wrap:wrap}
+.rev-done .btn{display:inline-block;background:var(--pitch-green);color:#fff;border:none;border-radius:8px;padding:.55rem 1rem;font-size:.88rem;font-weight:600;text-decoration:none;cursor:pointer}
+.rev-done .btn.ghost{background:transparent;color:var(--navy);border:1px solid var(--border)}
+</style>
+</head>
+<body>
+
+
+<header class="mod">
+  <h1>The Missing Steps</h1>
+  <p>Grade 8 Mathematics &middot; 8.NS &amp; 8.EE &middot; repeating decimals, scientific notation, brackets, roots, inequalities</p>
+</header>
+
+<div id="g7bar">
+  <a href="Grade_8_Math_Hub.html">&#8592; Back to Hub</a>
+  <span style="margin-left:auto">Student: <strong id="g7name" style="color:var(--pitch-green)">Guest</strong></span>
+</div>
+
+<nav class="topics" id="topnav">
+  <a href="#repeat" class="navlink">1 · Repeating decimals</a>
+  <a href="#scinot" class="navlink">2 · Scientific notation</a>
+  <a href="#brackets" class="navlink">3 · Brackets</a>
+  <a href="#classify" class="navlink">4 · Evaluate then classify</a>
+  <a href="#inequal" class="navlink">5 · Inequalities</a>
+  <a href="#reason" class="navlink">6 · Say why</a>
+  <a href="#check" class="navlink">7 · Module Check</a>
+</nav>
+
+<main>
+  <p class="legend"><strong>How to use:</strong> work top to bottom. Type answers and press <em>Check</em> or Enter. Green = correct, red = retry. Steps unlock as you go. Progress saves automatically.</p>
+
+  <div class="overall-progress">
+    <div class="op-counts">
+      <div class="op-stat done"><div class="num" id="op-done">0</div><div class="lbl">Steps done</div></div>
+      <div class="op-stat total"><div class="num" id="op-total">0</div><div class="lbl">Total</div></div>
+      <div class="op-stat pct"><div class="num" id="op-pct">0%</div><div class="lbl">Mastery</div></div>
+    </div>
+    <div style="display:flex;gap:.5rem">
+      <button class="btn-export" id="btn-export">Export progress</button>
+      <button class="btn-reset-all" id="btn-reset-all">Reset all</button>
+    </div>
+  </div>
+
+  <p class="legend"><strong>What this module is:</strong> five methods you already know, rebuilt around the one step in each that tends to go missing. Every section makes that step something you have to write down before the next one opens. Work top to bottom; progress saves automatically.</p>
+
+  <section class="topic" id="repeat">
+  <h2>1 &middot; Repeating decimals &mdash; the step that <em>is</em> the method</h2>
+  <p class="intro">One skill, taught before, and it broke in the same place twice. This section rebuilds it around the step that was missing.</p>
+  <p class="objective"><strong>By the end:</strong> you can convert a repeating decimal to a fraction and say why the subtraction is what does the work.</p>
+
+<div class="tcard">
+  <h3>The subtract step is the method</h3>
+  <p>Multiplying a repeating decimal by a power of ten does one job only: it lines the repeating tails up so they can cancel. It never removes the repeat by itself. The <strong>subtraction</strong> is what removes it, and without that step nothing has been converted.</p>
+  <div class="worked"><div class="wl">Worked example</div>
+  <p>Convert <span class="math">0.777&hellip;</span> to a fraction.</p>
+  <p>Let <span class="math">x = 0.777&hellip;</span>, so <span class="math">10x = 7.777&hellip;</span>.</p>
+  <p><em>Stop and look:</em> <span class="math">7.777&hellip;</span> is still repeating. Multiplying has changed nothing about the tail.</p>
+  <p>Now subtract the two lines. The tails are identical, so they cancel exactly:<br><span class="math">10x &minus; x = 7.777&hellip; &minus; 0.777&hellip;</span> &rarr; <span class="math">9x = 7</span>.</p>
+  <p><span class="math">x = 7/9</span>.</p>
+  </div>
+  <div class="keyfact"><strong>The test:</strong> if your answer still has a power of ten underneath it &mdash; 100, 1000 &mdash; you multiplied and stopped. A converted repeating decimal lands over 9, 99 or 999 (or a factor of them), never over 10, 100 or 1000.</div>
+</div>
+
+<div class="qcard" data-qid="1-1">
+  <div class="qhead"><span class="qtag learn">Learn</span><span class="qtitle">What has multiplying actually done?</span></div>
+  <div class="qbody">
+    <div class="step"><div class="step-label">You write <span class="math">x = 0.777&hellip;</span> and then <span class="math">10x = 7.777&hellip;</span>. Which statement is true?</div>
+      <div class="mc-group"><button class="mc-option" data-k="k1:NTAxfDE="><span class="math">7.777&hellip;</span> is still repeating &mdash; the tail has not gone anywhere</button><button class="mc-option" data-k="k1:NTAyfDA="><span class="math">7.777&hellip;</span> is now a whole number</button><button class="mc-option" data-k="k1:NTAzfDA=">Multiplying by 10 always produces a whole number</button><button class="mc-option" data-k="k1:NTA0fDA="><span class="math">7.777&hellip;</span> can be written exactly as <span class="math">777/100</span></button></div>
+      <div class="mc-feedback">Multiplying moved the decimal point. The repeating tail is still there, unchanged. That is exactly why a second line is needed and why the two lines are then subtracted.</div></div>
+
+  </div>
+</div>
+
+<div class="qcard" data-qid="1-2">
+  <div class="qhead"><span class="qtag guided">Guided</span><span class="qtitle">Do the subtraction, one line at a time</span></div>
+  <div class="qbody">
+    <div class="step"><div class="step-label">Step 1 &middot; Subtracting <span class="math">10x &minus; x</span> leaves how many <span class="math">x</span>?</div>
+      <div class="input-row"><span class="lbl">x&#39;s =</span><input type="number" step="any" class="ans-input" data-answer="k1:OQ==" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">Count the x&#39;s on the left-hand side of each line, not the digits on the right.</div></div>
+    <div class="step locked"><div class="step-label">Step 2 &middot; And on the right, <span class="math">7.777&hellip; &minus; 0.777&hellip;</span> =</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:Nw==" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">The two tails are identical, so every digit after the point cancels. Only the whole-number part survives.</div></div>
+    <div class="step locked"><div class="step-label">Step 3 &middot; <strong>Final answer</strong> &middot; <span class="math">x</span> =</div>
+      <div class="input-row"><input type="text" class="ans-input" data-type="text" data-answer="k1:Ny85" placeholder="e.g. 3/4"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">You now have a number of x&#39;s on one side and a plain number on the other. Divide.</div></div>
+
+  </div>
+</div>
+
+<div class="qcard" data-qid="1-3">
+  <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Two repeating digits</span></div>
+  <div class="qbody">
+    <div class="step"><div class="step-label">Step 1 &middot; <span class="math">0.2727&hellip;</span> &mdash; which power of ten lines the tails up? Type 10, 100 or 1000.</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:MTAw" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">Count how many digits are in the block that repeats, then use that many zeros.</div></div>
+    <div class="step locked"><div class="step-label">Step 2 &middot; Subtracting leaves how many <span class="math">x</span>?</div>
+      <div class="input-row"><span class="lbl">x&#39;s =</span><input type="number" step="any" class="ans-input" data-answer="k1:OTk=" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">Your multiplier minus one x.</div></div>
+    <div class="step locked"><div class="step-label">Step 3 &middot; <strong>Final answer</strong> &middot; <span class="math">x</span> = (lowest terms)</div>
+      <div class="input-row"><input type="text" class="ans-input" data-type="text" data-answer="k1:My8xMQ==" placeholder="e.g. 3/4"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">Divide, then look for a common factor in the top and bottom.</div></div>
+
+  </div>
+</div>
+
+<div class="qcard" data-qid="1-4">
+  <div class="qhead"><span class="qtag apply">Apply</span><span class="qtitle">When one digit settles before the repeat starts</span></div>
+  <div class="qbody">
+    <p class="muted-note" style="font-size:.82rem"><span class="math">0.8666&hellip;</span> &mdash; only the 6 repeats. Two multipliers are needed: one to get past the 8, one to line the tails up.</p>
+    <div class="step"><div class="step-label">Step 1 &middot; <span class="math">100x &minus; 10x</span> leaves how many <span class="math">x</span>?</div>
+      <div class="input-row"><span class="lbl">x&#39;s =</span><input type="number" step="any" class="ans-input" data-answer="k1:OTA=" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">Subtract the smaller multiplier from the larger one.</div></div>
+    <div class="step locked"><div class="step-label">Step 2 &middot; And on the right, <span class="math">86.66&hellip; &minus; 8.66&hellip;</span> =</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:Nzg=" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">The tails cancel. Subtract what is left.</div></div>
+    <div class="step locked"><div class="step-label">Step 3 &middot; <strong>Final answer</strong> &middot; <span class="math">x</span> = (lowest terms)</div>
+      <div class="input-row"><input type="text" class="ans-input" data-type="text" data-answer="k1:MTMvMTU=" placeholder="e.g. 3/4"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">Divide first, then cancel. Both numbers share a factor of six.</div></div>
+
+  </div>
+</div>
+
+<div class="qcard" data-qid="1-5" data-exam="1">
+  <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">Convert and simplify</span></div>
+  <div class="qbody">
+    <div class="step"><div class="step-label">Write <span class="math">0.4545&hellip;</span> as a fraction in lowest terms.</div>
+      <div class="input-row"><input type="text" class="ans-input" data-type="text" data-answer="k1:NS8xMQ==" placeholder="e.g. 3/4"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+</div>
+
+  </div>
+</div>
+
+  </section>
+
+  <section class="topic" id="scinot">
+  <h2>2 &middot; Scientific notation &mdash; check the coefficient first</h2>
+  <p class="intro">The single weakest skill in the record, and the misses share one shape: the operation is done correctly and the coefficient is left out of range.</p>
+  <p class="objective"><strong>By the end:</strong> you finish every scientific-notation answer by checking the coefficient, in both directions.</p>
+
+<div class="tcard">
+  <h3>Look at the coefficient before you look at anything else</h3>
+  <p>In <span class="math">a &times; 10<sup>n</sup></span> the coefficient <span class="math">a</span> must satisfy <span class="math">1 &le; a &lt; 10</span>. Every operation can push it outside that range, in either direction, and the answer is not finished until you have put it back.</p>
+  <div class="worked"><div class="wl">Worked example</div>
+  <p><strong>Too big.</strong> <span class="math">(6.8 &times; 10<sup>6</sup>) + (3.4 &times; 10<sup>6</sup>)</span>. The coefficients add: <span class="math">6.8 + 3.4 = 10.2</span>, giving <span class="math">10.2 &times; 10<sup>6</sup></span>.</p>
+  <p>Stop &mdash; <span class="math">10.2</span> is not below 10. Move the point one place <em>left</em> and the exponent one <em>up</em>: <span class="math">1.02 &times; 10<sup>7</sup></span>.</p>
+  <p><strong>Too small.</strong> <span class="math">0.8 &times; 10<sup>7</sup></span>. Now the coefficient is below 1. Move the point one place <em>right</em> and the exponent one <em>down</em>: <span class="math">8 &times; 10<sup>6</sup></span>.</p>
+  </div>
+  <div class="keyfact"><strong>The habit:</strong> the coefficient is the first thing you check, not the last. If an answer in scientific notation is marked wrong, look there before you touch the exponent &mdash; that is where it nearly always is.</div>
+</div>
+
+<div class="qcard" data-qid="2-1">
+  <div class="qhead"><span class="qtag learn">Learn</span><span class="qtitle">Which of these are properly written?</span></div>
+  <div class="qbody">
+    <div class="step"><div class="step-label">Select every number that is written in proper scientific notation.</div>
+      <div class="ms-group"><button class="ms-option" data-k="k1:NTA1fDE="><span class="box"></span><span class="math">3.5 &times; 10<sup>4</sup></span></button><button class="ms-option" data-k="k1:NTA2fDA="><span class="box"></span><span class="math">12.7 &times; 10<sup>3</sup></span></button><button class="ms-option" data-k="k1:NTA3fDA="><span class="box"></span><span class="math">0.45 &times; 10<sup>6</sup></span></button><button class="ms-option" data-k="k1:NTA4fDE="><span class="box"></span><span class="math">9.99 &times; 10<sup>&minus;2</sup></span></button></div>
+      <button class="check-btn ms-check">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">Test each coefficient against the rule: at least one, below ten. The exponent is irrelevant here.</div></div>
+
+  </div>
+</div>
+
+<div class="qcard" data-qid="2-2">
+  <div class="qhead"><span class="qtag guided">Guided</span><span class="qtitle">An answer that is right, one step early</span></div>
+  <div class="qbody">
+    <div class="step"><div class="step-label">Step 1 &middot; A calculation ends at <span class="math">14.2 &times; 10<sup>5</sup></span>. Is <span class="math">14.2</span> a proper coefficient? Type yes or no.</div>
+      <div class="input-row"><input type="text" class="ans-input" data-type="text" data-answer="k1:bm8=" placeholder="yes / no"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">Compare it with the rule in the teach card.</div></div>
+    <div class="step locked"><div class="step-label">Step 2 &middot; Rewrite it properly. <span class="math">coefficient</span> =</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:MS40Mg==" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">Move the decimal point one place. Which direction makes the number smaller?</div></div>
+    <div class="step locked"><div class="step-label">Step 3 &middot; <strong>Final answer</strong> &middot; <span class="math">exponent</span> =</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:Ng==" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">Making the coefficient smaller has to be paid for by making the power of ten larger.</div></div>
+
+  </div>
+</div>
+
+<div class="qcard" data-qid="2-3">
+  <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Adding two numbers in scientific notation</span></div>
+  <div class="qbody">
+    <div class="step"><div class="step-label">Step 1 &middot; <span class="math">(6.4 &times; 10<sup>5</sup>) + (7.8 &times; 10<sup>5</sup>)</span>. The powers already match, so add the coefficients:</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:MTQuMg==" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">Add the two coefficients as ordinary decimals. Leave the power of ten alone for now.</div></div>
+    <div class="step locked"><div class="step-label">Step 2 &middot; Coefficient check. Write it properly &mdash; <span class="math">coefficient</span> =</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:MS40Mg==" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">Your result is above ten, so the point moves left.</div></div>
+    <div class="step locked"><div class="step-label">Step 3 &middot; <strong>Final answer</strong> &middot; <span class="math">exponent</span> =</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:Ng==" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">One place left on the coefficient buys one on the exponent.</div></div>
+
+  </div>
+</div>
+
+<div class="qcard" data-qid="2-4">
+  <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">The other direction</span></div>
+  <div class="qbody">
+    <div class="step"><div class="step-label">Step 1 &middot; A division ends at <span class="math">0.64 &times; 10<sup>9</sup></span>. Is <span class="math">0.64</span> between 1 and 10? Type yes or no.</div>
+      <div class="input-row"><input type="text" class="ans-input" data-type="text" data-answer="k1:bm8=" placeholder="yes / no"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">It fails the rule at the bottom end, not the top.</div></div>
+    <div class="step locked"><div class="step-label">Step 2 &middot; <span class="math">coefficient</span> =</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:Ni40" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">This time the point moves the other way, to make the number bigger.</div></div>
+    <div class="step locked"><div class="step-label">Step 3 &middot; <strong>Final answer</strong> &middot; <span class="math">exponent</span> =</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:OA==" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">A bigger coefficient has to be paid for by a smaller power of ten.</div></div>
+
+  </div>
+</div>
+
+<div class="qcard" data-qid="2-5">
+  <div class="qhead"><span class="qtag apply">Apply</span><span class="qtitle">Dividing, with negative exponents</span></div>
+  <div class="qbody">
+    <p class="muted-note" style="font-size:.82rem"><span class="math">(3.6 &times; 10<sup>&minus;8</sup>) &divide; (4.5 &times; 10<sup>&minus;15</sup>)</span> &mdash; do the coefficient and the power of ten separately.</p>
+    <div class="step"><div class="step-label">Step 1 &middot; Coefficients: <span class="math">3.6 &divide; 4.5</span> =</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:MC44" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">Both are less than ten. The answer is less than one &mdash; that is allowed at this stage.</div></div>
+    <div class="step locked"><div class="step-label">Step 2 &middot; Exponents: <span class="math">&minus;8 &minus; (&minus;15)</span> =</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:Nw==" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">Subtracting a negative moves you up the number line. You have done this correctly before.</div></div>
+    <div class="step locked"><div class="step-label">Step 3 &middot; Coefficient check &mdash; <span class="math">coefficient</span> =</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:OA==" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">Your coefficient is below one, so it must get bigger.</div></div>
+    <div class="step locked"><div class="step-label">Step 4 &middot; <strong>Final answer</strong> &middot; <span class="math">exponent</span> =</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:Ng==" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">Pay for the change in the coefficient by moving the exponent the other way.</div></div>
+
+  </div>
+</div>
+
+<div class="qcard" data-qid="2-6" data-exam="1">
+  <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">Write it in scientific notation</span></div>
+  <div class="qbody">
+    <div class="step"><div class="step-label">Part A &middot; <span class="math">0.00062</span>. <span class="math">coefficient</span> =</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:Ni4y" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+</div>
+    <div class="step locked"><div class="step-label">Part B &middot; <span class="math">exponent</span> =</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:LTQ=" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+</div>
+
+  </div>
+</div>
+
+  </section>
+
+  <section class="topic" id="brackets">
+  <h2>3 &middot; The minus in front of a bracket</h2>
+  <p class="intro">A settled procedure, repeated identically across four attempts &mdash; which makes it mechanical, and mechanical faults are the cheapest kind to fix.</p>
+  <p class="objective"><strong>By the end:</strong> you expand a bracket with a negative in front of it correctly, and you can check it yourself in five seconds.</p>
+
+<div class="tcard">
+  <h3>A minus in front of a bracket belongs to <em>everything</em> inside it</h3>
+  <p>When you expand <span class="math">&minus;3(x + 2)</span>, the <span class="math">&minus;3</span> multiplies both terms, not just the first. Getting the second sign wrong is the most common way a correct method still produces a wrong answer.</p>
+  <div class="worked"><div class="wl">Worked example</div>
+  <p><span class="math">&minus;3(x + 2)</span> &rarr; <span class="math">&minus;3 &middot; x = &minus;3x</span> and <span class="math">&minus;3 &middot; 2 = &minus;6</span>, so the expansion is <span class="math">&minus;3x &minus; 6</span>.</p>
+  <p><strong>The five-second check.</strong> Put <span class="math">x = 0</span> into both the original and your expansion.<br>Original: <span class="math">&minus;3(0 + 2) = &minus;6</span>. &nbsp; Expansion: <span class="math">&minus;3(0) &minus; 6 = &minus;6</span>. They agree, so the expansion is safe.</p>
+  <p>Try the wrong version the same way: <span class="math">&minus;3x + 6</span> gives <span class="math">+6</span> at <span class="math">x = 0</span>. That disagrees with <span class="math">&minus;6</span>, so it cannot be right &mdash; and you knew before you solved anything.</p>
+  </div>
+  <div class="keyfact"><strong>The habit:</strong> expand each bracket on its own line before you collect anything, and if a minus sits in front of one, substitute <span class="math">x = 0</span> into both versions. It costs five seconds and it catches the fault every time.</div>
+</div>
+
+<div class="qcard" data-qid="3-1">
+  <div class="qhead"><span class="qtag learn">Learn</span><span class="qtitle">Which expansion is right?</span></div>
+  <div class="qbody">
+    <div class="step"><div class="step-label"><span class="math">&minus;3(x + 2)</span> expands to&hellip;</div>
+      <div class="mc-group"><button class="mc-option" data-k="k1:NTA5fDE="><span class="math">&minus;3x &minus; 6</span></button><button class="mc-option" data-k="k1:NTEwfDA="><span class="math">&minus;3x + 6</span></button><button class="mc-option" data-k="k1:NTExfDA="><span class="math">3x + 6</span></button><button class="mc-option" data-k="k1:NTEyfDA="><span class="math">&minus;3x + 2</span></button></div>
+      <div class="mc-feedback">The <span class="math">&minus;3</span> multiplies both terms: <span class="math">&minus;3 &middot; x</span> and <span class="math">&minus;3 &middot; 2</span>. Substituting <span class="math">x = 0</span> settles it &mdash; the original gives <span class="math">&minus;6</span>, and only one of these options does.</div></div>
+
+  </div>
+</div>
+
+<div class="qcard" data-qid="3-2">
+  <div class="qhead"><span class="qtag guided">Guided</span><span class="qtitle">Expand each bracket on its own line</span></div>
+  <div class="qbody">
+    <p class="muted-note" style="font-size:.82rem">Solve <span class="math">4(x &minus; 5) &minus; 3(x + 2) = 7</span>.</p>
+    <div class="step"><div class="step-label">Step 1 &middot; Expand <span class="math">4(x &minus; 5)</span>. Its constant term is&hellip;</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:LTIw" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">Multiply the outside number by the second term inside. Keep the sign that comes with it.</div></div>
+    <div class="step locked"><div class="step-label">Step 2 &middot; Expand <span class="math">&minus;3(x + 2)</span>. Its constant term is&hellip;</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:LTY=" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">The number in front is negative and the term inside is positive. What sign does the product carry?</div></div>
+    <div class="step locked"><div class="step-label">Step 3 &middot; Collect the two constants you just found:</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:LTI2" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">Add them. Both are on the same side of zero, so the total moves further from it.</div></div>
+    <div class="step locked"><div class="step-label">Step 4 &middot; The x terms give <span class="math">1x</span>. <strong>Final answer</strong> &middot; <span class="math">x</span> =</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:MzM=" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">You now have one x, a constant, and a number on the right. Undo the constant.</div></div>
+
+  </div>
+</div>
+
+<div class="qcard" data-qid="3-3">
+  <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Same shape, new numbers</span></div>
+  <div class="qbody">
+    <p class="muted-note" style="font-size:.82rem">Solve <span class="math">5(x &minus; 6) &minus; 2(x + 3) = 12</span>.</p>
+    <div class="step"><div class="step-label">Step 1 &middot; Constant from <span class="math">5(x &minus; 6)</span>:</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:LTMw" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">Outside number times the second term inside, sign included.</div></div>
+    <div class="step locked"><div class="step-label">Step 2 &middot; Constant from <span class="math">&minus;2(x + 3)</span>:</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:LTY=" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">Negative outside, positive inside.</div></div>
+    <div class="step locked"><div class="step-label">Step 3 &middot; <strong>Final answer</strong> &middot; <span class="math">x</span> =</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:MTY=" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">Collect the x terms, collect the constants, then undo them in reverse order.</div></div>
+
+  </div>
+</div>
+
+<div class="qcard" data-qid="3-4">
+  <div class="qhead"><span class="qtag apply">Apply</span><span class="qtitle">Catch the mistake</span></div>
+  <div class="qbody">
+    <div class="step"><div class="step-label">A student writes <span class="math">&minus;2(x &minus; 7) = &minus;2x &minus; 14</span>. Test it by substituting <span class="math">x = 0</span>.</div>
+      <div class="mc-group"><button class="mc-option" data-k="k1:NTEzfDE=">Wrong &mdash; the original gives <span class="math">14</span> but the expansion gives <span class="math">&minus;14</span></button><button class="mc-option" data-k="k1:NTE0fDA=">Right &mdash; the minus goes on to both terms</button><button class="mc-option" data-k="k1:NTE1fDA=">Wrong &mdash; it should be <span class="math">2x &minus; 14</span></button><button class="mc-option" data-k="k1:NTE2fDA=">An expansion cannot be tested by substituting a number</button></div>
+      <div class="mc-feedback">At <span class="math">x = 0</span> the original is <span class="math">&minus;2(&minus;7) = 14</span>. A negative times a negative is positive, so the correct expansion is <span class="math">&minus;2x + 14</span>. The substitution catches it before any solving happens.</div></div>
+
+  </div>
+</div>
+
+<div class="qcard" data-qid="3-5" data-exam="1">
+  <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">Solve</span></div>
+  <div class="qbody">
+    <div class="step"><div class="step-label">Solve <span class="math">6(x + 4) &minus; 4(x &minus; 3) = 2</span>. &nbsp; <span class="math">x</span> =</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:LTE3" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+</div>
+
+  </div>
+</div>
+
+  </section>
+
+  <section class="topic" id="classify">
+  <h2>4 &middot; Evaluate, then classify</h2>
+  <p class="intro">The miss here is a sorting habit, not a definition. The definition is already known &mdash; it is being applied to the symbol instead of to the number.</p>
+  <p class="objective"><strong>By the end:</strong> you evaluate a root before deciding what kind of number it is, and you finish a calculation instead of stopping at the parts.</p>
+
+<div class="tcard">
+  <h3>Work out the number first. <em>Then</em> classify it.</h3>
+  <p>A root sign tells you nothing on its own. <span class="math">&radic;49</span> and <span class="math">&radic;50</span> look almost identical and land on opposite sides of the line. Sorting by appearance will get one of them wrong every time; sorting by value never does.</p>
+  <div class="worked"><div class="wl">Worked example</div>
+  <p><span class="math">&radic;49</span> &mdash; what number is it? <span class="math">7 &middot; 7 = 49</span>, so <span class="math">&radic;49 = 7</span>. And <span class="math">7</span> is a fraction of integers (<span class="math">7/1</span>), so it is <strong>rational</strong>.</p>
+  <p><span class="math">&radic;50</span> &mdash; what number is it? <span class="math">7 &middot; 7 = 49</span> and <span class="math">8 &middot; 8 = 64</span>, so nothing whole squares to 50. <span class="math">&radic;50 = 7.0710&hellip;</span>, which never ends and never repeats &mdash; <strong>irrational</strong>.</p>
+  </div>
+  <div class="keyfact"><strong>Two questions, in this order:</strong> what number is this? &nbsp;then&nbsp; can I write that number as a fraction of whole numbers? The second question is meaningless until the first is answered.</div>
+</div>
+
+<div class="qcard" data-qid="4-1">
+  <div class="qhead"><span class="qtag learn">Learn</span><span class="qtitle">One root, two questions</span></div>
+  <div class="qbody">
+    <div class="step"><div class="step-label">Part A &middot; What number is <span class="math">&radic;49</span>?</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:Nw==" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">Which whole number, multiplied by itself, lands on forty-nine?</div></div>
+    <div class="step locked"><div class="step-label">Part B &middot; So <span class="math">&radic;49</span> is &mdash; type rational or irrational.</div>
+      <div class="input-row"><input type="text" class="ans-input" data-type="text" data-answer="k1:cmF0aW9uYWw=" placeholder="rational / irrational"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">You now have a plain whole number. Can a whole number be written as a fraction?</div></div>
+
+  </div>
+</div>
+
+<div class="qcard" data-qid="4-2">
+  <div class="qhead"><span class="qtag guided">Guided</span><span class="qtitle">And the one next to it</span></div>
+  <div class="qbody">
+    <div class="step"><div class="step-label">Part A &middot; <span class="math">&radic;50</span> sits between two consecutive whole numbers. Type the smaller one.</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:Nw==" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">Square the whole numbers either side until you bracket fifty.</div></div>
+    <div class="step locked"><div class="step-label">Part B &middot; So <span class="math">&radic;50</span> is &mdash; type rational or irrational.</div>
+      <div class="input-row"><input type="text" class="ans-input" data-type="text" data-answer="k1:aXJyYXRpb25hbA==" placeholder="rational / irrational"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">It is not a whole number, and its decimal never settles into a pattern.</div></div>
+
+  </div>
+</div>
+
+<div class="qcard" data-qid="4-3">
+  <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Sort the whole set</span></div>
+  <div class="qbody">
+    <div class="step"><div class="step-label">Select every number below that is <strong>irrational</strong>.</div>
+      <div class="ms-group"><button class="ms-option" data-k="k1:NTE3fDA="><span class="box"></span><span class="math">&radic;49</span></button><button class="ms-option" data-k="k1:NTE4fDE="><span class="box"></span><span class="math">&radic;50</span></button><button class="ms-option" data-k="k1:NTE5fDA="><span class="box"></span><span class="math">&#8731;27</span></button><button class="ms-option" data-k="k1:NTIwfDE="><span class="box"></span><span class="math">0.121121112&hellip;</span></button><button class="ms-option" data-k="k1:NTIxfDA="><span class="box"></span><span class="math">7/11</span></button></div>
+      <button class="check-btn ms-check">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">Evaluate each one before you decide. Two of these five have roots that come out whole, and one is already a fraction.</div></div>
+
+  </div>
+</div>
+
+<div class="qcard" data-qid="4-4">
+  <div class="qhead"><span class="qtag apply">Apply</span><span class="qtitle">Finish the calculation</span></div>
+  <div class="qbody">
+    <div class="step"><div class="step-label">Step 1 &middot; <span class="math">&#8731;64</span> =</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:NA==" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">Which number, used three times in a multiplication, gives sixty-four?</div></div>
+    <div class="step locked"><div class="step-label">Step 2 &middot; <span class="math">&radic;81</span> =</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:OQ==" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">Which number times itself gives eighty-one?</div></div>
+    <div class="step locked"><div class="step-label">Step 3 &middot; <strong>Final answer</strong> &middot; <span class="math">&#8731;64 + &radic;81</span> =</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:MTM=" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">Both roots are now plain numbers. The question asked for their sum, not for the two roots.</div></div>
+
+  </div>
+</div>
+
+<div class="qcard" data-qid="4-5" data-exam="1">
+  <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">Estimate without a calculator</span></div>
+  <div class="qbody">
+    <div class="step"><div class="step-label">Part A &middot; <span class="math">&radic;44</span> lies between two consecutive whole numbers. Type the smaller one.</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:Ng==" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+</div>
+    <div class="step locked"><div class="step-label">Part B &middot; Which is it nearer to, and how can you tell?</div>
+      <div class="mc-group"><button class="mc-option" data-k="k1:NTIyfDE=">Nearer <span class="math">7</span> &mdash; 44 is 8 above <span class="math">36</span> but only 5 below <span class="math">49</span></button><button class="mc-option" data-k="k1:NTIzfDA=">Nearer <span class="math">6</span> &mdash; 44 is closer to 40 than to 50</button><button class="mc-option" data-k="k1:NTI0fDA=">Exactly halfway &mdash; 44 sits between 36 and 49</button><button class="mc-option" data-k="k1:NTI1fDA=">Nearer <span class="math">7</span> &mdash; 44 is an even number</button></div>
+      <div class="mc-feedback">Compare the two gaps, not the two numbers. <span class="math">44 &minus; 36 = 8</span> and <span class="math">49 &minus; 44 = 5</span>, so 44 sits nearer the top of the interval.</div></div>
+
+  </div>
+</div>
+
+<div class="qcard" data-qid="4-6">
+  <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">One more, on your own</span></div>
+  <div class="qbody">
+    <div class="step"><div class="step-label">Part A &middot; <span class="math">&radic;68</span> lies between two consecutive whole numbers. Type the smaller one.</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:OA==" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">Square the whole numbers either side until sixty-eight is bracketed.</div></div>
+    <div class="step locked"><div class="step-label">Part B &middot; Which is it nearer to?</div>
+      <div class="mc-group"><button class="mc-option" data-k="k1:NTI2fDE=">The smaller one &mdash; the gap below is 4 and the gap above is 13</button><button class="mc-option" data-k="k1:NTI3fDA=">The larger one &mdash; the gap above is smaller</button><button class="mc-option" data-k="k1:NTI4fDA=">Exactly halfway between them</button><button class="mc-option" data-k="k1:NTI5fDA=">You cannot tell without a calculator</button></div>
+      <div class="mc-feedback">Compare the two gaps. 68 sits only 4 above the lower perfect square but 13 below the upper one, so it is much nearer the bottom of the interval.</div></div>
+
+  </div>
+</div>
+
+  </section>
+
+  <section class="topic" id="inequal">
+  <h2>5 &middot; Inequalities &mdash; the flip and the circle</h2>
+  <p class="intro">Seventeen attempts, ten misses, three separate faults inside them. They are separated here so each one can be checked on its own.</p>
+  <p class="objective"><strong>By the end:</strong> you solve an inequality, test your own answer, and show the solution on a number line with the right kind of circle.</p>
+
+<div class="tcard">
+  <h3>The flip, the circle, and the number that does not count</h3>
+  <p>An inequality is solved exactly like an equation, with one extra rule and two habits that are easy to lose. Each of the three is checkable in seconds, so none of them has to be remembered on trust.</p>
+  <div class="worked"><div class="wl">Worked example</div>
+  <p><strong>The flip.</strong> Solve <span class="math">&minus;3x + 4 &ge; 19</span>. Subtract 4: <span class="math">&minus;3x &ge; 15</span>. Divide by <span class="math">&minus;3</span> <em>and turn the sign round</em>: <span class="math">x &le; &minus;5</span>.</p>
+  <p><strong>The check.</strong> Try a number from your answer. <span class="math">x = &minus;6</span> gives <span class="math">&minus;3(&minus;6) + 4 = 22</span>, and <span class="math">22 &ge; 19</span> is true. Now try one that is not: <span class="math">x = 0</span> gives <span class="math">4</span>, which is not <span class="math">&ge; 19</span>. The small numbers work, so the sign must point that way.</p>
+  <p><strong>The circle.</strong> <span class="math">&le;</span> and <span class="math">&ge;</span> include the boundary, so it is drawn closed. <span class="math">&lt;</span> and <span class="math">&gt;</span> exclude it, so it is drawn open. The words in a problem decide this: <em>at most</em> and <em>at least</em> include; <em>more than</em> and <em>fewer than</em> do not.</p>
+  </div>
+  <div class="keyfact"><strong>Never take the flip on trust.</strong> Substitute one number from your own answer back into the original. If it does not satisfy it, the sign is the wrong way round &mdash; and you have found that out in five seconds instead of in marking.</div>
+</div>
+
+<div class="qcard" data-qid="5-1">
+  <div class="qhead"><span class="qtag learn">Learn</span><span class="qtitle">What happens when you divide by a negative?</span></div>
+  <div class="qbody">
+    <div class="step"><div class="step-label">You divide both sides of <span class="math">&minus;3x &ge; 15</span> by <span class="math">&minus;3</span>. What happens?</div>
+      <div class="mc-group"><button class="mc-option" data-k="k1:NTMwfDE=">The sign turns round: <span class="math">x &le; &minus;5</span></button><button class="mc-option" data-k="k1:NTMxfDA=">The sign stays as it is: <span class="math">x &ge; &minus;5</span></button><button class="mc-option" data-k="k1:NTMyfDA=">The sign becomes <span class="math">=</span></button><button class="mc-option" data-k="k1:NTMzfDA=">You cannot divide an inequality by a negative number</button></div>
+      <div class="mc-feedback">Dividing by a negative reverses the order of the number line, so the direction of the inequality reverses with it. Substituting <span class="math">x = &minus;6</span> into the original confirms which way it must point.</div></div>
+
+  </div>
+</div>
+
+<div class="qcard" data-qid="5-2">
+  <div class="qhead"><span class="qtag guided">Guided</span><span class="qtitle">One line at a time, then test it</span></div>
+  <div class="qbody">
+    <div class="step"><div class="step-label">Step 1 &middot; <span class="math">&minus;3x + 4 &ge; 19</span>. Subtract 4 from both sides: <span class="math">&minus;3x &ge;</span>&hellip;</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:MTU=" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">Do to the right what you did to the left. The left-hand side keeps its x term.</div></div>
+    <div class="step locked"><div class="step-label">Step 2 &middot; Divide both sides by <span class="math">&minus;3</span>. The number on the right is now&hellip;</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:LTU=" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">Divide the two numbers and keep track of the signs. A positive divided by a negative is negative.</div></div>
+    <div class="step locked"><div class="step-label">Step 3 &middot; <strong>Final answer</strong> &mdash; which is the solution?</div>
+      <div class="mc-group"><button class="mc-option" data-k="k1:NTM0fDE="><span class="math">x &le; &minus;5</span></button><button class="mc-option" data-k="k1:NTM1fDA="><span class="math">x &ge; &minus;5</span></button><button class="mc-option" data-k="k1:NTM2fDA="><span class="math">x &le; 5</span></button><button class="mc-option" data-k="k1:NTM3fDA="><span class="math">x &ge; 5</span></button></div>
+      <div class="mc-feedback">You divided by a negative, so the sign turns round. Test it: a number below <span class="math">&minus;5</span> should satisfy the original, and it does.</div></div>
+
+  </div>
+</div>
+
+<div class="qcard" data-qid="5-3">
+  <div class="qhead"><span class="qtag practice">Practice</span><span class="qtitle">Put it on the number line</span></div>
+  <div class="qbody">
+    <div class="step"><div class="step-label">Step 1 &middot; The solution is <span class="math">x &le; &minus;5</span>. Click the number line to plot the boundary point.</div>
+      <div class="plotbox" data-plot="line" data-min="-10" data-max="10" data-step="1"><input type="hidden" class="ans-input" data-answer="k1:LTU=" data-tol="0"/></div>
+      <button class="check-btn">Check</button></div>
+    <div class="step locked"><div class="step-label">Step 2 &middot; Is the circle at that point open or closed?</div>
+      <div class="mc-group"><button class="mc-option" data-k="k1:NTM4fDE=">Closed &mdash; <span class="math">&le;</span> includes the boundary</button><button class="mc-option" data-k="k1:NTM5fDA=">Open &mdash; the boundary is never part of the answer</button><button class="mc-option" data-k="k1:NTQwfDA=">Closed &mdash; the number is negative</button><button class="mc-option" data-k="k1:NTQxfDA=">Open &mdash; <span class="math">&le;</span> means &ldquo;below&rdquo;</button></div>
+      <div class="mc-feedback">The bar under the sign is what includes the boundary. <span class="math">&minus;5</span> itself satisfies <span class="math">x &le; &minus;5</span>, so it is filled in.</div></div>
+
+  </div>
+</div>
+
+<div class="qcard" data-qid="5-4">
+  <div class="qhead"><span class="qtag apply">Apply</span><span class="qtitle">The boundary value does not always count</span></div>
+  <div class="qbody">
+    <div class="step"><div class="step-label">Step 1 &middot; <span class="math">4(x + 2) &gt; 36</span>. Expand and simplify to <span class="math">4x &gt;</span>&hellip;</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:Mjg=" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">Expand the bracket first, then move the constant across.</div></div>
+    <div class="step locked"><div class="step-label">Step 2 &middot; Divide by 4: <span class="math">x &gt;</span>&hellip;</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:Nw==" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">A straightforward division. The sign does not move &mdash; you divided by a positive.</div></div>
+    <div class="step locked"><div class="step-label">Step 3 &middot; <strong>Final answer</strong> &middot; the smallest <em>whole number</em> that satisfies it:</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:OA==" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">Substitute your boundary value into the original. Is 36 greater than 36? If not, that value is not a solution and the next whole number is.</div></div>
+
+  </div>
+</div>
+
+<div class="qcard" data-qid="5-5">
+  <div class="qhead"><span class="qtag apply">Apply</span><span class="qtitle">The goods lift</span></div>
+  <div class="qbody">
+    <p class="muted-note" style="font-size:.82rem">A goods lift carries <strong>at most 400 kg</strong>. The operator rides with the load and weighs 70 kg. Each box weighs 25 kg. Let <span class="math">b</span> be the number of boxes.</p>
+    <div class="step"><div class="step-label">Step 1 &middot; The load is <span class="math">70 + 25b</span> and it must not exceed 400. So <span class="math">25b &le;</span>&hellip;</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:MzMw" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">Take the operator&#39;s weight off both sides.</div></div>
+    <div class="step locked"><div class="step-label">Step 2 &middot; Divide by 25: <span class="math">b &le;</span>&hellip;</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:MTMuMg==" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">The answer is not a whole number, and that is correct at this stage. Do not round it yet.</div></div>
+    <div class="step locked"><div class="step-label">Step 3 &middot; <strong>Final answer</strong> &middot; how many whole boxes can go in?</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:MTM=" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+<button class="hint-btn">Hint</button>
+<div class="hint-content">You cannot load part of a box, and going up would break the limit. Which way does this one have to go?</div></div>
+    <div class="step locked"><div class="step-label">Step 4 &middot; On a number line, is the circle at that number open or closed &mdash; and what in the question tells you?</div>
+      <div class="mc-group"><button class="mc-option" data-k="k1:NTQyfDE=">Closed &mdash; <em>at most</em> includes the maximum</button><button class="mc-option" data-k="k1:NTQzfDA=">Open &mdash; you cannot have a fraction of a box</button><button class="mc-option" data-k="k1:NTQ0fDA=">Closed &mdash; the answer is a whole number</button><button class="mc-option" data-k="k1:NTQ1fDA=">Open &mdash; <em>at most</em> means strictly below the limit</button></div>
+      <div class="mc-feedback"><em>At most</em> means &ldquo;this many or fewer&rdquo;, so the value itself is allowed and the circle is filled in. The words in the question decide the circle, not the shape of the number.</div></div>
+
+  </div>
+</div>
+
+<div class="qcard" data-qid="5-6" data-exam="1">
+  <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">Solve the inequality</span></div>
+  <div class="qbody">
+    <div class="step"><div class="step-label">Solve <span class="math">&minus;2x + 3 &ge; 11</span>.</div>
+      <div class="mc-group"><button class="mc-option" data-k="k1:NTQ2fDE="><span class="math">x &le; &minus;4</span></button><button class="mc-option" data-k="k1:NTQ3fDA="><span class="math">x &ge; &minus;4</span></button><button class="mc-option" data-k="k1:NTQ4fDA="><span class="math">x &le; 4</span></button><button class="mc-option" data-k="k1:NTQ5fDA="><span class="math">x &ge; 4</span></button></div>
+      <div class="mc-feedback">Subtract 3 to reach <span class="math">&minus;2x &ge; 8</span>, then divide by <span class="math">&minus;2</span> and turn the sign round.</div></div>
+
+  </div>
+</div>
+
+  </section>
+
+  <section class="topic" id="reason">
+  <h2>6 &middot; Say why</h2>
+  <p class="intro">This is the strongest thing in the record &mdash; a written critique that identified a fault, named the rule and corrected the answer. It is used here as a diagnostic, not a reward.</p>
+  <p class="objective"><strong>By the end:</strong> you can explain what each method is actually doing, and spot the flaw in someone else&#39;s reasoning.</p>
+
+<div class="tcard">
+  <h3>Saying why is not decoration &mdash; it is the test of whether you own the method</h3>
+  <p>A procedure you can run but cannot explain is a procedure that will drift. Explaining it out loud is the cheapest way to find out which parts you actually hold and which you are copying from memory. This section asks for reasons, not answers.</p>
+  <div class="worked"><div class="wl">Worked example</div>
+  <p>Take <span class="math">0.777&hellip; &times; 100 = 77.777&hellip;</span>. A repeating decimal has been multiplied by 100, and the result is still a repeating decimal &mdash; the tail is untouched.</p>
+  <p>So multiplying can never, on its own, produce a whole number. What it does is manufacture a <em>second</em> line whose tail is identical to the first. Subtracting the two makes the tails cancel, and only then is there a whole number to work with.</p>
+  </div>
+  <div class="keyfact"><strong>The pattern to notice:</strong> in all three of this module&#39;s methods the same thing is true &mdash; the step that feels like tidying up at the end is the step that does the actual work. The subtraction. The coefficient check. The second sign in the bracket.</div>
+</div>
+
+<div class="qcard" data-qid="6-1" data-exam="1">
+  <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">Critique the claim</span></div>
+  <div class="qbody">
+    <div class="step"><div class="step-label">Chidi says: <em>&ldquo;To turn any repeating decimal into a fraction, you multiply it by 100. That always gives you a whole number.&rdquo;</em> Which correction is right?</div>
+      <div class="mc-group"><button class="mc-option" data-k="k1:NTUwfDE=">Two things are wrong: 100 only suits a two-digit repeat, and multiplying alone never removes the tail &mdash; the subtraction does that</button><button class="mc-option" data-k="k1:NTUxfDA=">Nothing is wrong &mdash; multiplying by 100 works for every repeating decimal</button><button class="mc-option" data-k="k1:NTUyfDA=">The multiplier is right, but you must divide by 99 afterwards rather than subtract</button><button class="mc-option" data-k="k1:NTUzfDA=">Only one thing is wrong: he should multiply by 10 every time instead</button></div>
+      <div class="mc-feedback">The multiplier is chosen from the length of the repeating block, so <span class="math">0.777&hellip;</span> needs 10 and <span class="math">0.2727&hellip;</span> needs 100. And multiplying is never enough on its own: <span class="math">0.777&hellip; &times; 100 = 77.777&hellip;</span>, still repeating. The subtraction is what removes the tail.</div></div>
+
+  </div>
+</div>
+
+<div class="qcard" data-qid="6-2" data-exam="1">
+  <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">Where is the mistake?</span></div>
+  <div class="qbody">
+    <div class="step"><div class="step-label">A student computes <span class="math">(6.8 &times; 10<sup>6</sup>) + (3.4 &times; 10<sup>6</sup>)</span>, writes <span class="math">10.2 &times; 10<sup>6</sup></span>, and is told it is wrong. What should she change?</div>
+      <div class="mc-group"><button class="mc-option" data-k="k1:NTU0fDE=">The coefficient &mdash; <span class="math">10.2</span> is not below 10, so it becomes <span class="math">1.02 &times; 10<sup>7</sup></span></button><button class="mc-option" data-k="k1:NTU1fDA=">The exponent &mdash; adding the numbers means adding the powers too</button><button class="mc-option" data-k="k1:NTU2fDA=">Nothing &mdash; the answer is already correct</button><button class="mc-option" data-k="k1:NTU3fDA=">The addition &mdash; <span class="math">6.8 + 3.4</span> is not <span class="math">10.2</span></button></div>
+      <div class="mc-feedback">The arithmetic and the exponent are both right. The only thing outside the rules is the coefficient, and it is the first place to look whenever a scientific-notation answer comes back wrong.</div></div>
+
+  </div>
+</div>
+
+<div class="qcard" data-qid="6-3">
+  <div class="qhead"><span class="qtag stretch">Stretch</span><span class="qtitle">In your own words</span></div>
+  <div class="qbody">
+    <div class="step"><div class="step-label">Why does the <strong>subtraction</strong> step turn a repeating decimal into a fraction? What exactly would go wrong if you multiplied and then stopped? Use an example of your own.</div>
+      <textarea class="cr-area" placeholder="Type your reasoning..."></textarea>
+      <button class="check-btn cr-save">Save response</button></div>
+
+  </div>
+</div>
+
+  </section>
+
+  <section class="topic" id="check">
+  <h2>7 &middot; Module Check &mdash; Show What You Know</h2>
+  <p class="intro">Mixed and un-telegraphed: nothing here tells you which method it wants. That is the point &mdash; choosing the method is the skill being checked.</p>
+  <p class="objective"><strong>By the end:</strong> you can pick the right method without being told which section a question came from.</p>
+
+<div class="qcard" data-qid="7-1" data-exam="1">
+  <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">Repeating decimal</span></div>
+  <div class="qbody">
+    <div class="step"><div class="step-label">Write <span class="math">0.5555&hellip;</span> as a fraction in lowest terms.</div>
+      <div class="input-row"><input type="text" class="ans-input" data-type="text" data-answer="k1:NS85" placeholder="e.g. 3/4"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+</div>
+
+  </div>
+</div>
+
+<div class="qcard" data-qid="7-2" data-exam="1">
+  <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">Scientific notation</span></div>
+  <div class="qbody">
+    <div class="step"><div class="step-label">Part A &middot; <span class="math">(2.5 &times; 10<sup>4</sup>) &times; (6 &times; 10<sup>3</sup>)</span>. &nbsp;<span class="math">coefficient</span> =</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:MS41" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+</div>
+    <div class="step locked"><div class="step-label">Part B &middot; <span class="math">exponent</span> =</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:OA==" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+</div>
+
+  </div>
+</div>
+
+<div class="qcard" data-qid="7-3" data-exam="1">
+  <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">Linear equation</span></div>
+  <div class="qbody">
+    <div class="step"><div class="step-label">Solve <span class="math">3(x &minus; 4) &minus; 2(x + 5) = 1</span>. &nbsp;<span class="math">x</span> =</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:MjM=" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+</div>
+
+  </div>
+</div>
+
+<div class="qcard" data-qid="7-4" data-exam="1">
+  <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">Rational or irrational</span></div>
+  <div class="qbody">
+    <div class="step"><div class="step-label">Which of these numbers is irrational?</div>
+      <div class="mc-group"><button class="mc-option" data-k="k1:NTU4fDA="><span class="math">&radic;81</span></button><button class="mc-option" data-k="k1:NTU5fDA="><span class="math">&#8731;8</span></button><button class="mc-option" data-k="k1:NTYwfDE="><span class="math">&radic;12</span></button><button class="mc-option" data-k="k1:NTYxfDA="><span class="math">0.363636&hellip;</span></button></div>
+      <div class="mc-feedback"><span class="math">&radic;81 = 9</span> and <span class="math">&#8731;8 = 2</span>, both whole. <span class="math">0.363636&hellip;</span> repeats, so it converts to a fraction. Only <span class="math">12</span> is not a perfect square.</div></div>
+
+  </div>
+</div>
+
+<div class="qcard" data-qid="7-5" data-exam="1">
+  <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">Inequality on a number line</span></div>
+  <div class="qbody">
+    <div class="step"><div class="step-label">Part A &middot; Solve <span class="math">5(x + 3) &gt; 45</span>. The smallest whole number that satisfies it is&hellip;</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:Nw==" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+</div>
+    <div class="step locked"><div class="step-label">Part B &middot; Plot that number on the number line.</div>
+      <div class="plotbox" data-plot="line" data-min="0" data-max="16" data-step="1"><input type="hidden" class="ans-input" data-answer="k1:Nw==" data-tol="0"/></div>
+      <button class="check-btn">Check</button></div>
+
+  </div>
+</div>
+
+<div class="qcard" data-qid="7-6" data-exam="1">
+  <div class="qhead"><span class="qtag exam">Exam</span><span class="qtitle">Roots</span></div>
+  <div class="qbody">
+    <div class="step"><div class="step-label">Work out <span class="math">&#8731;125 + &radic;16</span>.</div>
+      <div class="input-row"><input type="number" step="any" class="ans-input" data-answer="k1:OQ==" data-tol="0"/><span class="feedback"></span></div>
+      <button class="check-btn">Check</button>
+</div>
+
+  </div>
+</div>
+
+  <div class="challenge">
+    <h3>Make your own</h3>
+    <p>Invent one question of your own for the method you found hardest here &mdash; write it, solve it in full, and bring it to
+    your next session. Inventing a question is the point at which you find out whether you own a method or are following it.</p>
+  </div>
+
+  </section>
+  <footer>The Missing Steps &middot; Grade 8 Mathematics Hub &middot; 8.NS and 8.EE.</footer>
+</main>
+<script>
+  // ===== Per-module identity (change these per unit) =====
+  const G7_TOPIC_ID='missing-steps';
+  const G7_TOPIC_TITLE='The Missing Steps';
+  var G7_SYNC_HUB='grade8'; // shared-cloud namespace for this deployment (must match the hub's SYNC_HUB_ID)
+  const G7_SKILLS={'1-1':'repeat-fraction','1-2':'repeat-fraction','1-3':'repeat-fraction','1-4':'repeat-fraction','1-5':'repeat-fraction','2-1':'sci-notation','2-2':'sci-notation','2-3':'sci-notation','2-4':'sci-notation','2-5':'sci-notation','2-6':'sci-notation','3-1':'linear-eq','3-2':'linear-eq','3-3':'linear-eq','3-4':'reasoning','3-5':'linear-eq','4-1':'irrational','4-2':'irrational','4-3':'irrational','4-4':'roots','4-5':'estimate','4-6':'estimate','5-1':'inequalities','5-2':'inequalities','5-3':'inequalities','5-4':'inequalities','5-5':'inequalities','5-6':'inequalities','6-1':'reasoning','6-2':'reasoning','6-3':'reasoning','7-1':'repeat-fraction','7-2':'sci-notation','7-3':'linear-eq','7-4':'irrational','7-5':'inequalities','7-6':'roots'};
+  const G7_SKILL_LABELS={'estimate':'Approximating irrational numbers','inequalities':'Linear inequalities & solution sets','irrational':'Identifying irrational numbers','linear-eq':'Solving linear equations','reasoning':'Reasoning & error analysis','repeat-fraction':'Repeating decimals \u2192 fractions','roots':'Square & cube roots','sci-notation':'Scientific notation'};
+
+  // ===== Shared [GRADE] Hub store =====
+  var G7_STORE='g8.';   /* storage namespace — one place, edit per deployment */
+  function K(s){return G7_STORE+s;}
+
+  /* Storage namespace — EDIT THIS ONCE per deployment, before first run.
+     A new grade or subject that leaves it as CHANGEME would otherwise write into whichever
+     deployment it was copied from. That failure is silent, so this makes it loud. */
+  (function(){
+    if(String(G7_STORE).indexOf('CHANGEME')<0)return;
+    function shout(){
+      var b=document.createElement('div');
+      b.setAttribute('role','alert');
+      b.style.cssText='position:fixed;inset:0 0 auto 0;z-index:99999;background:#B91C1C;color:#fff;'+
+        'font:600 15px/1.45 system-ui,sans-serif;padding:.9rem 1.1rem;text-align:left';
+      b.innerHTML='<strong>Starter Kit not configured.</strong> Set <code>G7_STORE</code> (and '+
+        '<code>G7_SYNC_HUB</code>) in this file before use — otherwise this module shares storage with '+
+        'the deployment it was copied from, and will overwrite another student&rsquo;s work. '+
+        'Nothing is being saved until you do.';
+      (document.body||document.documentElement).appendChild(b);
+    }
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',shout);else shout();
+  })();
+
+  /* The signed-in student, or '' — NEVER an invented name. This returned 'Guest' until
+     26 Jul 2026, which quietly created students.Guest on any device that reached a module
+     without signing in first (a bookmark, a homework deep link, a restored tab). That record
+     is invisible to the teacher dashboard, which lists roster names, and every cloud write it
+     makes is refused for having no PIN — so the work looked saved and reached nobody. */
+  function g7current(){return localStorage.getItem(K('current'))||'';}
+  function g7signedIn(){return !!g7current();}
+  /* Where the LOCAL store files this work. A student who lands here from a bookmark or a homework
+     link before signing in still gets a working progress bar — their answers go to a local-only
+     slot and are adopted under their real name by g7adopt() the moment they sign in. What they do
+     NOT get is an invented identity in the cloud or the activity log: that is the half that has to
+     stay honest, because a name the roster never authorised reaches no teacher and is refused by
+     the backend for having no PIN. Saving locally is generous; publishing under a made-up name is
+     a lie about who did the work. */
+  var G7_LOCAL='__local';
+  function g7slot(){return g7current()||G7_LOCAL;}
+  function g7all(){try{return JSON.parse(localStorage.getItem(K('data')))||{students:{}};}catch(e){return{students:{}};}}
+  function g7save(o){localStorage.setItem(K('data'),JSON.stringify(o));}
+  function g7topic(o){o.students=o.students||{};var s=g7slot();o.students[s]=o.students[s]||{topics:{}};var T=o.students[s].topics;T[G7_TOPIC_ID]=T[G7_TOPIC_ID]||{title:G7_TOPIC_TITLE,tree:{},totalSteps:0,sectionTotals:{},lastPracticed:0,attempts:0,correct:0,struggles:[],skillStats:{},exam:{attempts:0,correct:0},responses:[]};return T[G7_TOPIC_ID];}
+  function g7sectionTotals(){var m={};document.querySelectorAll('.qcard[data-qid]').forEach(function(c){var sec=(c.dataset.qid||'').split('-')[0];m[sec]=(m[sec]||0)+c.querySelectorAll('.step').length;});return m;}
+
+  /* ===== legacy-namespace repair (26 Jul 2026) =====
+     The hub carried its data across when the namespace was renamed; the modules did not, so any
+     student who reached a module before opening the hub read an empty store and was shown a blank
+     slate. Union of completed steps, newer record supplies the stats, scoped to the signed-in
+     student and this topic only. Idempotent, so it is safe to run on every load. */
+  /* Union of two records of the same topic. The more recently practised one supplies the stats;
+     every completed step the other holds is OR'd in on top. Neither side can erase the other, and
+     a step already marked done never becomes undone. */
+  function g7mergeTopic(a,b){
+    if(!a)return b; if(!b)return a;
+    var base=((a.lastPracticed||0)>=(b.lastPracticed||0))?a:b, other=(base===a)?b:a;
+    base.tree=base.tree||{};
+    Object.keys(other.tree||{}).forEach(function(q){
+      var os=(other.tree[q]&&other.tree[q].steps)||{};
+      var bq=base.tree[q]=base.tree[q]||{steps:{}}; bq.steps=bq.steps||{};
+      Object.keys(os).forEach(function(i){if(os[i])bq.steps[i]=true;});
+    });
+    return base;
+  }
+  /* ===== legacy-namespace repair (26 Jul 2026) =====
+     The hub carried its data across when the namespace was renamed; the modules did not, so a
+     student who reached a module before opening the hub read an empty store and was shown a blank
+     slate. Scoped to the signed-in student and this topic only — a module has no roster and must
+     not touch anybody else's record. Idempotent, so it is safe to run on every load, which is the
+     point: the hub's original one-shot copy could be disarmed before it ever ran. */
+  function g7migrate(){
+    try{
+      var LEGACY='g7.'; if(G7_STORE===LEGACY)return;
+      var me=g7current(); if(!me)return;
+      var old=null; try{old=JSON.parse(localStorage.getItem(LEGACY+'data'));}catch(e){return;}
+      var oldT=old&&old.students&&old.students[me]&&old.students[me].topics&&old.students[me].topics[G7_TOPIC_ID];
+      if(!oldT)return;
+      var o=g7all(); o.students=o.students||{};
+      o.students[me]=o.students[me]||{topics:{}}; o.students[me].topics=o.students[me].topics||{};
+      var cur=o.students[me].topics[G7_TOPIC_ID];
+      var merged=g7mergeTopic(oldT,cur);
+      if(JSON.stringify(merged)===JSON.stringify(cur||null))return;
+      o.students[me].topics[G7_TOPIC_ID]=merged; g7save(o);
+    }catch(e){}
+  }
+  /* Sign-in adopts whatever was done before it. Runs AFTER g7migrate() so a device carrying both a
+     legacy-namespace record and a pre-sign-in one ends up with the union of the two, rather than
+     whichever happened to be written last. */
+  function g7adopt(){
+    try{
+      var me=g7current(); if(!me)return;
+      var o=g7all(); var st=o.students||{};
+      var loc=st[G7_LOCAL]&&st[G7_LOCAL].topics&&st[G7_LOCAL].topics[G7_TOPIC_ID];
+      if(!loc)return;
+      st[me]=st[me]||{topics:{}}; st[me].topics=st[me].topics||{};
+      st[me].topics[G7_TOPIC_ID]=g7mergeTopic(loc,st[me].topics[G7_TOPIC_ID]);
+      delete st[G7_LOCAL].topics[G7_TOPIC_ID];
+      if(!Object.keys(st[G7_LOCAL].topics).length)delete st[G7_LOCAL];
+      o.students=st; g7save(o); schedulePush();
+    }catch(e){}
+  }
+  g7migrate(); g7adopt();
+  function loadData(){return g7topic(g7all()).tree;}
+  function saveData(tree){var o=g7all();var t=g7topic(o);t.tree=tree;t.totalSteps=document.querySelectorAll('.qcard .step').length;t.sectionTotals=g7sectionTotals();t.lastPracticed=Date.now();g7save(o);schedulePush();}
+  function g7sheet(event,question,detail){var url=localStorage.getItem(K('sheetURL'));if(!url||!g7signedIn())return;try{fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({hub:G7_SYNC_HUB||'default',student:g7current(),topic:G7_TOPIC_TITLE,question:question||'',event:event,detail:detail||'',ts:Date.now()})});}catch(e){}}
+  // AS-4 (automatic): the lesson's own Learn->Stretch ladder IS the difficulty gradient, so the level is
+  // read from the phase tag every stamped module already carries — no per-item tagging, no extra items,
+  // and any new module built from this template gets this for free. Untagged cards default to Target.
+  function g7level(qid){
+    var c=document.querySelector('.qcard[data-qid="'+String(qid).replace(/"/g,'')+'"]');
+    if(!c)return 2;
+    var tag=c.querySelector('.qtag'),cls=(tag&&tag.className)||'';
+    if(/(^|\s)stretch(\s|$)/.test(cls))return 4;                    // 4 = beyond the standard (bonus, never a pass/fail signal)
+    if(c.dataset.exam==='1'||/(^|\s)exam(\s|$)/.test(cls))return 3; // 3 = the assessed MCAP bar (the expectation)
+    if(/(^|\s)(learn|guided)(\s|$)/.test(cls))return 1;             // 1 = foundational (supported)
+    return 2;                                                       // 2 = target (independent, grade level)
+  }
+  /* ===== homework tagging =====
+   * The hub passes hw=<setId>&subj=<subjectId> on the link. When those are present the student is
+   * doing HOMEWORK, not free practice, so each attempt is also posted to the Homework tab. Without
+   * this the Sheet cannot tell the two apart: the topic record and the activity Log look identical
+   * either way, and the Homework tab only ever saw a row once a whole set was finished. */
+  function g7hwCtx(){try{var p=new URLSearchParams(location.search);var s=p.get('hw');
+    return s?{set:s,subj:p.get('subj')||''}:null;}catch(e){return null;}}
+  /* Mark this item done AS HOMEWORK, locally and in the cloud. Completion must not be inferred from
+   * the module tree: that records any past practice, so a set could show progress — or even auto-
+   * complete and post a score — for work never done as homework. Keyed by topic|qid because the
+   * same qid exists in more than one module. */
+  function g7hwMark(qid,wrong){
+    var c=g7hwCtx();if(!c)return;
+    try{
+      var o=g7all(),s=g7current();
+      o.students=o.students||{};o.students[s]=o.students[s]||{topics:{}};
+      var hs=o.students[s].hwstate=o.students[s].hwstate||{};
+      var rec=hs[c.subj]=hs[c.subj]||{sets:{},items:{},ts:0};
+      rec.items=rec.items||{};
+      var m=rec.items[c.set]=rec.items[c.set]||{};
+      m[G7_TOPIC_ID+'|'+qid]={ts:Date.now(),wrong:!!wrong};
+      rec.ts=Date.now();g7save(o);
+      syncPush('hwstate',s,c.subj,rec);
+    }catch(e){}
+  }
+  function g7hwPost(qid,wrong){
+    var c=g7hwCtx();if(!c)return;
+    var url=localStorage.getItem(K('sheetURL'));if(!url)return;
+    try{fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({op:'hw',hub:G7_SYNC_HUB||'default',name:g7current(),pin:g7pin(),
+        subject:c.subj,set:c.set,item:qid,outcome:wrong?'incorrect':'correct',ts:Date.now(),
+        payload:{topic:G7_TOPIC_ID,title:G7_TOPIC_TITLE}})}).catch(function(){});}catch(e){}
+  }
+  function g7log(qid,wrong,label,your,exam){var o=g7all();var t=g7topic(o);var sk=G7_SKILLS[qid]||'reasoning';t.skillStats[sk]=t.skillStats[sk]||{attempts:0,misses:0};t.skillStats[sk].attempts++;t.skillStats[sk].last=Date.now();t.attempts=(t.attempts||0)+1;if(wrong){t.skillStats[sk].misses++;t.struggles.push({qid:qid,label:(label||qid).trim(),skill:sk,skillLabel:G7_SKILL_LABELS[sk],your:your||'',ts:Date.now()});if(t.struggles.length>120)t.struggles=t.struggles.slice(-120);}else{t.correct=(t.correct||0)+1;}if(exam){t.exam=t.exam||{attempts:0,correct:0};t.exam.attempts++;if(!wrong)t.exam.correct++;}var _lv=g7level(qid);t.levelStats=t.levelStats||{};t.levelStats[_lv]=t.levelStats[_lv]||{attempts:0,misses:0};t.levelStats[_lv].attempts++;if(wrong)t.levelStats[_lv].misses++;t.lastPracticed=Date.now();g7save(o);g7sheet(wrong?'struggle':'step_complete',(label||qid).trim(),wrong?('typed "'+(your||'')+'"'):'');g7hwPost(qid,wrong);g7hwMark(qid,wrong);schedulePush();}
+
+  /* ===== spaced review (MR-1) phase-2: stored consecutive-session streak ===== */
+  // A "review session" = one module visit. We count only FIRST-attempt graded items;
+  // a visit with >=3 of them advances the streak one rung (>=80% first-attempt) or resets
+  // it to 0, at most once per calendar day (later same-day visits don't move it). The hub
+  // reads t.reviewStreak when present, else falls back to the phase-1 inferred proxy.
+  var _revFirst=0,_revCorrect=0,_revCommitted=false,_revBase=0,_revWasDue=false;
+  var _revSkill={};   // phase-3: per-skill session tally, keyed by skill
+  var REVIEW_RUNGS=[1,3,7,21,42];
+  function g7streakOf(t){return (typeof t.reviewStreak==='number')?t.reviewStreak:g7revProxy(t);}
+  function g7wasDue(t){var last=(t&&t.lastPracticed)||0;if(!last||((t&&t.attempts)||0)<=0)return false;return Date.now()>=last+REVIEW_RUNGS[g7streakOf(t)]*86400000;}
+  function g7revProxy(t){var a=(t&&t.attempts)||0,c=(t&&t.correct)||0;if(a<=0)return 0;var acc=c/a;var base=acc>=0.95?4:acc>=0.85?3:acc>=0.70?2:acc>=0.50?1:0;var cap=a>=12?4:a>=8?3:a>=4?2:a>=2?1:0;var s=Math.min(base,cap);var st=(t&&t.skillStats)||{},sh=false;Object.keys(st).forEach(function(k){var m=st[k].misses||0;if(m>=2&&m/Math.max(st[k].attempts||0,1)>=0.25)sh=true;});return sh?Math.max(0,s-1):s;}
+  // Snapshot the pre-session streak AND whether the topic was due, at load, before this visit's answers.
+  function g7reviewInit(){try{if(!g7current())return;var o=g7all(),t=g7topic(o);_revBase=(typeof t.reviewStreak==='number')?t.reviewStreak:g7revProxy(t);_revWasDue=g7wasDue(t);}catch(e){}}
+  window.addEventListener('load',g7reviewInit);
+  // phase-3: the same ladder, one level down — per *skill*, so a topic that is solid overall can
+  // still bring back the one skill inside it that is fading. Same shape as the topic proxy, read
+  // off skillStats; a skill needs only >=2 first-attempt items in a session (a module authors far
+  // fewer items per skill than per topic), still at most one rung per calendar day.
+  function g7skillProxy(t,sk){
+    var s=(t&&t.skillStats&&t.skillStats[sk])||null,a=(s&&s.attempts)||0;
+    if(a<=0)return 0;
+    var acc=(a-((s&&s.misses)||0))/a;
+    var base=acc>=0.95?4:acc>=0.85?3:acc>=0.70?2:acc>=0.50?1:0;
+    var cap=a>=12?4:a>=8?3:a>=4?2:a>=2?1:0;
+    return Math.min(base,cap);
+  }
+  function g7review(first,correct,qid){
+    if(!first)return;                                  // only first attempts test retrieval
+    _revFirst++;if(correct)_revCorrect++;
+    var o=g7all(),t=g7topic(o);
+    // AN-4: bucket this first-attempt as retention (topic was due at session start) or acquisition
+    if(_revWasDue){t.retFirst=(t.retFirst||0)+1;if(correct)t.retCorrect=(t.retCorrect||0)+1;}
+    else{t.acqFirst=(t.acqFirst||0)+1;if(correct)t.acqCorrect=(t.acqCorrect||0)+1;}
+    var today=Math.floor(Date.now()/86400000);
+    if(_revFirst>=3 && !(!_revCommitted&&t.reviewDay===today)){  // >=3 evidence; at most one rung/day
+      _revCommitted=true;
+      var pass=(_revCorrect/_revFirst)>=0.8;
+      t.reviewStreak=pass?Math.min(4,_revBase+1):0;
+      t.reviewDay=today;
+    }
+    if(qid){
+      var sk=G7_SKILLS[qid]||'reasoning';
+      var ss=t.skillStats[sk]=t.skillStats[sk]||{attempts:0,misses:0};
+      // base is snapshotted the first time this skill is seen this session — before any write below
+      var S=_revSkill[sk]=_revSkill[sk]||{first:0,correct:0,committed:false,
+        base:(typeof ss.streak==='number')?ss.streak:g7skillProxy(t,sk)};
+      S.first++;if(correct)S.correct++;
+      if(S.first>=2 && !(!S.committed && ss.day===today)){
+        S.committed=true;
+        ss.streak=(S.correct/S.first)>=0.8?Math.min(4,S.base+1):0;
+        ss.day=today;
+      }
+    }
+    g7save(o);
+    // v1.5: the streak and the acquisition/retention buckets are part of the topic record, so they
+    // must reach the cloud like any other write. Guarded because not every stamped copy carries the
+    // sync layer (the Starter_Kit template does not) — there it is simply a no-op.
+    if(typeof schedulePush==='function')schedulePush();
+  }
+  window.__modReview={review:g7review,proxy:g7revProxy,init:g7reviewInit,wasDue:g7wasDue,skillProxy:g7skillProxy};
+
+  // ===== answer helpers =====
+  function kdec(s){try{return atob(s);}catch(e){return '';}}
+  function ansVal(inp){var a=(inp&&inp.dataset&&inp.dataset.answer)||'';return a.slice(0,3)==='k1:'?kdec(a.slice(3)):a;}
+  function optCorrect(el){if(!el||!el.dataset)return false;var k=String(el.dataset.k||'');if(k.slice(0,3)==='k1:'){var d=kdec(k.slice(3));return d.slice(d.indexOf('|')+1)==='1';}return el.dataset.correct==='true';}
+  function normalizeText(s){s=String(s).toLowerCase().trim();var neg=/^[-–—]/.test(s);s=s.replace(/[\s–—-]+/g,'-').replace(/^-|-$/g,'').replace(/\s+/g,' ');return (neg?'-':'')+s;}
+  function g7fracVal(s){s=String(s).trim().replace(/\s+/g,'');var m=s.match(/^(-?\d+)\/(-?\d+)$/);if(m){var d=parseFloat(m[2]);if(d===0)return null;return parseFloat(m[1])/d;}if(/^-?\d+(?:\.\d+)?$/.test(s))return parseFloat(s);return null;}
+  function g7isLowest(s){var m=String(s).trim().match(/^-?(\d+)\/(\d+)$/);if(!m)return true;var a=parseInt(m[1],10),b=parseInt(m[2],10);function g(x,y){x=Math.abs(x);y=Math.abs(y);while(y){var t=y;y=x%y;x=t;}return x;}return g(a,b)===1;}
+  function checkInput(input){
+    var val=input.value.trim(); if(val==='')return null;
+    var type=input.dataset.type||'numeric'; var correct=false;
+    if(type==='numeric'){var ex=parseFloat(ansVal(input)),tol=parseFloat(input.dataset.tol||'0.01'),v=parseFloat(val);correct=!isNaN(v)&&Math.abs(v-ex)<=tol;}
+    else{var raw=ansVal(input);var ans=raw.split('|');correct=ans.map(function(a){return normalizeText(a);}).indexOf(normalizeText(val))>=0;input.dataset.simplify='';
+      if(!correct){var ev=g7fracVal(ans[0]),uv=g7fracVal(val);if(ev!==null&&uv!==null&&Math.abs(ev-uv)<1e-9){correct=true;if(!g7isLowest(val))input.dataset.simplify='1';}}}
+    input.classList.remove('correct','wrong');input.classList.add(correct?'correct':'wrong');
+    var fb=input.parentElement.querySelector('.feedback');if(!fb){var row=input.closest('.input-row, td');if(row)fb=row.querySelector('.feedback');}
+    if(fb){fb.classList.remove('correct','wrong');fb.classList.add(correct?'correct':'wrong');fb.textContent=correct?(input.dataset.simplify==='1'?'✓ simplify':'✓'):'✗';}
+    return correct;
+  }
+  function setStepDisabled(step,dis){step.querySelectorAll('input,textarea,button').forEach(function(el){el.disabled=dis;});}
+  function unlockNext(step){var n=step.nextElementSibling;while(n&&!n.classList.contains('step'))n=n.nextElementSibling;if(n&&n.classList.contains('locked')){n.classList.remove('locked');setStepDisabled(n,false);}}
+  function saveStepDone(card,step){var qid=card.dataset.qid;if(!qid)return;var tr=loadData();if(!tr[qid])tr[qid]={steps:{}};var idx=Array.prototype.indexOf.call(card.querySelectorAll('.step'),step);tr[qid].steps[idx]=true;saveData(tr);refreshOverall();}
+
+  document.addEventListener('click',function(e){
+    if(e.target.matches('.check-btn')&&!e.target.classList.contains('ms-check')&&!e.target.classList.contains('cr-save')){
+      var step=e.target.closest('.step');if(!step)return;var inputs=step.querySelectorAll('.ans-input');if(inputs.length===0)return;
+      var anyVal=false;inputs.forEach(function(i){if(String(i.value).trim()!=='')anyVal=true;});if(!anyVal)return;
+      var all=true;inputs.forEach(function(i){if(checkInput(i)!==true)all=false;});
+      var card=step.closest('.qcard');var qid=card?card.dataset.qid:'';var lbl=(step.querySelector('.step-label')||{}).textContent||'';var exam=card&&card.dataset.exam==='1';
+      var fiFirst=!step.dataset.att;step.dataset.att='1';
+      if(all){step.classList.add('completed');e.target.classList.add('done');e.target.textContent='Step complete';unlockNext(step);if(card)saveStepDone(card,step);if(!step.dataset.logged){g7log(qid,false,lbl,'',exam&&fiFirst);step.dataset.logged='1';}}
+      else{var your=Array.prototype.slice.call(inputs).map(function(i){return i.value;}).filter(function(v){return v!=='';}).join(', ');g7log(qid,true,lbl,your,exam&&fiFirst);}
+      g7review(fiFirst,all,qid);
+    }
+    if(e.target.closest('.mc-option')){
+      var opt=e.target.closest('.mc-option');var group=opt.closest('.mc-group');if(!group||group.classList.contains('answered')||opt.classList.contains('disabled'))return;
+      var correct=optCorrect(opt);
+      var fb=group.parentElement.querySelector('.mc-feedback');if(fb&&fb.dataset.exp===undefined)fb.dataset.exp=fb.textContent||'';
+      var mcStep=group.closest('.step');var mcCard=group.closest('.qcard');var mcQid=mcCard?mcCard.dataset.qid:'';var mcLbl=mcStep?((mcStep.querySelector('.step-label')||{}).textContent||''):'';var mcExam=mcCard&&mcCard.dataset.exam==='1';
+      var mcFirst=mcStep&&!mcStep.dataset.att;if(mcStep)mcStep.dataset.att='1';
+      g7log(mcQid,!correct,mcLbl,(opt.textContent||'').trim(),mcExam&&mcFirst);g7review(mcFirst,correct,mcQid);
+      if(correct){
+        group.classList.add('answered');group.querySelectorAll('.mc-option').forEach(function(b){b.classList.add('disabled');});opt.classList.add('correct');
+        if(fb){fb.textContent='✓ Correct! '+(fb.dataset.exp||'');fb.classList.remove('wrong');fb.classList.add('correct');}
+        if(mcStep){mcStep.classList.add('completed');unlockNext(mcStep);if(mcCard)saveStepDone(mcCard,mcStep);}
+      }else{
+        opt.classList.add('wrong');opt.classList.add('disabled');
+        if(fb){fb.textContent='✗ Not quite — re-read the question, rule that one out, and try again.';fb.classList.remove('correct');fb.classList.add('wrong');}
+        var rest=Array.prototype.filter.call(group.querySelectorAll('.mc-option'),function(b){return !b.classList.contains('disabled');});
+        rest.forEach(function(b){b.classList.add('cooldown');});
+        setTimeout(function(){rest.forEach(function(b){b.classList.remove('cooldown');});},1600);
+      }
+    }
+    var mso=e.target.closest('.ms-option');
+    if(mso){var g=mso.closest('.ms-group');if(g&&!g.classList.contains('answered'))mso.classList.toggle('sel');return;}
+    if(e.target.matches('.ms-check')){
+      var st=e.target.closest('.step');if(!st)return;var grp=st.querySelector('.ms-group');if(!grp||grp.classList.contains('answered'))return;
+      var opts=Array.prototype.slice.call(grp.querySelectorAll('.ms-option'));if(!opts.some(function(o){return o.classList.contains('sel');}))return;
+      var ok=opts.every(function(o){return optCorrect(o)===o.classList.contains('sel');});
+      var card2=st.closest('.qcard');var qid2=card2?card2.dataset.qid:'';var lbl2=(st.querySelector('.step-label')||{}).textContent||'';var exam2=card2&&card2.dataset.exam==='1';
+      var msFirst=!st.dataset.att;st.dataset.att='1';
+      if(ok){grp.classList.add('answered');opts.forEach(function(o){o.classList.add('disabled');if(optCorrect(o))o.classList.add('correct');});st.classList.add('completed');e.target.classList.add('done');e.target.textContent='Correct';unlockNext(st);if(card2)saveStepDone(card2,st);if(!st.dataset.logged){g7log(qid2,false,lbl2,'',exam2&&msFirst);st.dataset.logged='1';}}
+      else{var your2=opts.filter(function(o){return o.classList.contains('sel');}).map(function(o){return (o.textContent||'').trim().slice(0,24);}).join('; ');opts.forEach(function(o){if(o.classList.contains('sel')&&!optCorrect(o))o.classList.add('wrong');});g7log(qid2,true,lbl2,your2,exam2&&msFirst);setTimeout(function(){opts.forEach(function(o){o.classList.remove('wrong');});},1100);}
+      g7review(msFirst,ok,qid2);
+      return;
+    }
+    if(e.target.matches('.cr-save')){
+      var st3=e.target.closest('.step');if(!st3)return;var ta=st3.querySelector('.cr-area');if(!ta||!ta.value.trim())return;
+      var card3=st3.closest('.qcard');var qid3=card3?card3.dataset.qid:'';var lbl3=(st3.querySelector('.step-label')||{}).textContent||'';
+      var o=g7all();var t=g7topic(o);t.responses=t.responses||[];t.responses.push({qid:qid3,label:lbl3.trim(),text:ta.value.trim(),ts:Date.now()});if(t.responses.length>60)t.responses=t.responses.slice(-60);g7save(o);
+      g7sheet('constructed_response',lbl3.trim(),ta.value.trim().slice(0,180));
+      st3.classList.add('completed');e.target.classList.add('done');e.target.textContent='Saved';unlockNext(st3);if(card3)saveStepDone(card3,st3);
+      if(!st3.querySelector('.cr-saved')){var sv=document.createElement('div');sv.className='cr-saved';sv.textContent='Saved — your teacher will review this.';st3.appendChild(sv);}
+      return;
+    }
+    if(e.target.matches('.hint-btn')){var nx=e.target.nextElementSibling;if(nx&&nx.classList.contains('hint-content')){nx.classList.toggle('show');e.target.textContent=nx.classList.contains('show')?'Hide hint':'Hint';}}
+  });
+  document.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.matches('.ans-input')){e.preventDefault();var step=e.target.closest('.step');if(step){var b=step.querySelector('.check-btn');if(b&&!b.classList.contains('ms-check')&&!b.classList.contains('cr-save'))b.click();else checkInput(e.target);}else checkInput(e.target);}});
+  document.querySelectorAll('.step.locked').forEach(function(s){setStepDisabled(s,true);});
+  document.addEventListener('wheel',function(e){if(e.target&&e.target.matches&&e.target.matches('.ans-input')&&document.activeElement===e.target)e.target.blur();},{passive:true});
+  /* v1.4.2 anti-cheat: block copy/cut from question cards (typing areas exempt) */
+  ['copy','cut'].forEach(function(ev){document.addEventListener(ev,function(e){var t=e.target;if(t&&t.closest&&t.closest('.qcard')&&!(t.matches&&t.matches('input,textarea')))e.preventDefault();});});
+  /* v1.4.2 anti-cheat: shuffle MC/MS options on load (3+ options only; add data-noshuffle to a group to opt out) */
+  document.querySelectorAll('.mc-group,.ms-group').forEach(function(g){if(g.hasAttribute('data-noshuffle'))return;var o=Array.prototype.slice.call(g.querySelectorAll('.mc-option,.ms-option'));if(o.length<3)return;for(var i=o.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=o[i];o[i]=o[j];o[j]=t;}o.forEach(function(b){g.appendChild(b);});});
+
+  function countAllSteps(){return document.querySelectorAll('.qcard .step').length;}
+  function refreshOverall(){var d=loadData(),done=0;document.querySelectorAll('.qcard').forEach(function(c){var q=c.dataset.qid;if(q&&d[q]&&d[q].steps)done+=Object.keys(d[q].steps).filter(function(k){return d[q].steps[k];}).length;});var tot=countAllSteps();document.getElementById('op-done').textContent=done;document.getElementById('op-total').textContent=tot;document.getElementById('op-pct').textContent=(tot?Math.round(done/tot*100):0)+'%';renderSecReport();g7growthNotice();}
+  /* v1.4.3: student-facing per-section report card, injected after the overall progress box */
+  /* Unit-grew notice (2026-07-22). When a unit gains items, every returning student's mastery
+     percentage DROPS — the numerator is their real work, the denominator just got bigger. Nothing is
+     lost, but the app never said so, and an unexplained fall reads as lost work. Expressions &
+     Equations went 38 -> 52 steps in one day.
+
+     No new storage: the topic record already keeps `totalSteps` as of the student's last save, and
+     saveData() only overwrites it when they next answer something. The gap between that and the
+     live step count IS the "what's new" number.
+
+     `_grewFrom` is latched on first call so the banner survives the whole session — otherwise it
+     would vanish the instant the student answered anything, mid-read. It never fires for a student
+     with no prior record (a first visit is not growth), and never in review or homework mode, which
+     deliberately show a subset. */
+  var _grewFrom = null;
+  function g7growthNotice(){
+    if(_grewFrom===null){
+      _grewFrom = 0;
+      try{
+        var o=g7all(), s=g7current();
+        var t=o.students&&o.students[s]&&o.students[s].topics&&o.students[s].topics[G7_TOPIC_ID];
+        if(t) _grewFrom = Number(t.totalSteps||0);
+      }catch(e){}
+    }
+    var host=document.querySelector('.overall-progress');
+    var box=document.getElementById('grew-note');
+    var focused = /[?&](review|hw)=/.test(location.search);   // a deliberate subset, not the unit
+    var now=document.querySelectorAll('.qcard .step').length;
+    if(!host || focused || !_grewFrom || now<=_grewFrom){ if(box) box.remove(); return; }
+    var n=now-_grewFrom;
+    if(!box){
+      box=document.createElement('div'); box.id='grew-note'; box.className='grew-note';
+      box.setAttribute('role','status');
+      host.parentNode.insertBefore(box, host);
+    }
+    box.innerHTML='<strong>This unit has grown since you were last here.</strong> '+
+      n+' new question'+(n===1?' has':'s have')+' been added. Everything you finished is still saved '+
+      '&mdash; '+
+      'your percentage moved because there is more to do.';
+  }
+
+  function renderSecReport(){
+    var host=document.querySelector('.overall-progress');if(!host)return;
+    var box=document.getElementById('sec-report');
+    if(!box){box=document.createElement('div');box.id='sec-report';box.className='sec-report';host.parentNode.insertBefore(box,host.nextSibling);}
+    var rows='';
+    document.querySelectorAll('section.topic').forEach(function(sec){
+      var steps=sec.querySelectorAll('.qcard .step');if(!steps.length)return;
+      var done=sec.querySelectorAll('.qcard .step.completed').length;
+      var h=sec.querySelector('h2');var name=(h?h.textContent:sec.id).replace(/[<>&]/g,'').trim();
+      var pct=steps.length?Math.round(done/steps.length*100):0;
+      rows+='<div class="sec-row'+(pct>=100?' full':'')+'"><a href="#'+sec.id+'">'+name+'</a><span class="bar"><span style="width:'+pct+'%"></span></span><span class="val">'+done+'/'+steps.length+' · '+pct+'%</span></div>';
+    });
+    if(rows)box.innerHTML='<h3>Your section scores</h3>'+rows; else box.style.display='none';
+  }
+
+  function restoreProgress(){
+    var nm=document.getElementById('g7name');if(nm)nm.textContent=g7current();
+    if(!localStorage.getItem(K('current'))&&nm&&!document.getElementById('g7guestnote')){var gw=document.createElement('a');gw.id='g7guestnote';gw.href='Grade_8_Math_Hub.html';gw.style.cssText='margin-left:.6rem;color:var(--orange);font-weight:600;text-decoration:none';gw.textContent='Not signed in — your work is NOT being saved. Tap to choose your name in the Hub.';nm.parentNode.appendChild(gw);}
+    var d=loadData();var topic=g7topic(g7all());
+    document.querySelectorAll('.qcard').forEach(function(card){
+      var qid=card.dataset.qid;if(!qid||!d[qid]||!d[qid].steps)return;
+      var steps=Array.prototype.slice.call(card.querySelectorAll('.step'));
+      steps.forEach(function(step,idx){
+        if(d[qid].steps[idx]){
+          step.classList.add('completed');step.classList.remove('locked');setStepDisabled(step,false);step.dataset.logged='1';step.dataset.att='1';
+          if(idx+1<steps.length){steps[idx+1].classList.remove('locked');setStepDisabled(steps[idx+1],false);}
+          var b=step.querySelector('.check-btn');if(b){b.classList.add('done');b.textContent=b.classList.contains('cr-save')?'Saved':'Step complete';}
+          var mc=step.querySelector('.mc-group');if(mc){mc.classList.add('answered');mc.querySelectorAll('.mc-option').forEach(function(o){o.classList.add('disabled');if(optCorrect(o))o.classList.add('correct');});var mfb=mc.parentElement.querySelector('.mc-feedback');if(mfb)mfb.classList.add('correct');}
+          var ms=step.querySelector('.ms-group');if(ms){ms.classList.add('answered');ms.querySelectorAll('.ms-option').forEach(function(o){o.classList.add('disabled');if(optCorrect(o))o.classList.add('correct');});}
+          var ta=step.querySelector('.cr-area');if(ta){var rs=(topic.responses||[]).filter(function(r){return r.qid===qid;});if(rs.length){ta.value=rs[rs.length-1].text;if(rs[rs.length-1].reviewed&&!step.querySelector('.cr-saved')){var rv=document.createElement('div');rv.className='cr-saved';rv.textContent='✓ Reviewed by your teacher';step.appendChild(rv);}}}
+          step.querySelectorAll('.ans-input').forEach(function(i){i.classList.add('correct');i.value=ansVal(i).split('|')[0];});
+        }
+      });
+    });
+    refreshOverall();
+  }
+  window.addEventListener('load',restoreProgress);
+
+  /* ===== v1.5 cloud sync (offline-first; shared multi-hub backend) ===== */
+  /* The /exec URL is public, so it grants nothing alone: a student authenticates with their
+     own PIN and can only ever read/write their OWN record. Modules never hold the teacher key.
+     Ported from Grade 8, which had this layer first. */
+  function g7pin(){try{var m=JSON.parse(localStorage.getItem(K('pins'))||'{}');var n=g7current();return (n&&m&&m[n]!==undefined)?String(m[n]):'';}catch(e){return '';}}
+  function syncPush(kind,name,sub,payload){var u=localStorage.getItem(K('sheetURL'));if(!u)return;try{fetch(u,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({op:'put',hub:G7_SYNC_HUB||'default',kind:kind,name:name,sub:sub||'',payload:payload,ts:Date.now(),pin:g7pin()})}).catch(function(){});}catch(e){}}
+  function syncPull(cb){var u=localStorage.getItem(K('sheetURL'));if(!u){cb(null);return;}try{var nm='__modcb'+Math.floor(Math.random()*1e9);var s=document.createElement('script');
+    window[nm]=function(doc){try{cb(doc||null);}finally{try{delete window[nm];}catch(e2){}if(s.parentNode)s.parentNode.removeChild(s);}};
+    s.onerror=function(){try{delete window[nm];}catch(e2){}if(s.parentNode)s.parentNode.removeChild(s);cb(null);};
+    s.src=u+(u.indexOf('?')>=0?'&':'?')+'op=pull&hub='+encodeURIComponent(G7_SYNC_HUB||'default')+'&cb='+nm+'&name='+encodeURIComponent(g7current()||'')+'&pin='+encodeURIComponent(g7pin());document.head.appendChild(s);}catch(e){cb(null);}}
+  var _pushT=null;
+  /* Debounced: a student answering quickly would otherwise fire a push per keystroke-check.
+     It re-reads storage when it fires, so every write since the last push rides along. */
+  function schedulePush(){if(!localStorage.getItem(K('sheetURL'))||!g7signedIn())return;clearTimeout(_pushT);_pushT=setTimeout(function(){try{var o=g7all();var s=g7current();var to=o.students&&o.students[s]&&o.students[s].topics&&o.students[s].topics[G7_TOPIC_ID];if(to)syncPush('topic',s,G7_TOPIC_ID,to);}catch(e){}},1500);}
+  function mergeCloudTopic(doc){if(!doc)return false;var s=g7current();var changed=false;
+    var o=g7all();var t=g7topic(o);
+    var c=doc.topics&&doc.topics[s]&&doc.topics[s][G7_TOPIC_ID];
+    if(c&&((c.lastPracticed||0)>(t.lastPracticed||0))){o.students[s].topics[G7_TOPIC_ID]=c;changed=true;}
+    var m=doc.reviews&&doc.reviews[s]&&doc.reviews[s][G7_TOPIC_ID];
+    if(m){var to=o.students[s].topics[G7_TOPIC_ID];((to&&to.responses)||[]).forEach(function(r){var k=String(r.ts);if(Object.prototype.hasOwnProperty.call(m,k)&&(r.reviewed||0)!==(m[k]||0)){r.reviewed=m[k]||0;changed=true;}});}
+    if(changed){g7save(o);}else if((t.lastPracticed||0)>((c&&c.lastPracticed)||0)){schedulePush();}
+    return changed;}
+  window.__modSync={mergeCloudTopic:mergeCloudTopic,schedulePush:schedulePush};
+  /* An authenticated pull always returns the student's own pin row, because authenticating as a
+     student REQUIRES a stored PIN. No pin row while holding a local PIN therefore proves the
+     backend is refusing us, and every write this module makes is going nowhere but this browser.
+     Neither half of that failure raises an error: syncPush is no-cors, and an unauthenticated pull
+     returns the same empty doc as "no cloud data yet". Say it out loud instead. */
+  function g7syncHealth(doc){
+    try{
+      var me=g7current(); if(!me||!doc)return;
+      var mine=g7pin(); if(!mine)return;
+      var el=document.getElementById('g7syncwarn');
+      if(doc.pins&&doc.pins[me]){if(el)el.remove();return;}
+      if(el)return;
+      el=document.createElement('div'); el.id='g7syncwarn'; el.setAttribute('role','alert');
+      el.style.cssText='background:#FEF3C7;border:1px solid #F59E0B;border-left:5px solid #B45309;'+
+        'color:#7C2D12;padding:.6rem .85rem;margin:.6rem 0;border-radius:8px;font-size:.9rem';
+      el.innerHTML='<strong>Your work is saving on this device, but it is not reaching your teacher.</strong> '+
+        'Keep going &mdash; nothing is lost here. If you still see this next time, ask Mr Gabriel to reset your PIN.';
+      var host=document.querySelector('.overall-progress');
+      if(host&&host.parentNode)host.parentNode.insertBefore(el,host);
+    }catch(e){}
+  }
+  window.addEventListener('load',function(){syncPull(function(doc){if(mergeCloudTopic(doc))restoreProgress();g7plotSync();g7syncHealth(doc);});});
+
+
+  /* ===== plot input (6th format) =============================================================
+     A number line or coordinate grid the student clicks to place a point. The value lives in a
+     hidden .ans-input inside the same .step, so the ordinary engine does all the real work:
+     checkInput (numeric tolerance or text match), setStepDisabled (locking), restoreProgress
+     (re-fill), g7revReset (clearing for retrieval). Nothing here touches an answer handler.
+     Markup:
+       <div class="plotbox" data-plot="line" data-min="-10" data-max="10" data-step="1">
+         <input type="hidden" class="ans-input" data-answer="k1:..." data-tol="0"/></div>
+       <div class="plotbox" data-plot="grid" data-xmax="10" data-ymax="20" data-xstep="1" data-ystep="2">
+         <input type="hidden" class="ans-input" data-type="text" data-answer="k1:..."/></div>
+  ============================================================================================ */
+  function g7plotNum(el,name,dflt){var v=parseFloat(el.dataset[name]);return isNaN(v)?dflt:v;}
+  function g7plotDraw(box){
+    var inp=box.querySelector('.ans-input'); if(!inp)return;
+    var kind=box.dataset.plot||'line', W=360, sv;
+    if(kind==='line'){
+      var mn=g7plotNum(box,'min',-10), mx=g7plotNum(box,'max',10), st=g7plotNum(box,'step',1);
+      var H=88, x0=26, x1=W-26, y=52;
+      var px=function(v){return x0+(v-mn)/(mx-mn)*(x1-x0);};
+      var parts=['<line class="axis" x1="'+x0+'" y1="'+y+'" x2="'+x1+'" y2="'+y+'"/>'];
+      for(var v=mn; v<=mx+1e-9; v+=st){
+        parts.push('<line class="tick" x1="'+px(v).toFixed(1)+'" y1="'+(y-6)+'" x2="'+px(v).toFixed(1)+'" y2="'+(y+6)+'"/>');
+        parts.push('<text class="tlab" x="'+px(v).toFixed(1)+'" y="'+(y+22)+'" text-anchor="middle">'+(Math.round(v*100)/100)+'</text>');
+        parts.push('<circle class="hint-dot" cx="'+px(v).toFixed(1)+'" cy="'+y+'" r="2"/>');
+      }
+      var cur=parseFloat(inp.value);
+      if(!isNaN(cur)&&cur>=mn&&cur<=mx) parts.push('<circle class="pt" cx="'+px(cur).toFixed(1)+'" cy="'+y+'" r="7"/>');
+      parts.push('<rect class="hit" x="0" y="0" width="'+W+'" height="'+H+'"/>');
+      var _cur=parseFloat(inp.value);
+      sv='<svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" tabindex="0" role="slider" '+
+        'aria-valuemin="'+mn+'" aria-valuemax="'+mx+'" aria-valuenow="'+(isNaN(_cur)?'':_cur)+'" '+
+        'aria-label="Number line from '+mn+' to '+mx+'. Use the arrow keys to move the point, or click.">'+parts.join('')+'</svg>';
+    } else {
+      var xmn=g7plotNum(box,'xmin',0), xmx=g7plotNum(box,'xmax',10), xst=g7plotNum(box,'xstep',1);
+      var ymn=g7plotNum(box,'ymin',0), ymx=g7plotNum(box,'ymax',10), yst=g7plotNum(box,'ystep',1);
+      var H=300, L=44, R=W-16, T=16, B=H-40;
+      var gx=function(v){return L+(v-xmn)/(xmx-xmn)*(R-L);};
+      var gy=function(v){return B-(v-ymn)/(ymx-ymn)*(B-T);};
+      var g=[],i;
+      for(i=xmn;i<=xmx+1e-9;i+=xst){
+        g.push('<line class="gridline" x1="'+gx(i).toFixed(1)+'" y1="'+T+'" x2="'+gx(i).toFixed(1)+'" y2="'+B+'"/>');
+        g.push('<text class="tlab" x="'+gx(i).toFixed(1)+'" y="'+(B+18)+'" text-anchor="middle">'+(Math.round(i*100)/100)+'</text>');
+      }
+      for(i=ymn;i<=ymx+1e-9;i+=yst){
+        g.push('<line class="gridline" x1="'+L+'" y1="'+gy(i).toFixed(1)+'" x2="'+R+'" y2="'+gy(i).toFixed(1)+'"/>');
+        g.push('<text class="tlab" x="'+(L-7)+'" y="'+(gy(i)+4).toFixed(1)+'" text-anchor="end">'+(Math.round(i*100)/100)+'</text>');
+      }
+      g.push('<line class="axis" x1="'+L+'" y1="'+B+'" x2="'+R+'" y2="'+B+'"/>');
+      g.push('<line class="axis" x1="'+L+'" y1="'+T+'" x2="'+L+'" y2="'+B+'"/>');
+      var pr=String(inp.value||'').split(',');
+      if(pr.length===2){
+        var cx=parseFloat(pr[0]), cy=parseFloat(pr[1]);
+        if(!isNaN(cx)&&!isNaN(cy)&&cx>=xmn&&cx<=xmx&&cy>=ymn&&cy<=ymx)
+          g.push('<circle class="pt" cx="'+gx(cx).toFixed(1)+'" cy="'+gy(cy).toFixed(1)+'" r="7"/>');
+      }
+      g.push('<rect class="hit" x="0" y="0" width="'+W+'" height="'+H+'"/>');
+      sv='<svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" tabindex="0" role="application" '+
+        'aria-label="Coordinate grid, x from '+xmn+' to '+xmx+', y from '+ymn+' to '+ymx+'. '+
+        'Use the arrow keys to move the point, or click. Current point: '+(inp.value||'none')+'.">'+g.join('')+'</svg>';
+    }
+    var old=box.querySelector('svg'); if(old)old.parentNode.removeChild(old);
+    box.insertAdjacentHTML('afterbegin',sv);
+    var ro=box.querySelector('.readout');
+    if(!ro){ro=document.createElement('div');ro.className='readout';box.appendChild(ro);}
+    ro.textContent=inp.value?('Placed: '+(box.dataset.plot==='grid'?'('+inp.value+')':inp.value)):'Click to place your point, or focus it and use the arrow keys.';
+    box.classList.toggle('locked',!!inp.disabled);
+  }
+  function g7plotSet(box,evt){
+    var inp=box.querySelector('.ans-input');
+    if(!inp||inp.disabled)return;                       // a locked step must stay locked
+    var svg=box.querySelector('svg'); if(!svg)return;
+    // Read the viewBox ATTRIBUTE rather than svg.viewBox.baseVal: the SVG DOM geometry interfaces
+    // are not universally implemented (jsdom has none), and an attribute parse works everywhere.
+    var r=svg.getBoundingClientRect();
+    var vb=String(svg.getAttribute('viewBox')||'0 0 360 100').split(/[\s,]+/).map(parseFloat);
+    var vw=vb[2]||360, vh=vb[3]||100;
+    var sx=vw/(r.width||vw), sy=vh/(r.height||vh);
+    var px=(evt.clientX-r.left)*sx, py=(evt.clientY-r.top)*sy;
+    var snap=function(v,st,mn,mx){var n=mn+Math.round((v-mn)/st)*st;return Math.min(mx,Math.max(mn,Math.round(n*1e6)/1e6));};
+    if((box.dataset.plot||'line')==='line'){
+      var mn=g7plotNum(box,'min',-10), mx=g7plotNum(box,'max',10), st=g7plotNum(box,'step',1);
+      var x0=26, x1=360-26;
+      var v=mn+(px-x0)/(x1-x0)*(mx-mn);
+      inp.value=String(snap(v,st,mn,mx));
+    } else {
+      var xmn=g7plotNum(box,'xmin',0), xmx=g7plotNum(box,'xmax',10), xst=g7plotNum(box,'xstep',1);
+      var ymn=g7plotNum(box,'ymin',0), ymx=g7plotNum(box,'ymax',10), yst=g7plotNum(box,'ystep',1);
+      var L=44, R=360-16, T=16, B=300-40;
+      var vx=xmn+(px-L)/(R-L)*(xmx-xmn), vy=ymn+(B-py)/(B-T)*(ymx-ymn);
+      inp.value=snap(vx,xst,xmn,xmx)+','+snap(vy,yst,ymn,ymx);
+    }
+    inp.classList.remove('correct','wrong');
+    g7plotDraw(box);
+  }
+  function g7plotSync(){Array.prototype.forEach.call(document.querySelectorAll('.plotbox'),g7plotDraw);}
+  document.addEventListener('click',function(e){
+    var box=e.target.closest&&e.target.closest('.plotbox');
+    if(box&&e.target.classList.contains('hit'))g7plotSet(box,e);
+  });
+
+  /* Keyboard operation. Shipped click-only, which locked keyboard and screen-reader users out of
+     every plot item — including a real released MCAP capstone. Arrow keys step the point; Home/End
+     jump to the ends; the first press on an empty plot starts in the middle rather than doing
+     nothing, so there is always a way in without a pointer. */
+  function g7plotKey(box, e){
+    var inp=box.querySelector('.ans-input');
+    if(!inp||inp.disabled)return;
+    var k=e.key, grid=(box.dataset.plot||'line')==='grid';
+    var mn,mx,st,xmn,xmx,xst,ymn,ymx,yst,vx,vy;
+    var clamp=function(v,a,b){return Math.min(b,Math.max(a,Math.round(v*1e6)/1e6));};
+    if(!grid){
+      mn=g7plotNum(box,'min',-10); mx=g7plotNum(box,'max',10); st=g7plotNum(box,'step',1);
+      var cur=parseFloat(inp.value);
+      if(isNaN(cur)){ if(k.indexOf('Arrow')!==0&&k!=='Home'&&k!=='End')return;
+        cur=clamp(mn+Math.round(((mn+mx)/2-mn)/st)*st,mn,mx); }
+      else if(k==='ArrowLeft'||k==='ArrowDown')cur=clamp(cur-st,mn,mx);
+      else if(k==='ArrowRight'||k==='ArrowUp')cur=clamp(cur+st,mn,mx);
+      else if(k==='Home')cur=mn; else if(k==='End')cur=mx;
+      else return;
+      inp.value=String(cur);
+    } else {
+      xmn=g7plotNum(box,'xmin',0); xmx=g7plotNum(box,'xmax',10); xst=g7plotNum(box,'xstep',1);
+      ymn=g7plotNum(box,'ymin',0); ymx=g7plotNum(box,'ymax',10); yst=g7plotNum(box,'ystep',1);
+      var pr=String(inp.value||'').split(','); vx=parseFloat(pr[0]); vy=parseFloat(pr[1]);
+      if(isNaN(vx)||isNaN(vy)){ if(k.indexOf('Arrow')!==0&&k!=='Home'&&k!=='End')return;
+        vx=clamp(xmn+Math.round(((xmn+xmx)/2-xmn)/xst)*xst,xmn,xmx);
+        vy=clamp(ymn+Math.round(((ymn+ymx)/2-ymn)/yst)*yst,ymn,ymx); }
+      else if(k==='ArrowLeft')vx=clamp(vx-xst,xmn,xmx);
+      else if(k==='ArrowRight')vx=clamp(vx+xst,xmn,xmx);
+      else if(k==='ArrowDown')vy=clamp(vy-yst,ymn,ymx);
+      else if(k==='ArrowUp')vy=clamp(vy+yst,ymn,ymx);
+      else if(k==='Home'){vx=xmn;vy=ymn;} else if(k==='End'){vx=xmx;vy=ymx;}
+      else return;
+      inp.value=vx+','+vy;
+    }
+    e.preventDefault();
+    inp.classList.remove('correct','wrong');
+    g7plotDraw(box);
+    var sv=box.querySelector('svg'); if(sv&&sv.focus)sv.focus();   // redraw replaces the node
+  }
+  document.addEventListener('keydown',function(e){
+    var box=e.target.closest&&e.target.closest('.plotbox');
+    if(box)g7plotKey(box,e);
+  });
+
+  window.__modPlot={sync:g7plotSync,draw:g7plotDraw,key:g7plotKey};
+
+  /* ===== spaced review (MR-1) phase-3: in-module retrieval mode, ?review=<skill> ===== */
+  // Why this exists: restoreProgress() re-fills a completed item with its own correct answer, so a
+  // student sent back by the hub's "Due for review" would have re-read an answer key — the opposite
+  // of retrieval. Review mode takes the due skill's ALREADY-AUTHORED items (no new content), clears
+  // them for a real attempt, and hides the rest of the lesson. The stored tree is never touched, so
+  // the mastery bar stays monotonic; the re-attempt logs normally and lands in the AN-4 retention
+  // bucket because the topic was due when the session started.
+  var _oCap=false;
+  function g7capture(){                                   // originals, snapshotted before any restore
+    if(_oCap)return;_oCap=true;
+    Array.prototype.forEach.call(document.querySelectorAll('.qcard .step'),function(s){
+      s.dataset.olock=s.classList.contains('locked')?'1':'0';
+      var b=s.querySelector('.check-btn');if(b&&b.dataset.olbl===undefined)b.dataset.olbl=b.textContent;
+      var f=s.querySelector('.mc-feedback');if(f&&f.dataset.exp===undefined)f.dataset.exp=f.textContent||'';
+    });
+  }
+  g7capture();
+  function g7hubHref(){var a=document.querySelector('a[href$="Hub.html"]');return (a&&a.getAttribute('href'))||'index.html';}
+  function g7revParam(){try{return (new URLSearchParams(location.search)).get('review')||'';}catch(e){return '';}}
+  // The retrieval core for a skill: its Target/Exam items. Learn/Guided are scaffolded re-reads and
+  // Stretch is beyond the standard, so neither belongs in a review set — but if a skill authored
+  // nothing else, fall back to what exists rather than showing an empty panel.
+  function g7revSet(sk){
+    var core=[],any=[];
+    Array.prototype.forEach.call(document.querySelectorAll('.qcard[data-qid]'),function(c){
+      var q=c.dataset.qid;if((G7_SKILLS[q]||'reasoning')!==sk)return;
+      any.push(c);var lv=g7level(q);if(lv===2||lv===3)core.push(c);
+    });
+    return (core.length?core:any).slice(0,4);           // a short set — review is a pass, not a re-run
+  }
+  function g7revReset(card){
+    Array.prototype.forEach.call(card.querySelectorAll('.step'),function(s){
+      s.classList.remove('completed');
+      delete s.dataset.att;delete s.dataset.logged;
+      var lock=s.dataset.olock==='1';
+      s.classList.toggle('locked',lock);setStepDisabled(s,lock);
+      var b=s.querySelector('.check-btn');
+      if(b){b.classList.remove('done');if(b.dataset.olbl!==undefined)b.textContent=b.dataset.olbl;b.disabled=lock;}
+      Array.prototype.forEach.call(s.querySelectorAll('.ans-input'),function(i){
+        i.value='';i.classList.remove('correct','wrong');i.dataset.simplify='';});
+      Array.prototype.forEach.call(s.querySelectorAll('.feedback'),function(f){
+        f.textContent='';f.classList.remove('correct','wrong');});
+      var mc=s.querySelector('.mc-group');
+      if(mc){mc.classList.remove('answered');Array.prototype.forEach.call(mc.querySelectorAll('.mc-option'),function(o){
+        o.classList.remove('disabled','correct','wrong','sel','cooldown');});}
+      var mfb=s.querySelector('.mc-feedback');
+      if(mfb){mfb.classList.remove('correct','wrong');if(mfb.dataset.exp!==undefined)mfb.textContent=mfb.dataset.exp;}
+      var ms=s.querySelector('.ms-group');
+      if(ms){ms.classList.remove('answered');Array.prototype.forEach.call(ms.querySelectorAll('.ms-option'),function(o){
+        o.classList.remove('disabled','correct','wrong','sel');});}
+      var ta=s.querySelector('.cr-area');if(ta)ta.value='';
+      var sv=s.querySelector('.cr-saved');if(sv&&sv.parentNode)sv.parentNode.removeChild(sv);
+      var hc=s.querySelector('.hint-content');if(hc)hc.classList.remove('show');
+      var hb=s.querySelector('.hint-btn');if(hb)hb.textContent='Hint';
+    });
+    if(window.__modPlot)Array.prototype.forEach.call(card.querySelectorAll('.plotbox'),g7plotDraw);
+  }
+  function g7reviewMode(){
+    var sk=g7revParam();if(!sk)return;
+    var set=g7revSet(sk);if(!set.length)return;          // unknown/unauthored skill -> the normal lesson
+    var panel=document.createElement('div');panel.className='rev-panel';panel.id='g7-review-panel';
+    var h=document.createElement('h2');h.textContent='Review — '+(G7_SKILL_LABELS[sk]||sk);
+    var p=document.createElement('p');p.className='rev-sub';
+    p.textContent=set.length+' item'+(set.length===1?'':'s')+' you have worked before, cleared for a fresh '+
+      'attempt. Answer from memory — pulling it back is what makes it stick. Nothing here can move your '+
+      'mastery bar down.';
+    panel.appendChild(h);panel.appendChild(p);
+    set.forEach(function(c){g7revReset(c);panel.appendChild(c);});   // moved, never removed: totals stay honest
+    var done=document.createElement('div');done.className='rev-done';
+    var a1=document.createElement('a');a1.className='btn';a1.href=g7hubHref();a1.textContent='Done — back to the Hub';
+    var a2=document.createElement('a');a2.className='btn ghost';
+    a2.href=(location.pathname.split('/').pop()||'');a2.textContent='Open the full lesson';
+    done.appendChild(a1);done.appendChild(a2);panel.appendChild(done);
+    var first=document.querySelector('section.topic');
+    if(first&&first.parentNode)first.parentNode.insertBefore(panel,first);
+    else (document.querySelector('.container')||document.body).appendChild(panel);
+    document.body.classList.add('g7-review-mode');
+  }
+  /* ===== homework deep-link: ?q=<qid>[,<qid>...] =====
+   * A homework set can reference exact questions in this module. Reuses the review reset so the
+   * student makes a REAL attempt; the stored tree is untouched, so the hub reads completion back. */
+  function g7hwParam(){try{return (new URLSearchParams(location.search)).get('q')||'';}catch(e){return '';}}
+  function g7hwSet(csv){
+    var want=String(csv||'').split(',').map(function(s){return s.trim();}).filter(Boolean);
+    var byId={};
+    Array.prototype.forEach.call(document.querySelectorAll('.qcard[data-qid]'),function(c){byId[c.dataset.qid]=c;});
+    var out=[];
+    want.forEach(function(q){var c=byId[q];if(c&&out.indexOf(c)<0)out.push(c);});
+    return out;                                           // order follows the homework set, not the page
+  }
+  function g7homeworkMode(){
+    var csv=g7hwParam();if(!csv)return false;
+    var set=g7hwSet(csv);if(!set.length)return false;     // unknown qid -> fall through to the normal lesson
+    var panel=document.createElement('div');panel.className='rev-panel';panel.id='g7-homework-panel';
+    var h=document.createElement('h2');h.textContent='Homework';
+    var p=document.createElement('p');p.className='rev-sub';
+    p.textContent=set.length+' question'+(set.length===1?'':'s')+' set for you, cleared for a fresh '+
+      'attempt. Work each one out before you answer.';
+    panel.appendChild(h);panel.appendChild(p);
+    set.forEach(function(c){g7revReset(c);panel.appendChild(c);});
+    var done=document.createElement('div');done.className='rev-done';
+    var a1=document.createElement('a');a1.className='btn';a1.href=g7hubHref();a1.textContent='Done — back to the Hub';
+    var a2=document.createElement('a');a2.className='btn ghost';
+    a2.href=(location.pathname.split('/').pop()||'');a2.textContent='Open the full lesson';
+    done.appendChild(a1);done.appendChild(a2);panel.appendChild(done);
+    var first=document.querySelector('section.topic');
+    if(first&&first.parentNode)first.parentNode.insertBefore(panel,first);
+    else (document.querySelector('.container')||document.body).appendChild(panel);
+    document.body.classList.add('g7-review-mode');
+    return true;
+  }
+  // Homework wins over review: it is an explicit instruction, not a suggestion.
+  window.addEventListener('load',function(){if(!g7homeworkMode())g7reviewMode();});
+  window.__modHomeworkMode={set:g7hwSet,mode:g7homeworkMode,param:g7hwParam};
+  window.__modReviewMode={set:g7revSet,reset:g7revReset,mode:g7reviewMode,param:g7revParam};
+
+  document.getElementById('btn-export').addEventListener('click',function(){
+    var d=loadData();var cards=document.querySelectorAll('.qcard');var lines=[],td=0,ts=0;
+    cards.forEach(function(c){var q=c.dataset.qid||'?';var title=(c.querySelector('.qtitle')||{}).textContent||'';var steps=c.querySelectorAll('.step');ts+=steps.length;var done=0;if(d[q]&&d[q].steps)done=Object.keys(d[q].steps).filter(function(k){return d[q].steps[k];}).length;td+=done;lines.push(q.padEnd(8)+(done+'/'+steps.length).padEnd(8)+title.trim());});
+    var date=new Date().toLocaleDateString('en-US',{day:'2-digit',month:'short',year:'numeric'});
+    var sum=G7_TOPIC_TITLE+' — Progress Report\nStudent: '+g7current()+'    Date: '+date+'\n'+'='.repeat(58)+'\nOverall: '+td+' / '+ts+' steps  ('+(ts?Math.round(td/ts*100):0)+'%)\n'+'='.repeat(58)+'\n\n'+lines.join('\n');
+    var blob=new Blob([sum],{type:'text/plain'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='progress-'+g7current().replace(/\W+/g,'_')+'-'+new Date().toISOString().slice(0,10)+'.txt';a.click();URL.revokeObjectURL(a.href);
+  });
+  document.getElementById('btn-reset-all').addEventListener('click',function(){if(!confirm('Reset your progress for this module? This cannot be undone.'))return;var o=g7all();var s=g7current();if(o.students&&o.students[s]&&o.students[s].topics){delete o.students[s].topics[G7_TOPIC_ID];g7save(o);}location.reload();});
+
+  var sections=document.querySelectorAll('section.topic'),navlinks=document.querySelectorAll('.navlink');
+  function updateActive(){var cur='';sections.forEach(function(s){if(window.scrollY+120>=s.offsetTop)cur=s.id;});navlinks.forEach(function(a){a.classList.toggle('active',a.getAttribute('href')==='#'+cur);});}
+  window.addEventListener('scroll',updateActive);window.addEventListener('load',updateActive);
+</script>
+</body>
+</html>

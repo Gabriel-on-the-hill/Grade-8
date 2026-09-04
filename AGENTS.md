@@ -58,3 +58,7 @@ moment a per-student folder or note is added here, it must be gitignored *before
 it goes to the public internet attached to a named minor (root rule 6). Grade 7 already does this for
 `<student>/`. Follow that pattern: private student data is ignored, and a `LEDGER.md` (tutor-facing,
 never student-readable) is where per-student state lives. Ask the `pedagogy` skill to set one up.
+
+## Imported Claude Cowork project instructions
+
+BUILDING EDUCATIONAL HUB FOR GRADE 8
